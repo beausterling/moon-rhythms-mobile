@@ -1,29 +1,33 @@
 {
   "expo": {
-    "name": "moon-rhythms-mobile",
-    "slug": "moon-rhythms-mobile",
+    "name": "Moon Rhythms",
+    "slug": "moon-rhythms",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "scheme": "moon-rhythms",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0a0a1a"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.moonrhythms.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Moon Rhythms uses your location to calculate accurate moon positions for your exact coordinates."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.moonrhythms.app"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "plugins": ["expo-router"]
   }
 }
