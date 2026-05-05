@@ -28,6 +28,14 @@
       "edgeToEdgeEnabled": true,
       "package": "com.moonrhythms.app"
     },
-    "plugins": ["expo-router"]
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-sqlite"
+    ]
   }
 }
