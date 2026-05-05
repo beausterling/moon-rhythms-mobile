@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,26 +6,26 @@ import {
   Pressable,
   Dimensions,
   ActivityIndicator,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Image } from 'expo-image';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Image } from "expo-image";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
   runOnJS,
-} from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { useMoonPosition } from '../../hooks/useMoonPosition';
+} from "react-native-reanimated";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { useMoonPosition } from "../../hooks/useMoonPosition";
 import {
   getFrameFromAngle,
   getMoonFrameUri,
   interpolatePosition,
   formatDegrees,
   formatOffsetLabel,
-} from '../../lib/moon-calc';
+} from "../../lib/moon-calc";
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const TRACK_PADDING = 32;
 const TRACK_WIDTH = SCREEN_WIDTH - TRACK_PADDING * 2;
 const HALF_TRACK = TRACK_WIDTH / 2;
@@ -48,18 +48,21 @@ export default function HomeScreen() {
 
   const gesture = Gesture.Pan()
     .onStart(() => {
-      'worklet';
+      "worklet";
       startX.value = thumbX.value;
     })
     .onUpdate((e) => {
-      'worklet';
-      const newX = Math.max(-HALF_TRACK, Math.min(HALF_TRACK, startX.value + e.translationX));
+      "worklet";
+      const newX = Math.max(
+        -HALF_TRACK,
+        Math.min(HALF_TRACK, startX.value + e.translationX),
+      );
       thumbX.value = newX;
       const hours = (newX / HALF_TRACK) * MAX_HOURS;
       runOnJS(updateOffset)(hours);
     })
     .onEnd(() => {
-      'worklet';
+      "worklet";
       // Snap to center if close
       if (Math.abs(thumbX.value) < 12) {
         thumbX.value = withSpring(0, { damping: 20, stiffness: 300 });
@@ -120,7 +123,7 @@ export default function HomeScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#00ff41" />
+        <ActivityIndicator size="large" color="#7BA5FF" />
         <Text className="text-text-secondary text-sm font-josefin mt-4">
           Locating the Moon...
         </Text>
@@ -154,12 +157,12 @@ export default function HomeScreen() {
   if (!display) return null;
 
   const timeString = display.time.toLocaleTimeString([], {
-    hour: 'numeric',
-    minute: '2-digit',
+    hour: "numeric",
+    minute: "2-digit",
   });
   const dateString = display.time.toLocaleDateString([], {
-    month: 'short',
-    day: 'numeric',
+    month: "short",
+    day: "numeric",
   });
 
   return (
@@ -168,14 +171,20 @@ export default function HomeScreen() {
         contentContainerStyle={{
           paddingTop: insets.top + 16,
           paddingBottom: 56 + insets.bottom + 24, // tab bar height + safe area
-          alignItems: 'center',
+          alignItems: "center",
         }}
         showsVerticalScrollIndicator={false}
       >
         {/* Stale indicator */}
         {isStale && (
-          <View className="mx-8 mb-4 px-4 py-2 rounded-lg" style={{ backgroundColor: 'rgba(245,158,11,0.15)' }}>
-            <Text className="text-center text-xs font-josefin" style={{ color: '#f59e0b' }}>
+          <View
+            className="mx-8 mb-4 px-4 py-2 rounded-lg"
+            style={{ backgroundColor: "rgba(245,158,11,0.15)" }}
+          >
+            <Text
+              className="text-center text-xs font-josefin"
+              style={{ color: "#f59e0b" }}
+            >
               Showing cached data &middot; Tap to retry
             </Text>
           </View>
@@ -184,9 +193,13 @@ export default function HomeScreen() {
         {/* Time offset banner */}
         {!display.isLive && (
           <Pressable onPress={resetToNow} className="mb-2">
-            <View className="px-4 py-1.5 rounded-full" style={{ backgroundColor: 'rgba(0,255,65,0.1)' }}>
+            <View
+              className="px-4 py-1.5 rounded-full"
+              style={{ backgroundColor: "rgba(123,165,255,0.1)" }}
+            >
               <Text className="text-accent text-xs font-josefin text-center">
-                {formatOffsetLabel(displayOffset)} &middot; {dateString} {timeString} &middot; Tap for Now
+                {formatOffsetLabel(displayOffset)} &middot; {dateString}{" "}
+                {timeString} &middot; Tap for Now
               </Text>
             </View>
           </Pressable>
@@ -226,7 +239,7 @@ export default function HomeScreen() {
         {/* Zodiac card */}
         <View
           className="mt-6 mx-8 rounded-2xl px-6 py-5 items-center"
-          style={{ backgroundColor: 'rgba(18,18,42,0.8)' }}
+          style={{ backgroundColor: "rgba(18,18,42,0.8)" }}
         >
           <Text style={{ fontSize: 48, lineHeight: 56 }}>
             {display.zodiacSymbol}
@@ -243,33 +256,34 @@ export default function HomeScreen() {
         </View>
 
         {/* 72-Hour Time Scrubber */}
-        <View className="mt-8 w-full" style={{ paddingHorizontal: TRACK_PADDING }}>
+        <View
+          className="mt-8 w-full"
+          style={{ paddingHorizontal: TRACK_PADDING }}
+        >
           <Text className="text-text-secondary text-xs font-josefin text-center mb-3">
             72-Hour Time Scrubber
           </Text>
 
           <GestureDetector gesture={gesture}>
-            <View
-              style={{ height: 48, justifyContent: 'center' }}
-            >
+            <View style={{ height: 48, justifyContent: "center" }}>
               {/* Track background */}
               <View
                 className="rounded-full"
                 style={{
                   height: 3,
-                  backgroundColor: 'rgba(42,42,74,0.8)',
-                  width: '100%',
+                  backgroundColor: "rgba(42,42,74,0.8)",
+                  width: "100%",
                 }}
               />
 
               {/* Center tick (Now) */}
               <View
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   left: HALF_TRACK - 0.5,
                   width: 1,
                   height: 12,
-                  backgroundColor: 'rgba(136,136,170,0.4)',
+                  backgroundColor: "rgba(136,136,170,0.4)",
                   top: 18,
                 }}
               />
@@ -279,11 +293,11 @@ export default function HomeScreen() {
                 <View
                   key={pct}
                   style={{
-                    position: 'absolute',
+                    position: "absolute",
                     left: HALF_TRACK + pct * TRACK_WIDTH - 0.5,
                     width: 1,
                     height: 8,
-                    backgroundColor: 'rgba(136,136,170,0.2)',
+                    backgroundColor: "rgba(136,136,170,0.2)",
                     top: 20,
                   }}
                 />
@@ -293,14 +307,14 @@ export default function HomeScreen() {
               <Animated.View
                 style={[
                   {
-                    position: 'absolute',
+                    position: "absolute",
                     left: HALF_TRACK - THUMB_SIZE / 2,
                     top: (48 - THUMB_SIZE) / 2,
                     width: THUMB_SIZE,
                     height: THUMB_SIZE,
                     borderRadius: THUMB_SIZE / 2,
-                    backgroundColor: '#00ff41',
-                    shadowColor: '#00ff41',
+                    backgroundColor: "#7BA5FF",
+                    shadowColor: "#7BA5FF",
                     shadowOffset: { width: 0, height: 0 },
                     shadowOpacity: 0.5,
                     shadowRadius: 8,
@@ -314,20 +328,32 @@ export default function HomeScreen() {
 
           {/* Scrubber labels */}
           <View className="flex-row justify-between mt-1">
-            <Text className="text-text-secondary text-xs font-josefin" style={{ opacity: 0.5 }}>
+            <Text
+              className="text-text-secondary text-xs font-josefin"
+              style={{ opacity: 0.5 }}
+            >
               -36h
             </Text>
-            <Text className="text-text-secondary text-xs font-josefin" style={{ opacity: 0.5 }}>
+            <Text
+              className="text-text-secondary text-xs font-josefin"
+              style={{ opacity: 0.5 }}
+            >
               Now
             </Text>
-            <Text className="text-text-secondary text-xs font-josefin" style={{ opacity: 0.5 }}>
+            <Text
+              className="text-text-secondary text-xs font-josefin"
+              style={{ opacity: 0.5 }}
+            >
               +36h
             </Text>
           </View>
         </View>
 
         {/* Source attribution */}
-        <Text className="text-text-secondary text-xs font-josefin mt-8" style={{ opacity: 0.4 }}>
+        <Text
+          className="text-text-secondary text-xs font-josefin mt-8"
+          style={{ opacity: 0.4 }}
+        >
           {display.source}
         </Text>
 
@@ -339,11 +365,14 @@ export default function HomeScreen() {
                 width: 6,
                 height: 6,
                 borderRadius: 3,
-                backgroundColor: '#00ff41',
+                backgroundColor: "#7BA5FF",
                 marginRight: 6,
               }}
             />
-            <Text className="text-text-secondary text-xs font-josefin" style={{ opacity: 0.5 }}>
+            <Text
+              className="text-text-secondary text-xs font-josefin"
+              style={{ opacity: 0.5 }}
+            >
               Live
             </Text>
           </View>

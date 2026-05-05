@@ -1,31 +1,32 @@
-import { View, Text, ScrollView, Pressable } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { View, Text, ScrollView, Pressable } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const QUIZZES = [
   {
-    title: 'MBTI',
-    subtitle: '32 questions',
-    description: 'Explore how you tend to perceive, decide, and recharge.',
-    icon: 'sparkles-outline',
+    title: "MBTI",
+    subtitle: "32 questions",
+    description: "Explore how you tend to perceive, decide, and recharge.",
+    icon: "sparkles-outline",
   },
   {
-    title: 'Big Five',
-    subtitle: '50 questions',
-    description: 'Map openness, conscientiousness, extraversion, agreeableness, and neuroticism.',
-    icon: 'analytics-outline',
+    title: "Big Five",
+    subtitle: "50 questions",
+    description:
+      "Map openness, conscientiousness, extraversion, agreeableness, and neuroticism.",
+    icon: "analytics-outline",
   },
   {
-    title: 'Enneagram',
-    subtitle: '36 questions',
-    description: 'Find the motivation pattern behind your default reactions.',
-    icon: 'aperture-outline',
+    title: "Enneagram",
+    subtitle: "36 questions",
+    description: "Find the motivation pattern behind your default reactions.",
+    icon: "aperture-outline",
   },
   {
-    title: 'DISC',
-    subtitle: '28 questions',
-    description: 'Understand your communication and collaboration style.',
-    icon: 'compass-outline',
+    title: "DISC",
+    subtitle: "28 questions",
+    description: "Understand your communication and collaboration style.",
+    icon: "compass-outline",
   },
 ] as const;
 
@@ -42,11 +43,15 @@ export default function QuizzesScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        <Text className="text-text-primary font-josefin-semibold" style={{ fontSize: 28, lineHeight: 34 }}>
+        <Text
+          className="text-text-primary font-josefin-semibold"
+          style={{ fontSize: 28, lineHeight: 34 }}
+        >
           Quizzes
         </Text>
         <Text className="text-text-secondary text-base font-josefin mt-2">
-          Personality assessments will score on-device and sync when you are online.
+          Personality assessments will score on-device and sync when you are
+          online.
         </Text>
 
         <View className="mt-6 gap-4">
@@ -60,9 +65,9 @@ export default function QuizzesScreen() {
               <View className="flex-row items-start">
                 <View
                   className="w-11 h-11 rounded-xl items-center justify-center mr-4"
-                  style={{ backgroundColor: 'rgba(0,255,65,0.1)' }}
+                  style={{ backgroundColor: "rgba(123,165,255,0.1)" }}
                 >
-                  <Ionicons name={quiz.icon} size={22} color="#00ff41" />
+                  <Ionicons name={quiz.icon} size={22} color="#7BA5FF" />
                 </View>
                 <View className="flex-1">
                   <View className="flex-row items-center justify-between">

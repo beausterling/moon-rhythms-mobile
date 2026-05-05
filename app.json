@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0a0a1a"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": true,
@@ -32,10 +32,6 @@
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
-    "plugins": [
-      "expo-router",
-      "expo-font",
-      "expo-sqlite"
-    ]
+    "plugins": ["expo-router", "expo-font", "expo-sqlite"]
   }
 }

@@ -1,21 +1,21 @@
-import { Tabs } from 'expo-router';
-import { StyleSheet } from 'react-native';
-import { BlurView } from 'expo-blur';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Tabs } from "expo-router";
+import { StyleSheet } from "react-native";
+import { BlurView } from "expo-blur";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#00ff41',
-        tabBarInactiveTintColor: '#8888aa',
+        tabBarActiveTintColor: "#7BA5FF",
+        tabBarInactiveTintColor: "#8888aa",
         tabBarStyle: {
-          backgroundColor: 'rgba(10, 10, 26, 0.8)',
-          borderTopColor: 'rgba(255, 255, 255, 0.08)',
+          backgroundColor: "rgba(10, 10, 26, 0.8)",
+          borderTopColor: "rgba(255, 255, 255, 0.08)",
           borderTopWidth: 1,
           height: 56,
-          position: 'absolute',
+          position: "absolute",
         },
         tabBarBackground: () => (
           <BlurView
@@ -25,7 +25,7 @@ export default function TabLayout() {
           />
         ),
         tabBarLabelStyle: {
-          fontFamily: 'JosefinSans-Regular',
+          fontFamily: "JosefinSans-Regular",
           fontSize: 12,
         },
       }}
@@ -33,10 +33,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: "Home",
           tabBarIcon: ({ focused, color }) => (
             <Ionicons
-              name={focused ? 'moon' : 'moon-outline'}
+              name={focused ? "moon" : "moon-outline"}
               size={24}
               color={color}
             />
@@ -46,10 +46,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="quizzes"
         options={{
-          title: 'Quizzes',
+          title: "Quizzes",
           tabBarIcon: ({ focused, color }) => (
             <Ionicons
-              name={focused ? 'help-circle' : 'help-circle-outline'}
+              name={focused ? "help-circle" : "help-circle-outline"}
               size={24}
               color={color}
             />
@@ -59,10 +59,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="dashboard"
         options={{
-          title: 'Dashboard',
+          title: "Dashboard",
           tabBarIcon: ({ focused, color }) => (
             <Ionicons
-              name={focused ? 'grid' : 'grid-outline'}
+              name={focused ? "grid" : "grid-outline"}
               size={24}
               color={color}
             />

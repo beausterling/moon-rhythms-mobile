@@ -36,6 +36,9 @@ yarn-error.*
 # Claude Code agent state
 .claude/
 
+# Supabase CLI cache
+supabase/.temp/
+
 # typescript
 *.tsbuildinfo
 

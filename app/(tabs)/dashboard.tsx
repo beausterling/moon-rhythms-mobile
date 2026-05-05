@@ -1,23 +1,23 @@
-import { View, Text, Pressable, Alert, ScrollView } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { useAuth } from '../../lib/auth';
+import { View, Text, Pressable, Alert, ScrollView } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useAuth } from "../../lib/auth";
 
 const READING_TYPES = [
   {
-    title: 'Natal Chart',
-    subtitle: 'Birth matrix and chart wheel',
-    icon: 'radio-button-on-outline',
+    title: "Natal Chart",
+    subtitle: "Birth matrix and chart wheel",
+    icon: "radio-button-on-outline",
   },
   {
-    title: 'Human Design',
-    subtitle: 'Bodygraph view opens in-app',
-    icon: 'body-outline',
+    title: "Human Design",
+    subtitle: "Bodygraph view opens in-app",
+    icon: "body-outline",
   },
   {
-    title: 'Quiz Results',
-    subtitle: 'Personality assessments',
-    icon: 'help-circle-outline',
+    title: "Quiz Results",
+    subtitle: "Personality assessments",
+    icon: "help-circle-outline",
   },
 ] as const;
 
@@ -26,18 +26,14 @@ export default function DashboardScreen() {
   const insets = useSafeAreaInsets();
 
   const handleSignOut = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Sign Out',
-          style: 'destructive',
-          onPress: () => signOut(),
-        },
-      ]
-    );
+    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Sign Out",
+        style: "destructive",
+        onPress: () => signOut(),
+      },
+    ]);
   };
 
   return (
@@ -50,7 +46,10 @@ export default function DashboardScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        <Text className="text-text-primary font-josefin-semibold" style={{ fontSize: 28, lineHeight: 34 }}>
+        <Text
+          className="text-text-primary font-josefin-semibold"
+          style={{ fontSize: 28, lineHeight: 34 }}
+        >
           Dashboard
         </Text>
         <Text className="text-text-secondary text-base font-josefin mt-2">
@@ -60,15 +59,16 @@ export default function DashboardScreen() {
         <View className="bg-surface border border-border rounded-xl p-5 mt-6">
           <View
             className="w-12 h-12 rounded-xl items-center justify-center mb-4"
-            style={{ backgroundColor: 'rgba(0,255,65,0.1)' }}
+            style={{ backgroundColor: "rgba(123,165,255,0.1)" }}
           >
-            <Ionicons name="folder-open-outline" size={24} color="#00ff41" />
+            <Ionicons name="folder-open-outline" size={24} color="#7BA5FF" />
           </View>
           <Text className="text-text-primary text-xl font-josefin-semibold">
             No saved readings yet
           </Text>
           <Text className="text-text-secondary text-sm font-josefin mt-2 leading-5">
-            Birth charts, Human Design readings, and quiz results will appear here once those screens are connected.
+            Birth charts, Human Design readings, and quiz results will appear
+            here once those screens are connected.
           </Text>
         </View>
 
@@ -83,7 +83,7 @@ export default function DashboardScreen() {
             >
               <View
                 className="w-10 h-10 rounded-xl items-center justify-center mr-3"
-                style={{ backgroundColor: 'rgba(136,136,170,0.12)' }}
+                style={{ backgroundColor: "rgba(136,136,170,0.12)" }}
               >
                 <Ionicons name={reading.icon} size={20} color="#8888aa" />
               </View>
