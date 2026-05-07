@@ -8,6 +8,8 @@ import Animated, {
   useAnimatedStyle,
   withRepeat,
   withTiming,
+  withSequence,
+  withDelay,
   Easing,
   interpolate,
 } from "react-native-reanimated";
@@ -95,12 +97,15 @@ export default function WelcomeScreen() {
   // Shimmer sweep across the Begin button.
   // Button = w-full inside a px-8 container, so width = SCREEN_WIDTH - 64.
   const BUTTON_WIDTH = SCREEN_WIDTH - 64;
-  const SHIMMER_WIDTH = 50;
+  const SHIMMER_WIDTH = 24;
   const shimmerProgress = useSharedValue(0);
 
   useEffect(() => {
     shimmerProgress.value = withRepeat(
-      withTiming(1, { duration: 2200, easing: Easing.linear }),
+      withSequence(
+        withDelay(7500, withTiming(1, { duration: 900, easing: Easing.linear })),
+        withTiming(0, { duration: 0 }),
+      ),
       -1,
       false,
     );
@@ -112,9 +117,10 @@ export default function WelcomeScreen() {
         translateX: interpolate(
           shimmerProgress.value,
           [0, 1],
-          [-SHIMMER_WIDTH, BUTTON_WIDTH],
+          [-SHIMMER_WIDTH * 2, BUTTON_WIDTH + SHIMMER_WIDTH],
         ),
       },
+      { rotate: "22.5deg" },
     ],
   }));
 
@@ -176,8 +182,8 @@ export default function WelcomeScreen() {
 
         {/* Branding */}
         <Text
-          className="text-white font-josefin-semibold mt-8"
-          style={{ fontSize: 32, lineHeight: 38 }}
+          className="font-josefin-semibold mt-8"
+          style={{ fontSize: 32, lineHeight: 38, color: "#ffffff" }}
         >
           Moon Rhythms
         </Text>
@@ -232,9 +238,10 @@ export default function WelcomeScreen() {
                 style={[
                   {
                     position: "absolute",
-                    top: 0,
-                    bottom: 0,
-                    width: 50,
+                    top: -32,
+                    bottom: -32,
+                    width: SHIMMER_WIDTH,
+                    opacity: 0.5,
                   },
                   shimmerStyle,
                 ]}
@@ -266,9 +273,17 @@ export default function WelcomeScreen() {
             onPress={() => router.push("/(auth)/sign-in")}
             className="mt-4 items-center"
           >
-            <Text className="text-base font-josefin text-white">
+            <Text
+              className="text-base font-josefin"
+              style={{ color: "#8888aa" }}
+            >
               Already have an account?{" "}
-              <Text className="text-white">Sign in</Text>
+              <Text
+                className="font-josefin-semibold"
+                style={{ color: "#ffffff" }}
+              >
+                Sign in
+              </Text>
             </Text>
           </Pressable>
         </View>
