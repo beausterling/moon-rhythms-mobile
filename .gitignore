@@ -33,8 +33,11 @@ yarn-error.*
 # local env files
 .env*.local
 
-# Claude Code agent state
+# Agent / planning artifacts (never push)
 .claude/
+.planning/
+CLAUDE.md
+AGENTS.md
 
 # Supabase CLI cache
 supabase/.temp/

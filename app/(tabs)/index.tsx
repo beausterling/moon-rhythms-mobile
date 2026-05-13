@@ -25,6 +25,10 @@ import {
   formatOffsetLabel,
 } from "../../lib/moon-calc";
 
+// U+FE0E forces text-style rendering so iOS doesn't substitute color emoji.
+const TEXT_VARIATION_SELECTOR = "︎";
+const SYMBOL_FONT_FAMILY = "Apple Symbols";
+
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const TRACK_PADDING = 32;
 const TRACK_WIDTH = SCREEN_WIDTH - TRACK_PADDING * 2;
@@ -241,8 +245,16 @@ export default function HomeScreen() {
           className="mt-6 mx-8 rounded-2xl px-6 py-5 items-center"
           style={{ backgroundColor: "rgba(18,18,42,0.8)" }}
         >
-          <Text style={{ fontSize: 48, lineHeight: 56 }}>
+          <Text
+            style={{
+              fontSize: 48,
+              lineHeight: 56,
+              color: "#e8e8f0",
+              fontFamily: SYMBOL_FONT_FAMILY,
+            }}
+          >
             {display.zodiacSymbol}
+            {TEXT_VARIATION_SELECTOR}
           </Text>
           <Text
             className="text-text-primary font-josefin-semibold mt-2"

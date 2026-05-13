@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { View, Text, Pressable, Dimensions, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
@@ -18,81 +18,15 @@ import {
   MOON_FRAME_START,
   MOON_FRAME_END,
 } from "../../lib/constants";
+import { NightSky } from "../../components/NightSky";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
-const TOTAL_FRAMES = MOON_FRAME_END - MOON_FRAME_START + 1; // 712 frames
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const FRAME_INTERVAL = 1000 / 24; // 24fps = ~42ms per frame
-
-// Generate star data once (deterministic pseudo-random using index as seed)
-function generateStars(count: number) {
-  const stars = [];
-  for (let i = 0; i < count; i++) {
-    stars.push({
-      id: i,
-      x: ((i * 7919 + 104729) % 10000) / 10000, // pseudo-random x (0-1)
-      y: ((i * 6271 + 87811) % 10000) / 10000, // pseudo-random y (0-1)
-      size: 1 + ((i * 3571) % 2), // 1 or 2px
-      baseOpacity: 0.2 + ((i * 4217) % 40) / 100, // 0.2-0.6
-      duration: 3000 + ((i * 2719) % 5000), // 3-8 seconds
-    });
-  }
-  return stars;
-}
-
-function Star({
-  x,
-  y,
-  size,
-  baseOpacity,
-  duration,
-}: {
-  x: number;
-  y: number;
-  size: number;
-  baseOpacity: number;
-  duration: number;
-}) {
-  const opacity = useSharedValue(baseOpacity);
-
-  useEffect(() => {
-    opacity.value = withRepeat(
-      withTiming(baseOpacity - 0.1, {
-        duration,
-        easing: Easing.inOut(Easing.ease),
-      }),
-      -1,
-      true,
-    );
-  }, []);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
-
-  return (
-    <Animated.View
-      style={[
-        {
-          position: "absolute",
-          left: x * SCREEN_WIDTH,
-          top: y * SCREEN_HEIGHT,
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          backgroundColor: "#e8e8f0",
-        },
-        animatedStyle,
-      ]}
-    />
-  );
-}
 
 export default function WelcomeScreen() {
   const router = useRouter();
   const frameIndex = useRef(MOON_FRAME_START);
   const [currentFrame, setCurrentFrame] = useState(MOON_FRAME_START);
-
-  const stars = useMemo(() => generateStars(50), []);
 
   // Shimmer sweep across the Begin button.
   // Button = w-full inside a px-8 container, so width = SCREEN_WIDTH - 64.
@@ -142,14 +76,7 @@ export default function WelcomeScreen() {
 
   return (
     <View className="flex-1 bg-black items-center justify-center">
-      {/* Starfield layer */}
-      <View
-        style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
-      >
-        {stars.map((star) => (
-          <Star key={star.id} {...star} />
-        ))}
-      </View>
+      <NightSky />
 
       {/* Content */}
       <View className="items-center px-8">
