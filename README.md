@@ -6,12 +6,50 @@ Built with **Expo SDK 54**, **React Native**, **TypeScript**, and **Supabase**. 
 
 ---
 
-## 📲 Try It
+## 📲 Try It On Your Phone
 
-Want to try the app without cloning the repo or setting up a dev environment?
+You can install the app directly — no code, no Xcode, no Android Studio. The latest build of either platform is always available at:
 
-- **iOS:** [Install via Expo](https://expo.dev/accounts/beausterling/projects/moon-rhythms/builds/3ebdbec3-1395-499b-b8f7-fc82a0bdc629) — your device's UDID must be registered first, [reach out](https://github.com/beausterling) and I'll add you.
-- **Android:** [Download APK](https://expo.dev/artifacts/eas/rB88ZytneU415V8shgNDG5.apk) — installs directly on any Android device. Real devices recommended; emulator performance on macOS hosts can be sluggish for graphics-heavy screens.
+**👉 [expo.dev/accounts/beausterling/projects/moon-rhythms](https://expo.dev/accounts/beausterling/projects/moon-rhythms) 👈**
+
+Pick your platform below for step-by-step instructions.
+
+---
+
+### 🍎 iPhone / iPad
+
+iOS has one extra step (Apple's rules for testing outside the App Store): your device needs to be registered with my developer account first. Takes about a minute.
+
+1. **Reach out** — [open an issue here](https://github.com/beausterling/moon-rhythms-mobile/issues/new?title=iOS+test+access+request) or message me directly. I just need to know you want to try it.
+2. **I'll send you a registration link.** Open it in Safari *on your iPhone* (not your laptop). Tap **Allow** → go to **Settings → Profile Downloaded → Install** → enter your passcode.
+3. **Open the build page** ([expo.dev/.../moon-rhythms](https://expo.dev/accounts/beausterling/projects/moon-rhythms)) in Safari on the same iPhone.
+4. **Find the latest iOS build** (top of the list), tap it, then tap **Install**. iOS will ask you to confirm — say yes.
+5. **App appears on your home screen.** Open it and you're in.
+
+> The first time you run it, you may need to go to **Settings → General → VPN & Device Management** and trust my developer profile. iOS will prompt you if so.
+
+---
+
+### 🤖 Android
+
+No registration step — just install the APK.
+
+1. **Open the build page** on your Android phone: [expo.dev/.../moon-rhythms](https://expo.dev/accounts/beausterling/projects/moon-rhythms).
+2. **Find the latest Android build** at the top of the list and tap **Install**. The `.apk` file (~50 MB) will download.
+3. **Tap the downloaded file.** Android will warn you about installing from a non-Play Store source — tap **Settings**, enable **Allow from this source**, then go back and tap **Install**.
+4. **App appears in your app drawer.** Open it and you're in.
+
+> Real devices strongly recommended. Mac-hosted Android emulators can be sluggish on graphics-heavy screens like the Welcome animation — that's a known emulator limitation, not an app bug. The app runs smoothly on real Android hardware.
+
+---
+
+### What to expect when the app opens
+
+1. **Welcome screen** — animated moon over a starfield. Tap **Begin**.
+2. **Sign up** with email + password (or **Sign in** if you've used it before). Sessions persist so you only do this once per device.
+3. **Home tab** — live moon position: zodiac sign, phase, illumination %, degree. Drag the time scrubber to peek up to 72 hours forward or back.
+4. **Quizzes tab** — currently coming soon (Phase 4).
+5. **Dashboard tab** — your saved readings (Phase 5 territory; sign-out lives here for now).
 
 ---
 
