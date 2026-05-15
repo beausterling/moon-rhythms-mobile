@@ -1,0 +1,1385 @@
+{
+  "metadata": {
+    "name": "Moon Rhythms Deterministic Astrological Reference",
+    "version": "v1",
+    "generated": "2026-04-24",
+    "description": "Single source of truth for all deterministic astrological data used by Moon Rhythms. This file is for STRUCTURED LOOKUP — it does NOT go into the RAG vector database. Load it into Supabase as relational tables and reference it from chart calculation and AI prompt assembly.",
+    "design_decisions": {
+      "rulerships": "Modern (uses outer planets as rulers): Pluto=Scorpio, Neptune=Pisces, Uranus=Aquarius. Traditional rulers preserved in `traditional_ruler` field.",
+      "outer_planets_included": "Yes — Uranus, Neptune, Pluto are first-class planets with full data.",
+      "asteroids_included": "Chiron, Black Moon Lilith, North/South Node included. Ceres, Pallas, Juno, Vesta NOT included for MVP.",
+      "valence_language": "All references to 'malefic', 'benefic', 'evil', 'fortunate', 'good/bad aspects' are removed from active data. They appear ONLY in `classical_reference` blocks for historical/learning content.",
+      "gendered_language": "All masculine/feminine sign labels reframed as active/receptive. Sun/father, Moon/mother associations dropped from active data.",
+      "tradition": "Modern psychological astrology — Western tropical zodiac, Placidus default house system, with Whole Sign as alternate."
+    }
+  },
+
+  "planets": {
+    "_schema": "Each planet has core identity data, glyph, classification, orbital data, and modern/classical interpretive frames. The `archetype` field is a single-phrase summary for fast AI prompt assembly. The `function` field is the deeper one-sentence description.",
+
+    "sun": {
+      "id": "sun",
+      "name": "Sun",
+      "glyph": "☉",
+      "type": "luminary",
+      "archetype": "vital self",
+      "function": "The core identity, conscious purpose, and capacity to shine",
+      "rules_signs": ["leo"],
+      "exalted_in": "aries",
+      "detriment_in": "aquarius",
+      "fall_in": "libra",
+      "average_speed_per_day_degrees": 0.9856,
+      "orbit_around_sun_or_earth_years": 1.0,
+      "discovery_year": null,
+      "is_personal": true,
+      "is_social": false,
+      "is_transpersonal": false,
+      "modern_keywords": ["identity", "vitality", "purpose", "ego", "expression", "leadership", "self"],
+      "classical_reference": {
+        "valence": "luminary",
+        "associated_role": "father (dropped in modern Moon Rhythms framing)",
+        "body_parts": "heart, spine, eyes (informational only — not used in AI responses)"
+      }
+    },
+
+    "moon": {
+      "id": "moon",
+      "name": "Moon",
+      "glyph": "☽",
+      "type": "luminary",
+      "archetype": "emotional operating system",
+      "function": "Instinctive emotional response, what makes you feel safe, your inner private self",
+      "rules_signs": ["cancer"],
+      "exalted_in": "taurus",
+      "detriment_in": "capricorn",
+      "fall_in": "scorpio",
+      "average_speed_per_day_degrees": 13.1764,
+      "orbit_around_sun_or_earth_years": 0.0748,
+      "discovery_year": null,
+      "is_personal": true,
+      "is_social": false,
+      "is_transpersonal": false,
+      "modern_keywords": ["emotion", "instinct", "safety", "home", "memory", "mood", "nurturing", "inner life"],
+      "moon_rhythms_priority": "highest — this is the brand-anchor planet",
+      "classical_reference": {
+        "valence": "luminary",
+        "associated_role": "mother (dropped in modern Moon Rhythms framing)",
+        "body_parts": "stomach, breasts, lymphatic system (informational only)"
+      }
+    },
+
+    "mercury": {
+      "id": "mercury",
+      "name": "Mercury",
+      "glyph": "☿",
+      "type": "personal_planet",
+      "archetype": "the messenger",
+      "function": "Thinking, communication, and how information moves through the mind",
+      "rules_signs": ["gemini", "virgo"],
+      "exalted_in": "virgo",
+      "detriment_in": ["sagittarius", "pisces"],
+      "fall_in": "pisces",
+      "average_speed_per_day_degrees": 1.383,
+      "orbit_around_sun_or_earth_years": 0.241,
+      "discovery_year": null,
+      "is_personal": true,
+      "is_social": false,
+      "is_transpersonal": false,
+      "modern_keywords": ["thinking", "communication", "language", "intellect", "curiosity", "learning", "exchange"],
+      "special_property": "takes on the character of the planet it most closely aspects",
+      "classical_reference": {
+        "valence": "neutral / mutable",
+        "body_parts": "nervous system, hands, lungs (informational only)"
+      }
+    },
+
+    "venus": {
+      "id": "venus",
+      "name": "Venus",
+      "glyph": "♀",
+      "type": "personal_planet",
+      "archetype": "the connector",
+      "function": "What you love, how you love, and what you find beautiful",
+      "rules_signs": ["taurus", "libra"],
+      "exalted_in": "pisces",
+      "detriment_in": ["aries", "scorpio"],
+      "fall_in": "virgo",
+      "average_speed_per_day_degrees": 1.2,
+      "orbit_around_sun_or_earth_years": 0.615,
+      "discovery_year": null,
+      "is_personal": true,
+      "is_social": false,
+      "is_transpersonal": false,
+      "modern_keywords": ["love", "beauty", "harmony", "pleasure", "value", "attraction", "connection", "art"],
+      "classical_reference": {
+        "valence": "benefic (dropped in modern framing)",
+        "body_parts": "throat, kidneys, venous system (informational only)"
+      }
+    },
+
+    "mars": {
+      "id": "mars",
+      "name": "Mars",
+      "glyph": "♂",
+      "type": "personal_planet",
+      "archetype": "the warrior",
+      "function": "Drive, ambition, anger, and how you assert yourself",
+      "rules_signs": ["aries"],
+      "traditional_ruler_of": ["scorpio"],
+      "exalted_in": "capricorn",
+      "detriment_in": ["taurus", "libra"],
+      "fall_in": "cancer",
+      "average_speed_per_day_degrees": 0.524,
+      "orbit_around_sun_or_earth_years": 1.881,
+      "discovery_year": null,
+      "is_personal": true,
+      "is_social": false,
+      "is_transpersonal": false,
+      "modern_keywords": ["drive", "action", "anger", "courage", "assertion", "desire", "competition", "initiative"],
+      "classical_reference": {
+        "valence": "malefic (dropped in modern framing)",
+        "body_parts": "muscles, blood, head (informational only)"
+      }
+    },
+
+    "jupiter": {
+      "id": "jupiter",
+      "name": "Jupiter",
+      "glyph": "♃",
+      "type": "social_planet",
+      "archetype": "the expander",
+      "function": "Growth, optimism, faith, and where you reach beyond yourself",
+      "rules_signs": ["sagittarius"],
+      "traditional_ruler_of": ["pisces"],
+      "exalted_in": "cancer",
+      "detriment_in": ["gemini", "virgo"],
+      "fall_in": "capricorn",
+      "average_speed_per_day_degrees": 0.083,
+      "orbit_around_sun_or_earth_years": 11.862,
+      "discovery_year": null,
+      "is_personal": false,
+      "is_social": true,
+      "is_transpersonal": false,
+      "modern_keywords": ["growth", "expansion", "faith", "optimism", "abundance", "wisdom", "travel", "philosophy"],
+      "classical_reference": {
+        "valence": "benefic (dropped in modern framing)",
+        "body_parts": "liver, thighs, hips (informational only)"
+      }
+    },
+
+    "saturn": {
+      "id": "saturn",
+      "name": "Saturn",
+      "glyph": "♄",
+      "type": "social_planet",
+      "archetype": "the structurer",
+      "function": "Structure, time, mastery, and where you do your slowest growing",
+      "rules_signs": ["capricorn"],
+      "traditional_ruler_of": ["aquarius"],
+      "exalted_in": "libra",
+      "detriment_in": ["cancer", "leo"],
+      "fall_in": "aries",
+      "average_speed_per_day_degrees": 0.0335,
+      "orbit_around_sun_or_earth_years": 29.457,
+      "discovery_year": null,
+      "is_personal": false,
+      "is_social": true,
+      "is_transpersonal": false,
+      "modern_keywords": ["structure", "discipline", "time", "responsibility", "limitation", "maturity", "mastery"],
+      "classical_reference": {
+        "valence": "malefic (dropped in modern framing)",
+        "body_parts": "bones, skin, teeth, joints (informational only)"
+      }
+    },
+
+    "uranus": {
+      "id": "uranus",
+      "name": "Uranus",
+      "glyph": "♅",
+      "type": "transpersonal_planet",
+      "archetype": "the disruptor",
+      "function": "Originality, sudden change, and the urge to break pattern",
+      "rules_signs": ["aquarius"],
+      "traditional_ruler": "saturn",
+      "exalted_in": "scorpio",
+      "detriment_in": "leo",
+      "fall_in": "taurus",
+      "average_speed_per_day_degrees": 0.0117,
+      "orbit_around_sun_or_earth_years": 84.011,
+      "discovery_year": 1781,
+      "is_personal": false,
+      "is_social": false,
+      "is_transpersonal": true,
+      "modern_keywords": ["originality", "disruption", "freedom", "innovation", "rebellion", "individuality", "awakening"]
+    },
+
+    "neptune": {
+      "id": "neptune",
+      "name": "Neptune",
+      "glyph": "♆",
+      "type": "transpersonal_planet",
+      "archetype": "the dissolver",
+      "function": "Imagination, empathy, and the dissolving of boundaries",
+      "rules_signs": ["pisces"],
+      "traditional_ruler": "jupiter",
+      "exalted_in": "leo",
+      "detriment_in": "virgo",
+      "fall_in": "aquarius",
+      "average_speed_per_day_degrees": 0.006,
+      "orbit_around_sun_or_earth_years": 164.79,
+      "discovery_year": 1846,
+      "is_personal": false,
+      "is_social": false,
+      "is_transpersonal": true,
+      "modern_keywords": ["imagination", "empathy", "spirituality", "illusion", "dreams", "compassion", "dissolution"]
+    },
+
+    "pluto": {
+      "id": "pluto",
+      "name": "Pluto",
+      "glyph": "♇",
+      "type": "transpersonal_planet",
+      "archetype": "the transformer",
+      "function": "Deep transformation, hidden power, and what gets stripped and reborn",
+      "rules_signs": ["scorpio"],
+      "traditional_ruler": "mars",
+      "exalted_in": "aries",
+      "detriment_in": "taurus",
+      "fall_in": "libra",
+      "average_speed_per_day_degrees": 0.004,
+      "orbit_around_sun_or_earth_years": 247.94,
+      "discovery_year": 1930,
+      "is_personal": false,
+      "is_social": false,
+      "is_transpersonal": true,
+      "modern_keywords": ["transformation", "power", "depth", "rebirth", "obsession", "shadow", "intensity", "elimination"],
+      "note_on_planetary_status": "Reclassified as 'dwarf planet' by astronomers in 2006. Astrologically, still treated as a primary planetary force."
+    }
+  },
+
+  "additional_points": {
+    "_schema": "Non-planetary points used in modern interpretation. North Node and South Node are essential. Chiron and Black Moon Lilith are commonly used.",
+
+    "north_node": {
+      "id": "north_node",
+      "name": "North Node",
+      "alternate_names": ["True Node", "Rahu (Vedic)", "Caput Draconis"],
+      "glyph": "☊",
+      "type": "lunar_node",
+      "archetype": "growth direction",
+      "function": "The qualities you're growing into in this lifetime — unfamiliar but expansive",
+      "modern_keywords": ["growth", "purpose", "future", "destiny", "evolution", "stretch"],
+      "always_opposite_to": "south_node",
+      "moves_retrograde": true,
+      "average_speed_per_day_degrees": -0.053
+    },
+
+    "south_node": {
+      "id": "south_node",
+      "name": "South Node",
+      "alternate_names": ["Ketu (Vedic)", "Cauda Draconis"],
+      "glyph": "☋",
+      "type": "lunar_node",
+      "archetype": "comfort zone",
+      "function": "The qualities that come easily but represent the past — what to release",
+      "modern_keywords": ["past", "comfort zone", "habit", "innate skill", "release", "karma"],
+      "always_opposite_to": "north_node"
+    },
+
+    "chiron": {
+      "id": "chiron",
+      "name": "Chiron",
+      "glyph": "⚷",
+      "type": "centaur",
+      "archetype": "the wounded healer",
+      "function": "The deepest wound that becomes the source of healing for self and others",
+      "modern_keywords": ["wound", "healing", "vulnerability", "teaching", "outsider"],
+      "discovery_year": 1977,
+      "orbit_around_sun_years": 50.42,
+      "note": "Modern addition. PD interpretive content does not exist for Chiron — must be commissioned."
+    },
+
+    "black_moon_lilith": {
+      "id": "black_moon_lilith",
+      "name": "Black Moon Lilith",
+      "glyph": "⚸",
+      "type": "calculated_point",
+      "calculation_method": "mean apogee of the Moon's orbit",
+      "archetype": "the unsanctioned feminine",
+      "function": "Where you refuse to be tamed, the wild and exiled part of self",
+      "modern_keywords": ["wildness", "rage", "exile", "unfiltered", "taboo", "primal"],
+      "note": "Modern interpretation, no PD source. Multiple calculation methods exist (Mean, True, Natural) — Moon Rhythms uses Mean Black Moon Lilith by default."
+    },
+
+    "ascendant": {
+      "id": "ascendant",
+      "name": "Ascendant",
+      "alternate_names": ["Rising Sign", "ASC"],
+      "type": "chart_angle",
+      "calculation": "the degree of the zodiac rising on the eastern horizon at the moment of birth",
+      "is_first_house_cusp": true,
+      "archetype": "the lens",
+      "function": "How you appear to others, your default style of meeting the world",
+      "modern_keywords": ["presentation", "first impression", "physical body", "approach", "lens"]
+    },
+
+    "midheaven": {
+      "id": "midheaven",
+      "name": "Midheaven",
+      "alternate_names": ["MC", "Medium Coeli"],
+      "type": "chart_angle",
+      "calculation": "the highest point of the chart at the moment of birth",
+      "is_tenth_house_cusp": true,
+      "archetype": "the public summit",
+      "function": "Where you're heading in public life, what you're known for",
+      "modern_keywords": ["career", "vocation", "public role", "ambition", "reputation"]
+    },
+
+    "descendant": {
+      "id": "descendant",
+      "name": "Descendant",
+      "alternate_names": ["DSC"],
+      "type": "chart_angle",
+      "calculation": "the degree of the zodiac setting on the western horizon at the moment of birth — always opposite the Ascendant",
+      "is_seventh_house_cusp": true,
+      "archetype": "the other",
+      "function": "What you seek in partnership, what you project onto others",
+      "modern_keywords": ["partnership", "other", "projection", "complement", "shadow"]
+    },
+
+    "imum_coeli": {
+      "id": "imum_coeli",
+      "name": "Imum Coeli",
+      "alternate_names": ["IC", "Nadir"],
+      "type": "chart_angle",
+      "calculation": "the lowest point of the chart at the moment of birth — always opposite the Midheaven",
+      "is_fourth_house_cusp": true,
+      "archetype": "the foundation",
+      "function": "Your private base, your roots, your inner home",
+      "modern_keywords": ["roots", "private life", "foundation", "family", "deepest self"]
+    },
+
+    "part_of_fortune": {
+      "id": "part_of_fortune",
+      "name": "Part of Fortune",
+      "alternate_names": ["Lot of Fortune", "Pars Fortunae"],
+      "glyph": "⊗",
+      "type": "arabic_part",
+      "calculation_day_birth": "Ascendant + Moon - Sun",
+      "calculation_night_birth": "Ascendant + Sun - Moon",
+      "archetype": "natural ease",
+      "function": "Where things come together with grace — a point of physical wellbeing and lived flow",
+      "modern_keywords": ["ease", "fortune", "flow", "wellbeing", "natural gift"]
+    }
+  },
+
+  "signs": {
+    "_schema": "The 12 zodiac signs in order. Each carries element, modality, polarity, ruler (modern), traditional ruler where different, exalted/detriment/fall planets, and approximate date range. Date ranges are approximate — exact dates shift slightly year to year. Use Swiss Ephemeris for precise sun-sign boundaries.",
+
+    "aries": {
+      "id": "aries",
+      "name": "Aries",
+      "glyph": "♈",
+      "symbol": "the ram",
+      "ordinal": 1,
+      "element": "fire",
+      "modality": "cardinal",
+      "polarity": "active",
+      "ruler": "mars",
+      "exalted_planet": "sun",
+      "detriment_planet": "venus",
+      "fall_planet": "saturn",
+      "approximate_dates": "March 20 - April 19",
+      "season_northern_hemisphere": "early spring",
+      "archetype": "the initiator",
+      "modern_keywords": ["beginning", "courage", "action", "directness", "self-assertion", "pioneering"]
+    },
+
+    "taurus": {
+      "id": "taurus",
+      "name": "Taurus",
+      "glyph": "♉",
+      "symbol": "the bull",
+      "ordinal": 2,
+      "element": "earth",
+      "modality": "fixed",
+      "polarity": "receptive",
+      "ruler": "venus",
+      "exalted_planet": "moon",
+      "detriment_planet": "mars",
+      "fall_planet": "uranus",
+      "approximate_dates": "April 20 - May 20",
+      "season_northern_hemisphere": "mid spring",
+      "archetype": "the steady builder",
+      "modern_keywords": ["stability", "sensuality", "patience", "value", "comfort", "endurance"]
+    },
+
+    "gemini": {
+      "id": "gemini",
+      "name": "Gemini",
+      "glyph": "♊",
+      "symbol": "the twins",
+      "ordinal": 3,
+      "element": "air",
+      "modality": "mutable",
+      "polarity": "active",
+      "ruler": "mercury",
+      "exalted_planet": null,
+      "detriment_planet": "jupiter",
+      "fall_planet": null,
+      "approximate_dates": "May 21 - June 20",
+      "season_northern_hemisphere": "late spring",
+      "archetype": "the messenger",
+      "modern_keywords": ["curiosity", "communication", "adaptability", "duality", "exchange", "mental agility"]
+    },
+
+    "cancer": {
+      "id": "cancer",
+      "name": "Cancer",
+      "glyph": "♋",
+      "symbol": "the crab",
+      "ordinal": 4,
+      "element": "water",
+      "modality": "cardinal",
+      "polarity": "receptive",
+      "ruler": "moon",
+      "exalted_planet": "jupiter",
+      "detriment_planet": "saturn",
+      "fall_planet": "mars",
+      "approximate_dates": "June 21 - July 22",
+      "season_northern_hemisphere": "early summer",
+      "archetype": "the nurturer",
+      "modern_keywords": ["nurturing", "memory", "home", "family", "emotional security", "protection"]
+    },
+
+    "leo": {
+      "id": "leo",
+      "name": "Leo",
+      "glyph": "♌",
+      "symbol": "the lion",
+      "ordinal": 5,
+      "element": "fire",
+      "modality": "fixed",
+      "polarity": "active",
+      "ruler": "sun",
+      "exalted_planet": null,
+      "detriment_planet": ["uranus", "saturn"],
+      "fall_planet": null,
+      "approximate_dates": "July 23 - August 22",
+      "season_northern_hemisphere": "mid summer",
+      "archetype": "the performer",
+      "modern_keywords": ["self-expression", "creativity", "warmth", "generosity", "pride", "presence"]
+    },
+
+    "virgo": {
+      "id": "virgo",
+      "name": "Virgo",
+      "glyph": "♍",
+      "symbol": "the maiden",
+      "ordinal": 6,
+      "element": "earth",
+      "modality": "mutable",
+      "polarity": "receptive",
+      "ruler": "mercury",
+      "exalted_planet": "mercury",
+      "detriment_planet": ["jupiter", "neptune"],
+      "fall_planet": "venus",
+      "approximate_dates": "August 23 - September 22",
+      "season_northern_hemisphere": "late summer",
+      "archetype": "the analyst",
+      "modern_keywords": ["analysis", "service", "precision", "improvement", "discernment", "craft"]
+    },
+
+    "libra": {
+      "id": "libra",
+      "name": "Libra",
+      "glyph": "♎",
+      "symbol": "the scales",
+      "ordinal": 7,
+      "element": "air",
+      "modality": "cardinal",
+      "polarity": "active",
+      "ruler": "venus",
+      "exalted_planet": "saturn",
+      "detriment_planet": "mars",
+      "fall_planet": ["sun", "pluto"],
+      "approximate_dates": "September 23 - October 22",
+      "season_northern_hemisphere": "early autumn",
+      "archetype": "the harmonizer",
+      "modern_keywords": ["balance", "relationship", "fairness", "diplomacy", "beauty", "partnership"]
+    },
+
+    "scorpio": {
+      "id": "scorpio",
+      "name": "Scorpio",
+      "glyph": "♏",
+      "symbol": "the scorpion",
+      "ordinal": 8,
+      "element": "water",
+      "modality": "fixed",
+      "polarity": "receptive",
+      "ruler": "pluto",
+      "traditional_ruler": "mars",
+      "exalted_planet": "uranus",
+      "detriment_planet": "venus",
+      "fall_planet": "moon",
+      "approximate_dates": "October 23 - November 21",
+      "season_northern_hemisphere": "mid autumn",
+      "archetype": "the alchemist",
+      "modern_keywords": ["depth", "transformation", "intensity", "intimacy", "power", "secrets"]
+    },
+
+    "sagittarius": {
+      "id": "sagittarius",
+      "name": "Sagittarius",
+      "glyph": "♐",
+      "symbol": "the archer",
+      "ordinal": 9,
+      "element": "fire",
+      "modality": "mutable",
+      "polarity": "active",
+      "ruler": "jupiter",
+      "exalted_planet": null,
+      "detriment_planet": "mercury",
+      "fall_planet": null,
+      "approximate_dates": "November 22 - December 21",
+      "season_northern_hemisphere": "late autumn",
+      "archetype": "the seeker",
+      "modern_keywords": ["adventure", "freedom", "philosophy", "expansion", "vision", "truth"]
+    },
+
+    "capricorn": {
+      "id": "capricorn",
+      "name": "Capricorn",
+      "glyph": "♑",
+      "symbol": "the sea-goat",
+      "ordinal": 10,
+      "element": "earth",
+      "modality": "cardinal",
+      "polarity": "receptive",
+      "ruler": "saturn",
+      "exalted_planet": "mars",
+      "detriment_planet": "moon",
+      "fall_planet": "jupiter",
+      "approximate_dates": "December 22 - January 19",
+      "season_northern_hemisphere": "early winter",
+      "archetype": "the architect",
+      "modern_keywords": ["structure", "ambition", "discipline", "achievement", "responsibility", "mastery"]
+    },
+
+    "aquarius": {
+      "id": "aquarius",
+      "name": "Aquarius",
+      "glyph": "♒",
+      "symbol": "the water-bearer",
+      "ordinal": 11,
+      "element": "air",
+      "modality": "fixed",
+      "polarity": "active",
+      "ruler": "uranus",
+      "traditional_ruler": "saturn",
+      "exalted_planet": null,
+      "detriment_planet": "sun",
+      "fall_planet": null,
+      "approximate_dates": "January 20 - February 18",
+      "season_northern_hemisphere": "mid winter",
+      "archetype": "the visionary",
+      "modern_keywords": ["originality", "community", "innovation", "independence", "vision", "humanitarianism"]
+    },
+
+    "pisces": {
+      "id": "pisces",
+      "name": "Pisces",
+      "glyph": "♓",
+      "symbol": "the fishes",
+      "ordinal": 12,
+      "element": "water",
+      "modality": "mutable",
+      "polarity": "receptive",
+      "ruler": "neptune",
+      "traditional_ruler": "jupiter",
+      "exalted_planet": "venus",
+      "detriment_planet": "mercury",
+      "fall_planet": "mercury",
+      "approximate_dates": "February 19 - March 19",
+      "season_northern_hemisphere": "late winter",
+      "archetype": "the mystic",
+      "modern_keywords": ["intuition", "compassion", "imagination", "empathy", "transcendence", "art"]
+    }
+  },
+
+  "houses": {
+    "_schema": "The 12 houses. Each has a life-domain, a polarity (angular/succedent/cadent which signals weight/intensity), and an associated sign (the 'natural' sign that resonates with that house's themes — Aries with the 1st, Taurus with the 2nd, etc.). Angular houses (1, 4, 7, 10) carry the most weight in chart interpretation.",
+
+    "1": {
+      "ordinal": 1,
+      "name": "First House",
+      "alternate_names": ["House of Self", "House of Identity"],
+      "polarity": "angular",
+      "weight": "high",
+      "associated_sign": "aries",
+      "associated_planet": "mars",
+      "cusp_is_chart_angle": "ascendant",
+      "domain": "self, presentation, physical body, first impressions",
+      "modern_keywords": ["identity", "appearance", "approach", "self", "first impression"]
+    },
+    "2": {
+      "ordinal": 2,
+      "name": "Second House",
+      "alternate_names": ["House of Resources", "House of Possessions"],
+      "polarity": "succedent",
+      "weight": "medium",
+      "associated_sign": "taurus",
+      "associated_planet": "venus",
+      "domain": "money, possessions, values, self-worth, income",
+      "modern_keywords": ["money", "values", "self-worth", "resources", "income"]
+    },
+    "3": {
+      "ordinal": 3,
+      "name": "Third House",
+      "alternate_names": ["House of Communication", "House of Mind"],
+      "polarity": "cadent",
+      "weight": "low",
+      "associated_sign": "gemini",
+      "associated_planet": "mercury",
+      "domain": "communication, siblings, neighbors, short trips, daily learning",
+      "modern_keywords": ["communication", "thinking", "siblings", "daily life", "learning"]
+    },
+    "4": {
+      "ordinal": 4,
+      "name": "Fourth House",
+      "alternate_names": ["House of Home", "House of Roots"],
+      "polarity": "angular",
+      "weight": "high",
+      "associated_sign": "cancer",
+      "associated_planet": "moon",
+      "cusp_is_chart_angle": "imum_coeli",
+      "domain": "home, family of origin, roots, private life, foundation",
+      "modern_keywords": ["home", "family", "roots", "foundation", "private life"]
+    },
+    "5": {
+      "ordinal": 5,
+      "name": "Fifth House",
+      "alternate_names": ["House of Pleasure", "House of Creativity"],
+      "polarity": "succedent",
+      "weight": "medium",
+      "associated_sign": "leo",
+      "associated_planet": "sun",
+      "domain": "creativity, romance, children, play, self-expression",
+      "modern_keywords": ["creativity", "romance", "play", "children", "joy"]
+    },
+    "6": {
+      "ordinal": 6,
+      "name": "Sixth House",
+      "alternate_names": ["House of Service", "House of Daily Work"],
+      "polarity": "cadent",
+      "weight": "low",
+      "associated_sign": "virgo",
+      "associated_planet": "mercury",
+      "domain": "daily work, routine, health practices, service, craft",
+      "modern_keywords": ["routine", "work", "health", "habits", "service"]
+    },
+    "7": {
+      "ordinal": 7,
+      "name": "Seventh House",
+      "alternate_names": ["House of Partnership", "House of the Other"],
+      "polarity": "angular",
+      "weight": "high",
+      "associated_sign": "libra",
+      "associated_planet": "venus",
+      "cusp_is_chart_angle": "descendant",
+      "domain": "partnership, marriage, contracts, projection",
+      "modern_keywords": ["partnership", "marriage", "other", "commitment", "projection"]
+    },
+    "8": {
+      "ordinal": 8,
+      "name": "Eighth House",
+      "alternate_names": ["House of Depth", "House of Transformation"],
+      "polarity": "succedent",
+      "weight": "medium",
+      "associated_sign": "scorpio",
+      "associated_planet": "pluto",
+      "associated_planet_traditional": "mars",
+      "domain": "intimacy, shared resources, transformation, the taboo",
+      "modern_keywords": ["intimacy", "transformation", "shared resources", "depth", "taboo"]
+    },
+    "9": {
+      "ordinal": 9,
+      "name": "Ninth House",
+      "alternate_names": ["House of Meaning", "House of Higher Mind"],
+      "polarity": "cadent",
+      "weight": "low",
+      "associated_sign": "sagittarius",
+      "associated_planet": "jupiter",
+      "domain": "philosophy, higher education, long travel, religion, worldview",
+      "modern_keywords": ["philosophy", "travel", "education", "meaning", "worldview"]
+    },
+    "10": {
+      "ordinal": 10,
+      "name": "Tenth House",
+      "alternate_names": ["House of Vocation", "House of Public Role"],
+      "polarity": "angular",
+      "weight": "high",
+      "associated_sign": "capricorn",
+      "associated_planet": "saturn",
+      "cusp_is_chart_angle": "midheaven",
+      "domain": "career, public role, reputation, authority",
+      "modern_keywords": ["career", "vocation", "reputation", "authority", "public role"]
+    },
+    "11": {
+      "ordinal": 11,
+      "name": "Eleventh House",
+      "alternate_names": ["House of Community", "House of Hopes"],
+      "polarity": "succedent",
+      "weight": "medium",
+      "associated_sign": "aquarius",
+      "associated_planet": "uranus",
+      "associated_planet_traditional": "saturn",
+      "domain": "friends, networks, community, future hopes, group efforts",
+      "modern_keywords": ["community", "friends", "networks", "future", "hopes"]
+    },
+    "12": {
+      "ordinal": 12,
+      "name": "Twelfth House",
+      "alternate_names": ["House of the Unconscious", "House of Solitude"],
+      "polarity": "cadent",
+      "weight": "low",
+      "associated_sign": "pisces",
+      "associated_planet": "neptune",
+      "associated_planet_traditional": "jupiter",
+      "domain": "unconscious, solitude, retreat, dreams, hidden patterns",
+      "modern_keywords": ["unconscious", "solitude", "dreams", "spirituality", "hidden"]
+    }
+  },
+
+  "aspects": {
+    "_schema": "Major and minor aspects. Default orbs are starting values; users may eventually configure tighter orbs. Valence is descriptive ('flowing' vs 'frictional') rather than judgmental ('good' vs 'evil').",
+
+    "major": {
+      "conjunction": {
+        "id": "conjunction",
+        "name": "Conjunction",
+        "glyph": "☌",
+        "degrees": 0,
+        "default_orb": 8,
+        "valence": "merging",
+        "description": "Two planets blend into a single combined energy",
+        "polarity": "neutral",
+        "is_major": true
+      },
+      "sextile": {
+        "id": "sextile",
+        "name": "Sextile",
+        "glyph": "⚹",
+        "degrees": 60,
+        "default_orb": 6,
+        "valence": "cooperative",
+        "description": "An open opportunity that must be reached for",
+        "element_relationship": "compatible (fire-air or earth-water)",
+        "polarity": "harmonious",
+        "is_major": true
+      },
+      "square": {
+        "id": "square",
+        "name": "Square",
+        "glyph": "□",
+        "degrees": 90,
+        "default_orb": 8,
+        "valence": "frictional",
+        "description": "Internal tension that drives action and growth",
+        "modality_relationship": "same modality, different elements",
+        "polarity": "challenging",
+        "is_major": true
+      },
+      "trine": {
+        "id": "trine",
+        "name": "Trine",
+        "glyph": "△",
+        "degrees": 120,
+        "default_orb": 8,
+        "valence": "flowing",
+        "description": "Effortless harmony between energies",
+        "element_relationship": "same element",
+        "polarity": "harmonious",
+        "is_major": true
+      },
+      "opposition": {
+        "id": "opposition",
+        "name": "Opposition",
+        "glyph": "☍",
+        "degrees": 180,
+        "default_orb": 8,
+        "valence": "polarizing",
+        "description": "Tension between two opposing energies that must be integrated",
+        "polarity": "challenging",
+        "is_major": true
+      }
+    },
+
+    "minor": {
+      "semisextile": {
+        "id": "semisextile",
+        "name": "Semisextile",
+        "glyph": "⚺",
+        "degrees": 30,
+        "default_orb": 2,
+        "valence": "subtle_adjustment",
+        "description": "Small friction between adjacent signs requiring small adjustment",
+        "is_major": false
+      },
+      "semisquare": {
+        "id": "semisquare",
+        "name": "Semisquare",
+        "glyph": "∠",
+        "degrees": 45,
+        "default_orb": 2,
+        "valence": "minor_friction",
+        "description": "Low-grade irritation, less intense than a square",
+        "is_major": false
+      },
+      "quintile": {
+        "id": "quintile",
+        "name": "Quintile",
+        "glyph": "Q",
+        "degrees": 72,
+        "default_orb": 2,
+        "valence": "creative",
+        "description": "A creative or artistic gift that emerges with practice",
+        "is_major": false
+      },
+      "sesquiquadrate": {
+        "id": "sesquiquadrate",
+        "name": "Sesquiquadrate",
+        "alternate_names": ["sesquisquare"],
+        "glyph": "⚼",
+        "degrees": 135,
+        "default_orb": 2,
+        "valence": "minor_friction",
+        "description": "Indirect tension, often shows up as nagging frustration",
+        "is_major": false
+      },
+      "biquintile": {
+        "id": "biquintile",
+        "name": "Biquintile",
+        "glyph": "bQ",
+        "degrees": 144,
+        "default_orb": 2,
+        "valence": "creative",
+        "description": "A unique creative ability, subtler than a quintile",
+        "is_major": false
+      },
+      "quincunx": {
+        "id": "quincunx",
+        "name": "Quincunx",
+        "alternate_names": ["inconjunct"],
+        "glyph": "⚻",
+        "degrees": 150,
+        "default_orb": 3,
+        "valence": "awkward",
+        "description": "Energies that don't fit naturally and require constant adjustment",
+        "is_major": false
+      }
+    }
+  },
+
+  "elements": {
+    "_schema": "The four classical elements that group the signs. Used for compatibility analysis and quick chart description.",
+
+    "fire": {
+      "id": "fire",
+      "name": "Fire",
+      "signs": ["aries", "leo", "sagittarius"],
+      "archetype": "spark and momentum",
+      "modern_keywords": ["passion", "action", "inspiration", "warmth", "directness", "courage"],
+      "compatible_elements": ["fire", "air"],
+      "challenging_elements": ["water", "earth"]
+    },
+    "earth": {
+      "id": "earth",
+      "name": "Earth",
+      "signs": ["taurus", "virgo", "capricorn"],
+      "archetype": "groundedness and material",
+      "modern_keywords": ["stability", "practicality", "patience", "embodiment", "sensuality", "build"],
+      "compatible_elements": ["earth", "water"],
+      "challenging_elements": ["fire", "air"]
+    },
+    "air": {
+      "id": "air",
+      "name": "Air",
+      "signs": ["gemini", "libra", "aquarius"],
+      "archetype": "thought and exchange",
+      "modern_keywords": ["intellect", "communication", "social", "abstraction", "ideas", "perspective"],
+      "compatible_elements": ["air", "fire"],
+      "challenging_elements": ["earth", "water"]
+    },
+    "water": {
+      "id": "water",
+      "name": "Water",
+      "signs": ["cancer", "scorpio", "pisces"],
+      "archetype": "feeling and depth",
+      "modern_keywords": ["emotion", "intuition", "empathy", "depth", "memory", "sensitivity"],
+      "compatible_elements": ["water", "earth"],
+      "challenging_elements": ["fire", "air"]
+    }
+  },
+
+  "modalities": {
+    "_schema": "The three modalities (qualities) describing HOW a sign expresses its element. Used for understanding pace and approach.",
+
+    "cardinal": {
+      "id": "cardinal",
+      "name": "Cardinal",
+      "signs": ["aries", "cancer", "libra", "capricorn"],
+      "archetype": "the initiator",
+      "function": "starts new things, marks the beginning of each season",
+      "modern_keywords": ["initiation", "action", "leadership", "starting", "momentum"],
+      "season_marker": "first sign of each season"
+    },
+    "fixed": {
+      "id": "fixed",
+      "name": "Fixed",
+      "signs": ["taurus", "leo", "scorpio", "aquarius"],
+      "archetype": "the sustainer",
+      "function": "stabilizes and persists, holds the middle of each season",
+      "modern_keywords": ["stability", "persistence", "depth", "loyalty", "stubbornness"],
+      "season_marker": "middle sign of each season"
+    },
+    "mutable": {
+      "id": "mutable",
+      "name": "Mutable",
+      "signs": ["gemini", "virgo", "sagittarius", "pisces"],
+      "archetype": "the adapter",
+      "function": "transitions and flexes, ends each season",
+      "modern_keywords": ["adaptability", "change", "flexibility", "transition", "synthesis"],
+      "season_marker": "last sign of each season"
+    }
+  },
+
+  "polarities": {
+    "_schema": "Two-way classification of signs by energetic direction. Modern Moon Rhythms uses 'active' and 'receptive' instead of the classical 'masculine/feminine' or 'positive/negative'.",
+
+    "active": {
+      "id": "active",
+      "name": "Active",
+      "alternate_names": ["positive", "yang", "masculine (classical, dropped)"],
+      "signs": ["aries", "gemini", "leo", "libra", "sagittarius", "aquarius"],
+      "elements": ["fire", "air"],
+      "function": "outward expression, projection, initiation"
+    },
+    "receptive": {
+      "id": "receptive",
+      "name": "Receptive",
+      "alternate_names": ["negative", "yin", "feminine (classical, dropped)"],
+      "signs": ["taurus", "cancer", "virgo", "scorpio", "capricorn", "pisces"],
+      "elements": ["earth", "water"],
+      "function": "inward absorption, reception, holding"
+    }
+  },
+
+  "lunar_phases": {
+    "_schema": "Eight phases of the lunar cycle, each spanning ~3.7 days. Calculated from the angular distance between Sun and Moon. Critical for Moon Rhythms.",
+
+    "new_moon": {
+      "id": "new_moon",
+      "name": "New Moon",
+      "ordinal": 1,
+      "sun_moon_angle_degrees": "0 to 45",
+      "average_days_in_phase": 3.7,
+      "archetype": "the seed",
+      "function": "fresh start, intention-setting, planting seeds in the dark",
+      "modern_keywords": ["beginnings", "intention", "potential", "darkness", "seeding"]
+    },
+    "waxing_crescent": {
+      "id": "waxing_crescent",
+      "name": "Waxing Crescent",
+      "ordinal": 2,
+      "sun_moon_angle_degrees": "45 to 90",
+      "average_days_in_phase": 3.7,
+      "archetype": "the gathering",
+      "function": "building momentum, initial action on intentions",
+      "modern_keywords": ["building", "momentum", "growth", "first steps"]
+    },
+    "first_quarter": {
+      "id": "first_quarter",
+      "name": "First Quarter",
+      "ordinal": 3,
+      "sun_moon_angle_degrees": "90 to 135",
+      "average_days_in_phase": 3.7,
+      "archetype": "the test",
+      "function": "first obstacles, decisions that demand commitment",
+      "modern_keywords": ["challenge", "decision", "tension", "action", "test"]
+    },
+    "waxing_gibbous": {
+      "id": "waxing_gibbous",
+      "name": "Waxing Gibbous",
+      "ordinal": 4,
+      "sun_moon_angle_degrees": "135 to 180",
+      "average_days_in_phase": 3.7,
+      "archetype": "the refinement",
+      "function": "fine-tuning, anticipation, preparing for fullness",
+      "modern_keywords": ["refinement", "anticipation", "adjustment", "preparation"]
+    },
+    "full_moon": {
+      "id": "full_moon",
+      "name": "Full Moon",
+      "ordinal": 5,
+      "sun_moon_angle_degrees": "180 to 225",
+      "average_days_in_phase": 3.7,
+      "archetype": "the revelation",
+      "function": "culmination, illumination, emotional peak, what was hidden becomes visible",
+      "modern_keywords": ["culmination", "revelation", "intensity", "fullness", "release"]
+    },
+    "waning_gibbous": {
+      "id": "waning_gibbous",
+      "name": "Waning Gibbous",
+      "alternate_names": ["disseminating moon"],
+      "ordinal": 6,
+      "sun_moon_angle_degrees": "225 to 270",
+      "average_days_in_phase": 3.7,
+      "archetype": "the distribution",
+      "function": "sharing what was learned, integration, gratitude",
+      "modern_keywords": ["sharing", "integration", "teaching", "gratitude"]
+    },
+    "last_quarter": {
+      "id": "last_quarter",
+      "name": "Last Quarter",
+      "alternate_names": ["third quarter"],
+      "ordinal": 7,
+      "sun_moon_angle_degrees": "270 to 315",
+      "average_days_in_phase": 3.7,
+      "archetype": "the reckoning",
+      "function": "release, completion, what no longer fits gets cut",
+      "modern_keywords": ["release", "completion", "letting go", "review"]
+    },
+    "waning_crescent": {
+      "id": "waning_crescent",
+      "name": "Waning Crescent",
+      "alternate_names": ["balsamic moon"],
+      "ordinal": 8,
+      "sun_moon_angle_degrees": "315 to 360",
+      "average_days_in_phase": 3.7,
+      "archetype": "the rest",
+      "function": "rest, surrender, preparation for the next cycle",
+      "modern_keywords": ["rest", "surrender", "dreams", "preparation", "ending"]
+    }
+  },
+
+  "decans": {
+    "_schema": "Each sign divides into three 10-degree decans. Each decan has a sub-ruler (modern Triplicity system used here). The first decan is ruled by the sign's ruler; subsequent decans are ruled by the next planet in the same element. This is used for fine-grained chart analysis.",
+
+    "_method": "Modern Triplicity / Chaldean Decans",
+
+    "aries": {
+      "decan_1": {"degrees": "0-9.99", "sub_ruler": "mars", "flavor": "pure aries — rawest expression"},
+      "decan_2": {"degrees": "10-19.99", "sub_ruler": "sun", "flavor": "aries with leo overlay — proud, expressive"},
+      "decan_3": {"degrees": "20-29.99", "sub_ruler": "jupiter", "flavor": "aries with sagittarius overlay — adventurous, philosophical"}
+    },
+    "taurus": {
+      "decan_1": {"degrees": "0-9.99", "sub_ruler": "venus", "flavor": "pure taurus — sensual, grounded"},
+      "decan_2": {"degrees": "10-19.99", "sub_ruler": "mercury", "flavor": "taurus with virgo overlay — methodical, practical"},
+      "decan_3": {"degrees": "20-29.99", "sub_ruler": "saturn", "flavor": "taurus with capricorn overlay — disciplined, structured"}
+    },
+    "gemini": {
+      "decan_1": {"degrees": "0-9.99", "sub_ruler": "mercury", "flavor": "pure gemini — quick, curious"},
+      "decan_2": {"degrees": "10-19.99", "sub_ruler": "venus", "flavor": "gemini with libra overlay — diplomatic, social"},
+      "decan_3": {"degrees": "20-29.99", "sub_ruler": "uranus", "flavor": "gemini with aquarius overlay — original, unconventional"}
+    },
+    "cancer": {
+      "decan_1": {"degrees": "0-9.99", "sub_ruler": "moon", "flavor": "pure cancer — deeply emotional, instinctive"},
+      "decan_2": {"degrees": "10-19.99", "sub_ruler": "pluto", "flavor": "cancer with scorpio overlay — intense, transformative"},
+      "decan_3": {"degrees": "20-29.99", "sub_ruler": "neptune", "flavor": "cancer with pisces overlay — dreamy, compassionate"}
+    },
+    "leo": {
+      "decan_1": {"degrees": "0-9.99", "sub_ruler": "sun", "flavor": "pure leo — radiant, expressive"},
+      "decan_2": {"degrees": "10-19.99", "sub_ruler": "jupiter", "flavor": "leo with sagittarius overlay — generous, expansive"},
+      "decan_3": {"degrees": "20-29.99", "sub_ruler": "mars", "flavor": "leo with aries overlay — bold, action-oriented"}
+    },
+    "virgo": {
+      "decan_1": {"degrees": "0-9.99", "sub_ruler": "mercury", "flavor": "pure virgo — analytical, precise"},
+      "decan_2": {"degrees": "10-19.99", "sub_ruler": "saturn", "flavor": "virgo with capricorn overlay — disciplined, ambitious"},
+      "decan_3": {"degrees": "20-29.99", "sub_ruler": "venus", "flavor": "virgo with taurus overlay — sensual, grounded"}
+    },
+    "libra": {
+      "decan_1": {"degrees": "0-9.99", "sub_ruler": "venus", "flavor": "pure libra — graceful, balanced"},
+      "decan_2": {"degrees": "10-19.99", "sub_ruler": "uranus", "flavor": "libra with aquarius overlay — innovative, social-minded"},
+      "decan_3": {"degrees": "20-29.99", "sub_ruler": "mercury", "flavor": "libra with gemini overlay — communicative, intellectual"}
+    },
+    "scorpio": {
+      "decan_1": {"degrees": "0-9.99", "sub_ruler": "pluto", "flavor": "pure scorpio — intense, penetrating"},
+      "decan_2": {"degrees": "10-19.99", "sub_ruler": "neptune", "flavor": "scorpio with pisces overlay — psychic, mystical"},
+      "decan_3": {"degrees": "20-29.99", "sub_ruler": "moon", "flavor": "scorpio with cancer overlay — emotionally protective"}
+    },
+    "sagittarius": {
+      "decan_1": {"degrees": "0-9.99", "sub_ruler": "jupiter", "flavor": "pure sagittarius — adventurous, philosophical"},
+      "decan_2": {"degrees": "10-19.99", "sub_ruler": "mars", "flavor": "sagittarius with aries overlay — bold, pioneering"},
+      "decan_3": {"degrees": "20-29.99", "sub_ruler": "sun", "flavor": "sagittarius with leo overlay — confident, expressive"}
+    },
+    "capricorn": {
+      "decan_1": {"degrees": "0-9.99", "sub_ruler": "saturn", "flavor": "pure capricorn — disciplined, ambitious"},
+      "decan_2": {"degrees": "10-19.99", "sub_ruler": "venus", "flavor": "capricorn with taurus overlay — patient, sensual"},
+      "decan_3": {"degrees": "20-29.99", "sub_ruler": "mercury", "flavor": "capricorn with virgo overlay — methodical, analytical"}
+    },
+    "aquarius": {
+      "decan_1": {"degrees": "0-9.99", "sub_ruler": "uranus", "flavor": "pure aquarius — original, independent"},
+      "decan_2": {"degrees": "10-19.99", "sub_ruler": "mercury", "flavor": "aquarius with gemini overlay — communicative, ideas-driven"},
+      "decan_3": {"degrees": "20-29.99", "sub_ruler": "venus", "flavor": "aquarius with libra overlay — diplomatic, socially-attuned"}
+    },
+    "pisces": {
+      "decan_1": {"degrees": "0-9.99", "sub_ruler": "neptune", "flavor": "pure pisces — intuitive, dreamy"},
+      "decan_2": {"degrees": "10-19.99", "sub_ruler": "moon", "flavor": "pisces with cancer overlay — emotional, nurturing"},
+      "decan_3": {"degrees": "20-29.99", "sub_ruler": "pluto", "flavor": "pisces with scorpio overlay — deep, transformative"}
+    }
+  },
+
+  "house_systems": {
+    "_schema": "Different mathematical methods for dividing the sky into 12 houses. Moon Rhythms defaults to Placidus but offers Whole Sign as alternate. Most users will never see this setting; advanced users will care.",
+
+    "placidus": {
+      "id": "placidus",
+      "name": "Placidus",
+      "is_default": true,
+      "method": "time-based; divides the diurnal arc of each ecliptic point",
+      "best_for": "psychological astrology, modern western tradition",
+      "limitation": "fails near polar latitudes (above ~66° N/S)"
+    },
+    "whole_sign": {
+      "id": "whole_sign",
+      "name": "Whole Sign",
+      "method": "each sign occupies one full house starting from the ascending sign",
+      "best_for": "Hellenistic and traditional astrology, simplicity, polar latitudes",
+      "limitation": "loses precision in some interpretive contexts"
+    },
+    "koch": {
+      "id": "koch",
+      "name": "Koch",
+      "method": "time-based variant similar to Placidus",
+      "best_for": "those preferring birthplace-specific calculations",
+      "limitation": "also fails at high latitudes"
+    },
+    "equal_house": {
+      "id": "equal_house",
+      "name": "Equal House",
+      "method": "each house is exactly 30° starting from the ascendant",
+      "best_for": "high latitudes, simplicity",
+      "limitation": "loses the distinct meaning of the Midheaven as 10th cusp"
+    }
+  },
+
+  "chart_angles": {
+    "_schema": "The four cardinal points of a chart. These are the most important sensitive points in any natal chart. They're distinct from houses but coincide with house cusps in most house systems.",
+
+    "ascendant": {
+      "id": "ascendant",
+      "name": "Ascendant",
+      "abbreviation": "ASC",
+      "is_house_cusp": 1,
+      "calculation": "ecliptic degree rising in the east at moment of birth",
+      "function": "how you appear, your default approach to the world",
+      "always_opposite": "descendant"
+    },
+    "descendant": {
+      "id": "descendant",
+      "name": "Descendant",
+      "abbreviation": "DSC",
+      "is_house_cusp": 7,
+      "calculation": "180° from ascendant",
+      "function": "what you seek in partnership, what you project",
+      "always_opposite": "ascendant"
+    },
+    "midheaven": {
+      "id": "midheaven",
+      "name": "Midheaven",
+      "abbreviation": "MC",
+      "alternate_name": "Medium Coeli",
+      "is_house_cusp": 10,
+      "calculation": "highest point of the ecliptic at moment of birth",
+      "function": "public role, vocation, what you're known for",
+      "always_opposite": "imum_coeli"
+    },
+    "imum_coeli": {
+      "id": "imum_coeli",
+      "name": "Imum Coeli",
+      "abbreviation": "IC",
+      "alternate_name": "Nadir",
+      "is_house_cusp": 4,
+      "calculation": "180° from midheaven",
+      "function": "private base, roots, deepest self",
+      "always_opposite": "midheaven"
+    }
+  },
+
+  "synastry_framework": {
+    "_schema": "Deterministic rules for two-chart comparison. Used to bias the AI's interpretation of relationship dynamics. Does NOT contain interpretive content — that lives in commissioned chunks.",
+
+    "default_orbs_for_synastry": {
+      "_note": "Synastry orbs are typically tighter than natal aspect orbs.",
+      "conjunction": 7,
+      "opposition": 7,
+      "trine": 6,
+      "square": 6,
+      "sextile": 4
+    },
+
+    "high_significance_aspects": {
+      "_description": "These cross-chart aspects are weighted more heavily in synastry interpretation.",
+      "sun_moon_any_aspect": "very high — emotional and identity compatibility",
+      "moon_moon_any_aspect": "very high — emotional rhythm match",
+      "venus_mars_any_aspect": "high — sexual/romantic chemistry",
+      "ascendant_sun_or_moon": "high — felt sense of seeing each other clearly",
+      "saturn_personal_planet": "high — long-term commitment potential AND restriction patterns",
+      "node_personal_planet": "high — karmic / soul-level resonance"
+    },
+
+    "challenging_synastry_patterns": {
+      "_description": "Patterns that often produce friction. Not 'bad' — just things to name and work with.",
+      "saturn_square_or_opposite_personal_planet": "tension around restriction, judgment, time",
+      "mars_square_or_opposite_mars": "competitive friction, conflict over pace",
+      "moon_square_or_opposite_moon": "different emotional rhythms, easy misreading",
+      "pluto_aspecting_personal_planet": "intensity, power dynamics"
+    },
+
+    "harmonious_synastry_patterns": {
+      "sun_trine_or_sextile_moon": "easy emotional understanding",
+      "venus_trine_or_sextile_jupiter": "warmth and ease in shared values",
+      "moon_in_partner's_4th_house": "feeling at home with each other",
+      "venus_in_partner's_5th_or_7th_house": "natural attraction and partnership"
+    }
+  },
+
+  "moon_sign_compatibility_matrix": {
+    "_schema": "Element-based compatibility heuristic for moon signs. This is a SIMPLIFIED model used as a default before deeper synastry analysis. The AI should use this for quick first-pass relationship reads, then layer in nuance.",
+
+    "_methodology": "Same element = high natural understanding. Compatible element = moderate ease. Challenging element = friction that requires explicit work.",
+
+    "fire_moon_with": {
+      "fire_moon": "high — shared spontaneity and warmth",
+      "earth_moon": "challenging — pace mismatch, fire feels constrained",
+      "air_moon": "high — fire feeds air, easy energetic exchange",
+      "water_moon": "challenging — fire's directness can hurt water's sensitivity"
+    },
+    "earth_moon_with": {
+      "fire_moon": "challenging — fire's pace overwhelms earth's steadiness",
+      "earth_moon": "high — shared groundedness and reliability",
+      "air_moon": "challenging — abstraction vs. tangibility",
+      "water_moon": "high — water nourishes earth, mutual stability"
+    },
+    "air_moon_with": {
+      "fire_moon": "high — mental and energetic stimulation",
+      "earth_moon": "challenging — needs differ at root",
+      "air_moon": "high — shared mental and social rhythm",
+      "water_moon": "challenging — air's detachment can wound water's depth"
+    },
+    "water_moon_with": {
+      "fire_moon": "challenging — water absorbs fire's heat as overwhelm",
+      "earth_moon": "high — earth holds water's depth steadily",
+      "air_moon": "challenging — water needs immersion, air needs space",
+      "water_moon": "high — deep mutual emotional understanding"
+    }
+  },
+
+  "transit_significance": {
+    "_schema": "Heuristic for which transits are worth surfacing to users. Not every planetary movement matters — only certain ones produce noticeable life events.",
+
+    "highest_significance": {
+      "outer_planet_transits_to_personal_planets": "saturn, uranus, neptune, pluto crossing your sun, moon, mercury, venus, or mars produces multi-month life themes",
+      "saturn_return": "ages 28-30 and 58-60 — major life restructuring",
+      "outer_planet_to_angles": "transits to ASC, MC, DSC, IC mark public/private life shifts",
+      "progressed_lunar_phases": "the 27.5 year progressed lunation cycle marks deep emotional chapters"
+    },
+
+    "moderate_significance": {
+      "jupiter_returns": "every 12 years — opportunity expansion",
+      "jupiter_to_personal_planets": "weeks of growth and optimism",
+      "saturn_to_houses": "structuring themes by life domain"
+    },
+
+    "low_significance_for_user_alerts": {
+      "_note": "Mercury, Venus, Mars, Sun, Moon transits move quickly and most don't merit user notifications. Reserve alerts for outer planets and significant lunations.",
+      "mercury_retrograde": "well-known cultural signal, user-requested",
+      "venus_retrograde": "relationship review periods",
+      "mars_retrograde": "stalled momentum periods",
+      "new_and_full_moons_in_user's_sign": "monthly emotional resonance"
+    }
+  },
+
+  "classical_reference": {
+    "_note": "This block preserves traditional astrological labels and frameworks that are NOT used in modern Moon Rhythms responses. Kept for historical/learning content only. The AI should NOT reference these in user-facing chat unless explicitly asked about astrological history.",
+
+    "benefic_planets": ["jupiter", "venus"],
+    "malefic_planets": ["saturn", "mars"],
+    "luminaries": ["sun", "moon"],
+    "neutral_or_mutable_planets": ["mercury"],
+
+    "sign_classifications": {
+      "barren_signs": ["aries", "leo", "virgo", "capricorn"],
+      "fruitful_signs": ["taurus", "cancer", "scorpio", "pisces"],
+      "double_bodied_signs": ["gemini", "sagittarius", "pisces"],
+      "feral_signs": ["leo"],
+      "human_signs": ["gemini", "virgo", "libra", "aquarius"],
+      "mute_signs": ["cancer", "scorpio", "pisces"]
+    },
+
+    "planetary_dignities_simple": {
+      "_note": "Simplified dignity hierarchy — domicile (rulership) > exaltation > triplicity > term > face. Modern Moon Rhythms uses domicile and exaltation/detriment/fall only.",
+      "domicile": "planet in its own sign — strongest expression",
+      "exaltation": "planet in its sign of exaltation — graceful expression",
+      "detriment": "planet opposite its rulership — challenged expression",
+      "fall": "planet opposite its exaltation — weakest expression"
+    },
+
+    "house_body_associations_archived": {
+      "_note": "Sepharial's house-to-body-part mapping. NOT used by Moon Rhythms AI. Archived for completeness only.",
+      "1": "head and face",
+      "2": "neck and throat",
+      "3": "arms and lungs",
+      "4": "chest and breasts",
+      "5": "back and heart",
+      "6": "abdomen and digestive system",
+      "7": "loins and kidneys",
+      "8": "reproductive and excretory systems",
+      "9": "thighs and hips",
+      "10": "knees and skeletal structure",
+      "11": "calves and ankles",
+      "12": "feet"
+    }
+  },
+
+  "moon_rhythms_specific": {
+    "_schema": "Application-specific deterministic data — settings and conventions that apply specifically to how Moon Rhythms presents data, not general astrological reference.",
+
+    "default_house_system": "placidus",
+    "fallback_house_system_high_latitude": "whole_sign",
+    "default_zodiac": "tropical",
+    "default_node_calculation": "true_node",
+    "default_lilith_calculation": "mean_apogee",
+    "use_traditional_rulerships": false,
+    "preferred_aspect_orbs": "default",
+    "show_minor_aspects": false,
+
+    "supported_planets_mvp": [
+      "sun", "moon", "mercury", "venus", "mars",
+      "jupiter", "saturn", "uranus", "neptune", "pluto"
+    ],
+    "supported_points_mvp": [
+      "ascendant", "midheaven", "descendant", "imum_coeli",
+      "north_node", "south_node", "chiron", "black_moon_lilith"
+    ],
+    "future_additions": ["part_of_fortune", "vertex", "ceres", "pallas", "juno", "vesta"],
+
+    "user_facing_planet_order": [
+      "sun", "moon", "mercury", "venus", "mars",
+      "jupiter", "saturn", "uranus", "neptune", "pluto",
+      "chiron", "north_node", "south_node", "black_moon_lilith"
+    ],
+
+    "user_facing_voice_rules": {
+      "use_active_receptive_not_masculine_feminine": true,
+      "use_challenging_not_evil_or_malefic": true,
+      "use_flowing_not_good_or_benefic": true,
+      "use_nurturing_parent_not_mother": true,
+      "use_structuring_parent_not_father": true,
+      "include_medical_associations": false,
+      "include_cosmic_or_mystical_language": false
+    }
+  }
+}

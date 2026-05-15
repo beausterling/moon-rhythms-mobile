@@ -1,0 +1,109 @@
+{
+  "_note": "This file contains STRUCTURED FACTS extracted from Sepharial that should be stored in relational tables in Supabase, NOT in the RAG knowledge_chunks table. These are deterministic lookups used by the AI assembler (e.g., 'is Mars in its rulership? what element is Scorpio?'), not retrievable interpretive text.",
+
+  "planet_rulerships": {
+    "_schema": "One planet rules one or two signs in classical astrology. Modern astrology typically uses the outer planets as co-rulers, shown here.",
+    "sun": {"rules": ["leo"]},
+    "moon": {"rules": ["cancer"]},
+    "mercury": {"rules": ["gemini", "virgo"]},
+    "venus": {"rules": ["taurus", "libra"]},
+    "mars": {"rules": ["aries"], "co_rules_classically": ["scorpio"]},
+    "jupiter": {"rules": ["sagittarius"], "co_rules_classically": ["pisces"]},
+    "saturn": {"rules": ["capricorn"], "co_rules_classically": ["aquarius"]},
+    "uranus": {"rules": ["aquarius"], "traditional_ruler_of_same_sign": "saturn"},
+    "neptune": {"rules": ["pisces"], "traditional_ruler_of_same_sign": "jupiter"},
+    "pluto": {"rules": ["scorpio"], "traditional_ruler_of_same_sign": "mars"}
+  },
+
+  "sign_elements": {
+    "aries": "fire",
+    "taurus": "earth",
+    "gemini": "air",
+    "cancer": "water",
+    "leo": "fire",
+    "virgo": "earth",
+    "libra": "air",
+    "scorpio": "water",
+    "sagittarius": "fire",
+    "capricorn": "earth",
+    "aquarius": "air",
+    "pisces": "water"
+  },
+
+  "sign_modalities": {
+    "aries": "cardinal",
+    "taurus": "fixed",
+    "gemini": "mutable",
+    "cancer": "cardinal",
+    "leo": "fixed",
+    "virgo": "mutable",
+    "libra": "cardinal",
+    "scorpio": "fixed",
+    "sagittarius": "mutable",
+    "capricorn": "cardinal",
+    "aquarius": "fixed",
+    "pisces": "mutable"
+  },
+
+  "sign_polarities": {
+    "_note": "Classical 'masculine/feminine' relabeled as 'active/receptive' or 'positive/negative' in modern use. Moon Rhythms should use 'active' and 'receptive' in user-facing copy.",
+    "aries": "active",
+    "taurus": "receptive",
+    "gemini": "active",
+    "cancer": "receptive",
+    "leo": "active",
+    "virgo": "receptive",
+    "libra": "active",
+    "scorpio": "receptive",
+    "sagittarius": "active",
+    "capricorn": "receptive",
+    "aquarius": "active",
+    "pisces": "receptive"
+  },
+
+  "major_aspects": {
+    "_schema": "Primary aspects used in Moon Rhythms. Orb = degrees of flexibility in measurement (tighter = stronger aspect).",
+    "conjunction": {"degrees": 0, "default_orb": 8, "valence": "merging"},
+    "sextile": {"degrees": 60, "default_orb": 6, "valence": "cooperative"},
+    "square": {"degrees": 90, "default_orb": 8, "valence": "frictional"},
+    "trine": {"degrees": 120, "default_orb": 8, "valence": "flowing"},
+    "opposition": {"degrees": 180, "default_orb": 8, "valence": "polarizing"},
+    "_minor_aspects_for_later": {
+      "semisextile": 30,
+      "semisquare": 45,
+      "quintile": 72,
+      "sesquiquadrate": 135,
+      "quincunx": 150,
+      "biquintile": 144
+    }
+  },
+
+  "classical_valences": {
+    "_note": "Sepharial's 'benefic/malefic' system is classical. Moon Rhythms should NOT use these labels in user-facing copy but may store them for optional historical/learning content.",
+    "benefic": ["jupiter", "venus"],
+    "malefic": ["saturn", "mars"],
+    "luminaries": ["sun", "moon"],
+    "neutral_or_mutable": ["mercury"],
+    "modern_additions": {
+      "uranus": "disruptor (neutral)",
+      "neptune": "dissolver (neutral)",
+      "pluto": "transformer (neutral)"
+    }
+  },
+
+  "house_body_associations": {
+    "_note": "Sepharial mapped each house to body parts. Moon Rhythms DOES NOT use these in AI responses — they're medical claims and outside our scope. Stored only as historical reference.",
+    "1": "face and head",
+    "2": "neck and throat",
+    "3": "arms and lungs",
+    "4": "breasts and thorax",
+    "5": "back and heart",
+    "6": "abdomen and lower viscera",
+    "7": "loins and kidneys",
+    "8": "excretory system",
+    "9": "thighs",
+    "10": "knees",
+    "11": "legs (calf to ankle)",
+    "12": "ankles and feet"
+  }
+}

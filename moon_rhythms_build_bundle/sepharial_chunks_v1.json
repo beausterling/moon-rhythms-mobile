@@ -1,0 +1,264 @@
+{
+  "corpus_metadata": {
+    "version": "v1",
+    "generated": "2026-04-24",
+    "source_book": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920",
+    "source_url": "https://www.gutenberg.org/ebooks/46963",
+    "public_domain_status": "US PD (pre-1930); author died 1929 — globally PD",
+    "prompt_version": "voice_modernization_v1",
+    "chunk_count": 31,
+    "notes": "Sample batch for Moon Rhythms review. Covers 10 planets + 12 houses + 9 aspects/framework chunks. Does NOT yet cover planets-in-signs, planets-in-houses, or aspect combinations — those require a second extraction pass from Sepharial's Section III, plus full ingestion of Alan Leo. This is the starting foundation."
+  },
+
+  "chunks": [
+
+    {
+      "chunk_key": "planet_sun_nature",
+      "title": "Sun: Core Nature",
+      "body": "The Sun is the vital principle — the part of a person that wants to shine, lead, and be recognized. People with a strong Sun carry themselves with presence. They have a natural sense of dignity and dislike anything small or petty about themselves. Their energy is bright, steady, and warming. The upside is integrity and the capacity to inspire others. The shadow is pride — a reluctance to admit fault, a hunger for admiration that can curdle into arrogance when ignored. Where your Sun sits in the chart is where you most want to be seen for who you really are.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter I",
+      "keywords": ["sun", "identity", "vitality", "presence", "dignity", "leadership", "recognition", "pride"]
+    },
+
+    {
+      "chunk_key": "planet_moon_nature",
+      "title": "Moon: Core Nature",
+      "body": "The Moon is the emotional operating system — how you instinctively react, what soothes you, what you need to feel safe. People with a strong Moon tend to be perceptive, adaptable, and deeply affected by atmosphere and mood. They respond to the emotional undercurrent in a room before they respond to what's being said. The upside is tenderness and emotional intelligence. The shadow is changeability — shifting moods, discomfort with consistency, a pull toward escape when feelings get heavy. Your Moon sign describes not who you are when you're performing, but who you are when you're alone or very safe.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter I",
+      "keywords": ["moon", "emotions", "instinct", "safety", "adaptability", "mood", "sensitivity", "home"]
+    },
+
+    {
+      "chunk_key": "planet_mercury_nature",
+      "title": "Mercury: Core Nature",
+      "body": "Mercury is how you think, speak, and process information. It's the mental switchboard — how quickly you connect ideas, how you phrase things, whether you prefer to talk a thought out or work it through in your head first. People with a strong Mercury are versatile, curious, and verbally alert. They often have several interests going at once. Mercury takes on the color of the planet it's closest to, so its character is shaped heavily by its aspects. The shadow is scatter — too many threads, restless overthinking, communication that runs faster than considered judgment allows.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter I",
+      "keywords": ["mercury", "thinking", "communication", "intellect", "curiosity", "language", "versatility", "overthinking"]
+    },
+
+    {
+      "chunk_key": "planet_venus_nature",
+      "title": "Venus: Core Nature",
+      "body": "Venus is the capacity to appreciate, attract, and connect. It shows up as taste, warmth, sensuality, and the pull toward beauty and pleasure. People with a strong Venus are often gentle company — they know how to make others feel comfortable and valued. They tend to care about aesthetics, harmony, and the small details that make a space or relationship feel good. The upside is grace and the ability to create ease around them. The shadow is avoidance — a reluctance to face conflict, a pull toward pleasant surfaces over hard truths. Venus describes what you love and how you love it.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter I",
+      "keywords": ["venus", "love", "beauty", "harmony", "pleasure", "attraction", "taste", "conflict-avoidance"]
+    },
+
+    {
+      "chunk_key": "planet_mars_nature",
+      "title": "Mars: Core Nature",
+      "body": "Mars is the drive to act. It shows up as ambition, directness, and a willingness to start things before all the details are worked out. People with a strong Mars tend to speak their minds plainly, move quickly, and push past hesitation that stops others. The upside is initiative and the courage to pursue what they want. The shadow is impatience and a tendency to treat disagreement as conflict. Mars doesn't care much about consequence in the moment — which is what makes it powerful, and also what makes it prone to collateral damage. Where your Mars sits shows where you fight for what you want.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter I",
+      "keywords": ["mars", "drive", "ambition", "directness", "anger", "action", "assertion", "impulsiveness"]
+    },
+
+    {
+      "chunk_key": "planet_jupiter_nature",
+      "title": "Jupiter: Core Nature",
+      "body": "Jupiter is the capacity for expansion — generosity, optimism, and belief that things will work out. People with a strong Jupiter tend to think big, take chances, and draw opportunity toward them. They often carry a natural confidence that reassures others. The upside is faith and abundance. The shadow is excess: overpromising, overextending, believing in a vision that outruns reality. Jupiter rarely causes small problems; its problems tend to be about doing too much, not too little. Where your Jupiter sits in the chart is where you most naturally grow, explore, and sometimes overreach.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter I",
+      "keywords": ["jupiter", "expansion", "optimism", "generosity", "growth", "excess", "faith", "opportunity"]
+    },
+
+    {
+      "chunk_key": "planet_saturn_nature",
+      "title": "Saturn: Core Nature",
+      "body": "Saturn is the principle of structure, time, and earned mastery. It shows up as patience, discipline, and a preference for the long path over the quick win. People with a strong Saturn are often taken seriously early in life — they carry weight, keep commitments, and tolerate delay in service of something lasting. The upside is depth and reliability. The shadow is restriction: self-denial that hardens into rigidity, a felt sense of never being quite enough, a tendency to mistake caution for wisdom. Where your Saturn sits is where you'll do the slowest, most honest growing — and where the payoff compounds.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter I",
+      "keywords": ["saturn", "structure", "discipline", "patience", "limitation", "maturity", "responsibility", "restriction"]
+    },
+
+    {
+      "chunk_key": "planet_uranus_nature",
+      "title": "Uranus: Core Nature",
+      "body": "Uranus is the urge to break pattern — to see what others miss, to invent, to refuse the given. People with a strong Uranus tend to think sideways. They resist being categorized, dislike hierarchy for its own sake, and often find their footing by going against the grain. The upside is originality and the capacity to do things no one else would think to try. The shadow is instability: sudden reversals, restlessness that burns through relationships and jobs, a contrarian reflex that opposes for its own sake. Uranus doesn't move predictably — which is the point. Where your Uranus sits is where your life is meant to be unconventional.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter I",
+      "keywords": ["uranus", "originality", "rebellion", "innovation", "independence", "disruption", "change", "unconventional"]
+    },
+
+    {
+      "chunk_key": "planet_neptune_nature",
+      "title": "Neptune: Core Nature",
+      "body": "Neptune is the dissolving principle — imagination, empathy, the blurring of the line between self and other. People with a strong Neptune are often highly sensitive and artistically inclined. They pick up on undercurrents and carry a dreamlike quality others find compelling. The upside is imagination, compassion, and a spiritual or creative depth. The shadow is confusion: escapism, self-deception, difficulty seeing a person or situation clearly because the wish obscures the reality. Neptune rarely lies on purpose — it just doesn't distinguish well between what is and what could be. Where your Neptune sits is where you're most porous to possibility, and most prone to illusion.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter I",
+      "keywords": ["neptune", "imagination", "empathy", "sensitivity", "illusion", "escapism", "spirituality", "boundaries"]
+    },
+
+    {
+      "chunk_key": "planet_pluto_nature",
+      "title": "Pluto: Core Nature",
+      "body": "Pluto is the principle of deep transformation — what gets stripped, what gets reborn, what has power over us that we didn't choose. It wasn't in Sepharial's 1920 source (discovered in 1930), but it belongs in any modern astrological toolkit. People with a strong Pluto run deep. They see through surfaces, sense hidden motives, and are drawn to whatever others avoid. The upside is psychological depth and the capacity to metabolize intense experience. The shadow is obsession, power struggles, and a tendency to hold on longer than is good for you. Where your Pluto sits is where your life keeps asking you to surrender and regenerate.",
+      "source_ref": "Moon Rhythms original (Pluto not covered in 1920 source; added for modern completeness)",
+      "keywords": ["pluto", "transformation", "power", "depth", "obsession", "rebirth", "shadow", "intensity"]
+    },
+
+    {
+      "chunk_key": "house_01_self",
+      "title": "First House: Self and Presentation",
+      "body": "The First House is how you show up — the face you present before anyone knows who you are. It governs your physical presence, your style of entering a room, your default first move in any new situation. Planets here have an outsized effect on how others perceive you and how you perceive yourself. The sign on the First House cusp (your Rising or Ascendant) is the lens through which your whole chart is filtered — the packaging on the rest of the planets.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter III (modernized and expanded)",
+      "keywords": ["first house", "ascendant", "rising sign", "self", "presentation", "identity", "first impressions", "appearance"]
+    },
+
+    {
+      "chunk_key": "house_02_resources",
+      "title": "Second House: Resources and Self-Worth",
+      "body": "The Second House is the domain of what you own and what you value — your money, your possessions, and the deeper question of what gives you a sense of worth. Planets here shape your relationship with resources: how you earn, how you spend, what you consider valuable, and what security means to you. In the body, it traditionally relates to the neck and throat. More importantly for modern use, it's the house of your material base and your self-esteem.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter III (modernized)",
+      "keywords": ["second house", "money", "resources", "self-worth", "values", "possessions", "security", "income"]
+    },
+
+    {
+      "chunk_key": "house_03_mind",
+      "title": "Third House: Mind and Immediate Environment",
+      "body": "The Third House governs how you think and communicate in daily life — short trips, letters and texts, the relationships with siblings and neighbors that make up your immediate social texture. Planets here shape your mental style: whether you're analytical or impressionistic, chatty or selective, detail-focused or big-picture. It's also the house of learning in the informal sense — picking things up as you go, rather than formal study (which belongs to the Ninth).",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter III (modernized)",
+      "keywords": ["third house", "communication", "thinking", "siblings", "neighbors", "short trips", "learning", "daily life"]
+    },
+
+    {
+      "chunk_key": "house_04_roots",
+      "title": "Fourth House: Home and Roots",
+      "body": "The Fourth House is the foundation — home, family of origin, the inherited emotional landscape you carry from childhood into adulthood. Traditionally associated with the mother figure, modern use reframes this as the nurturing parent, the source of your sense of emotional belonging. It also rules real estate and literal living spaces, and marks where you go for deep rest. Planets here shape what home feels like for you, what you need in a living environment, and what unfinished family patterns still show up in your life.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter III (modernized — reframed family role language)",
+      "keywords": ["fourth house", "home", "family", "roots", "mother", "nurturing parent", "childhood", "belonging"]
+    },
+
+    {
+      "chunk_key": "house_05_creation",
+      "title": "Fifth House: Creation, Pleasure, and Play",
+      "body": "The Fifth House is the house of what you make — children, creative work, love affairs, play, and anything you do purely because it delights you. Planets here shape your capacity for joy and self-expression. It's the house of romance (as distinct from committed partnership, which belongs to the Seventh), the house of performance, and the house of risk-taking for fun. Where this house is active in a chart, the person often has a distinct sense of creative identity and a need for spaces where they can show off, flirt, or play.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter III (modernized)",
+      "keywords": ["fifth house", "creativity", "romance", "pleasure", "children", "play", "self-expression", "joy"]
+    },
+
+    {
+      "chunk_key": "house_06_craft",
+      "title": "Sixth House: Daily Craft and Wellbeing",
+      "body": "The Sixth House is the domain of daily routine — the work you do, how you take care of your body, the small daily practices that keep your life running. It governs health (not through disease so much as through habits), the workplace and coworkers, and the detailed, humble labor that builds a life. Planets here shape your relationship with discipline, service, and the small acts of maintenance most people overlook. The Sixth is where your ideals about yourself meet the reality of what you actually do every day.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter III (modernized — removed medical/sickness framing)",
+      "keywords": ["sixth house", "routine", "work", "health", "habits", "service", "daily practice", "wellbeing"]
+    },
+
+    {
+      "chunk_key": "house_07_partnership",
+      "title": "Seventh House: Partnership",
+      "body": "The Seventh House is the domain of one-to-one partnership — marriage, business partnerships, open enemies, and anyone you meet as a peer across a contract or commitment. Planets here describe what you're drawn to in a partner, the dynamics that tend to show up in your close relationships, and what you project onto others that actually belongs to you. The sign on the Seventh House cusp (the Descendant) is the opposite of your Rising — it describes the qualities you're missing and tend to seek in others to complete the picture.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter III (modernized)",
+      "keywords": ["seventh house", "partnership", "marriage", "descendant", "relationships", "commitment", "projection", "peers"]
+    },
+
+    {
+      "chunk_key": "house_08_depths",
+      "title": "Eighth House: Depth, Shared Resources, Transformation",
+      "body": "The Eighth House is the house of what's beneath the surface — shared resources (joint finances, inheritance, debt), intimate merging with another person, and the experiences that strip you down and rebuild you: death, crisis, deep psychological work, sexuality at its most vulnerable. Planets here tend to run deep. People with strong Eighth House placements are often drawn to investigate what others avoid — the hidden, the taboo, the systemic. It's the house where you lose yourself and find something larger.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter III (modernized and substantially expanded — source was limited)",
+      "keywords": ["eighth house", "transformation", "intimacy", "shared resources", "sexuality", "crisis", "taboo", "depth"]
+    },
+
+    {
+      "chunk_key": "house_09_horizons",
+      "title": "Ninth House: Expansion and Meaning",
+      "body": "The Ninth House is the domain of the bigger picture — long travel, higher education, religion and philosophy, the frameworks you use to make sense of life. Planets here shape your relationship with meaning itself. People with an active Ninth House are often drawn to teach, publish, or explore — whether literally (travel, cross-cultural experience) or intellectually (academic study, spiritual practice, ambitious ideas). Where the Third House is the mind picking things up as it goes, the Ninth is the mind trying to build a worldview.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter III (modernized)",
+      "keywords": ["ninth house", "meaning", "philosophy", "travel", "higher education", "religion", "teaching", "worldview"]
+    },
+
+    {
+      "chunk_key": "house_10_vocation",
+      "title": "Tenth House: Vocation and Public Role",
+      "body": "The Tenth House is what you're known for. It governs career in the deep sense — not a job, but the role you play in the public sphere and how you're perceived by people with power over your life. Planets here shape your ambitions, your relationship with authority, and the reputation you build over time. The sign on the Tenth House cusp (the Midheaven) marks the direction your life reaches toward: the version of yourself you're growing into as you mature. Traditionally associated with the father figure, modern use reframes this as the structuring parent.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter III (modernized — reframed family role language)",
+      "keywords": ["tenth house", "career", "vocation", "midheaven", "reputation", "authority", "ambition", "public role"]
+    },
+
+    {
+      "chunk_key": "house_11_community",
+      "title": "Eleventh House: Community and Future",
+      "body": "The Eleventh House is the domain of community — friends, networks, groups, causes you belong to, and the future you're working toward. Where the Seventh is one-to-one partnership, the Eleventh is many-to-many: the crowd, the scene, the movement. Planets here shape how you find your people and what you contribute to collective projects. It's also the house of hopes and wishes — the version of the future you let yourself want.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter III (modernized)",
+      "keywords": ["eleventh house", "community", "friends", "networks", "groups", "future", "hopes", "collective"]
+    },
+
+    {
+      "chunk_key": "house_12_inner",
+      "title": "Twelfth House: Inner Life and the Hidden",
+      "body": "The Twelfth House is the most private part of the chart — what you keep to yourself, what you process alone, the unconscious material that shapes behavior from beneath the surface. Traditionally framed as the house of confinement and loss, modern use sees it as the house of interiority: meditation, retreat, dreams, the deep well of images and intuitions that feed creative and spiritual life. Planets here often operate quietly, shaping experience in ways the person themselves may not fully see. It's also the house of compassion — being moved by what most people overlook.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter III (modernized — softened the punitive framing)",
+      "keywords": ["twelfth house", "unconscious", "solitude", "retreat", "dreams", "spirituality", "compassion", "hidden"]
+    },
+
+    {
+      "chunk_key": "aspect_conjunction",
+      "title": "Conjunction: The Blending",
+      "body": "A conjunction is when two planets sit within a few degrees of each other in the chart. Their energies merge — it's the tightest possible aspect, and it produces a blended expression where you can't fully separate the two forces anymore. Conjunctions are intense because they're inseparable. A Sun-Venus conjunction person can't really talk about their core identity without their sense of love and beauty also speaking. Whether a conjunction plays out as strength or challenge depends on the planets involved and how they relate in the rest of the chart.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter IV (modernized)",
+      "keywords": ["conjunction", "aspect", "blending", "merge", "combined energies", "tight aspect"]
+    },
+
+    {
+      "chunk_key": "aspect_opposition",
+      "title": "Opposition: The Seesaw",
+      "body": "An opposition is when two planets sit across the chart from each other, 180 degrees apart. They pull in opposite directions and the person feels the tension between them — often as an internal seesaw, sometimes projected onto relationships where the other person seems to embody what you're fighting in yourself. Oppositions aren't doomed; they're dynamic. Mature work with an opposition means holding both ends at once rather than collapsing into one or flipping helplessly between them. The classical view called oppositions 'evil' — modern use sees them as challenging but growth-producing.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter IV (modernized — dropped 'evil' framing)",
+      "keywords": ["opposition", "aspect", "tension", "projection", "polarity", "seesaw", "integration"]
+    },
+
+    {
+      "chunk_key": "aspect_square",
+      "title": "Square: The Friction",
+      "body": "A square is when two planets sit 90 degrees apart. It's the aspect of friction — the two forces don't merge (like a conjunction) or pull apart (like an opposition); they grind against each other. Squares produce the pressure that forces action. They're often uncomfortable, especially in early life, and often where a person's most distinctive strengths eventually get built. The classical view called squares 'evil' — modern use sees them as the aspect that makes things happen. A chart without squares is rarely a chart that accomplishes much.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter IV (modernized — dropped 'evil' framing)",
+      "keywords": ["square", "aspect", "friction", "challenge", "pressure", "growth", "difficulty", "motivation"]
+    },
+
+    {
+      "chunk_key": "aspect_trine",
+      "title": "Trine: The Flow",
+      "body": "A trine is when two planets sit 120 degrees apart, in signs of the same element. Their energies flow together — the aspect of natural talent, where something works without much effort. Trines are traditionally called 'good,' and they are easy, but 'easy' has its own trap: abilities that come cheaply are often under-developed because they were never tested. A chart with too many trines and no squares can produce someone gifted but unmotivated. Trines describe where your life moves smoothly, but not necessarily where your character gets built.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter IV (modernized)",
+      "keywords": ["trine", "aspect", "flow", "talent", "ease", "harmony", "same element"]
+    },
+
+    {
+      "chunk_key": "aspect_sextile",
+      "title": "Sextile: The Opportunity",
+      "body": "A sextile is when two planets sit 60 degrees apart, in compatible elements (fire-air or earth-water). Where a trine is flow, a sextile is opportunity — the energies cooperate, but the person has to actually reach for the opening. Sextiles don't just happen; they require a small amount of initiative. Often they describe skills or relationships that develop when the person chooses to develop them, and remain latent otherwise. The aspect of the receptive door — but you have to walk through it.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter IV (modernized)",
+      "keywords": ["sextile", "aspect", "opportunity", "cooperation", "latent talent", "receptive"]
+    },
+
+    {
+      "chunk_key": "framework_significators",
+      "title": "The Main Points of Emphasis in a Chart",
+      "body": "When reading a natal chart, five points carry the most weight: the Sun, the Moon, the Ascendant (the sign rising at the moment of birth), the Midheaven (the highest point of the chart, the Tenth House cusp), and any planet that rules one of these points or sits closely aspected to them. These are the 'significators' — the parts of the chart that most directly describe the person. Other planets matter, but they matter most through their relationships with these five anchors.",
+      "source_ref": "Sepharial, Astrology: How to Make and Read Your Own Horoscope, 1920, Chapter IV (modernized)",
+      "keywords": ["significators", "sun", "moon", "ascendant", "midheaven", "chart ruler", "emphasis"]
+    },
+
+    {
+      "chunk_key": "framework_planet_sign_house",
+      "title": "How to Read Any Planet in a Chart",
+      "body": "Every planet in a birth chart can be read through three layers. First, the planet itself — what function it represents (Mars is drive, Venus is connection, Saturn is structure). Second, the sign it's in — the style or flavor through which that function expresses (Mars in Gemini is mentally quick; Mars in Taurus is physically grounded). Third, the house it occupies — the area of life where that function operates (Mars in the Third House shows up in communication; Mars in the Tenth shows up in career). Planet + sign + house is the core triad of chart reading.",
+      "source_ref": "Moon Rhythms synthesis from Sepharial's framework",
+      "keywords": ["chart reading", "planet", "sign", "house", "framework", "interpretation", "basics"]
+    },
+
+    {
+      "chunk_key": "framework_aspects_overview",
+      "title": "How Planets Interact: An Overview",
+      "body": "Planets in a chart don't operate in isolation — they form angular relationships called aspects. The five major aspects are: conjunction (0°, planets merged), sextile (60°, cooperative), square (90°, friction), trine (120°, easy flow), and opposition (180°, dynamic tension). Aspects are what make a chart a system rather than a list. Two people can have the same Sun sign but completely different lives because the aspects to their Sun are completely different. When reading a chart, the aspect pattern often tells you more than any single placement.",
+      "source_ref": "Moon Rhythms synthesis from Sepharial's Chapter IV",
+      "keywords": ["aspects", "chart interpretation", "angles", "major aspects", "framework", "patterns"]
+    },
+
+    {
+      "chunk_key": "framework_moon_emphasis",
+      "title": "Why the Moon Matters Most in Moon Rhythms",
+      "body": "Most astrology leads with the Sun sign — it's what people mean when they say 'I'm a Leo.' But the Moon often describes the inner experience of a person more accurately than the Sun does. Where the Sun is who you are when you're performing, the Moon is who you are when you're unobserved. In relationships especially, compatibility comes down to how well two people's emotional operating systems — their Moons — can live alongside each other. That's the angle Moon Rhythms is built around.",
+      "source_ref": "Moon Rhythms original framing",
+      "keywords": ["moon sign", "emotional style", "inner life", "sun vs moon", "compatibility", "moon rhythms"]
+    }
+
+  ]
+}
