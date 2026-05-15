@@ -1,6 +1,6 @@
 # Moon Rhythms Mobile
 
-> Native mobile companion to [moonrhythms.io](https://moonrhythms.io) — an ambient lunar awareness app for iOS and Android. Open it and instantly see where the moon is: sign, phase, illumination, degree.
+> Native mobile companion to [moonrhythms.io](https://moonrhythms.io) — a personalized astrology app that helps users understand their emotional patterns, relationships, and personal growth through their birth chart and current Moon cycles. Users can chat with an AI guide that explains their chart in simple, practical language, with paid features for relationship insights using a partner’s birth data. Over time, the app can surface meaningful Moon transits, patterns, and reflections to help users build self-awareness day by day.
 
 Built with **Expo SDK 54**, **React Native**, **TypeScript**, and **Supabase**. This is my **Nucamp React Native Bootcamp Honors Project**.
 
@@ -10,8 +10,8 @@ Built with **Expo SDK 54**, **React Native**, **TypeScript**, and **Supabase**. 
 
 | Welcome | Home | Dashboard |
 | :---: | :---: | :---: |
-| ![Welcome screen with moon and starfield](docs/screenshots/welcome.png) | ![Home screen with live moon position](docs/screenshots/home.png) | ![Dashboard with saved readings](docs/screenshots/dashboard.png) |
-| Animated moon + starfield gate before auth | Live phase, illumination, zodiac sign, and 72-hour time scrubber | Saved birth charts, Human Design, and quiz results |
+| ![Welcome screen with moon animation](docs/screenshots/welcome.png) | ![Home screen with live current astrological moon position](docs/screenshots/home.png) | ![Dashboard with saved readings](docs/screenshots/dashboard.png) |
+| Animated moon + starry background before auth | Live phase, illumination, zodiac sign, and 72-hour time scrubber | Saved birth charts and user data |
 
 ---
 
