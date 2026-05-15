@@ -1,3 +1,9 @@
+-- ARCHIVED 2026-05-15
+-- This migration was drafted before the master architecture doc existed.
+-- It was never applied to any environment and is superseded by the
+-- migrations in this directory. Preserved for historical reference only.
+-- See docs/supabase_master_doc.md for the active schema.
+
 -- Moon Rhythms Mobile core schema
 -- Safe to run in a Supabase project that already has auth enabled.
 
