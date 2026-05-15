@@ -53,6 +53,16 @@ No registration step — just install the APK.
 
 ---
 
+### Getting updates
+
+Once installed, the app updates itself silently for most changes — you do nothing. Open it like normal and the new version is already there.
+
+Occasionally I'll ship a "bigger" update (new feature module, SDK bump, etc.) that needs a fresh install. When that happens, I'll let testers know directly and you'll repeat the install steps above on the same link — no need to re-register your device on iOS, and Android just overwrites the old version.
+
+If something looks broken or the app refuses to open after I push an update, force-quit and reopen once — that triggers the silent update to apply. If it's still broken, ping me.
+
+---
+
 ## 📸 Screens
 
 | Welcome | Home | Dashboard |
