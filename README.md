@@ -6,6 +6,15 @@ Built with **Expo SDK 54**, **React Native**, **TypeScript**, and **Supabase**. 
 
 ---
 
+## 📲 Try It
+
+Want to try the app without cloning the repo or setting up a dev environment?
+
+- **iOS:** [Install via Expo](https://expo.dev/accounts/beausterling/projects/moon-rhythms/builds/3ebdbec3-1395-499b-b8f7-fc82a0bdc629) — your device's UDID must be registered first, [reach out](https://github.com/beausterling) and I'll add you.
+- **Android:** [Download APK](https://expo.dev/artifacts/eas/rB88ZytneU415V8shgNDG5.apk) — installs directly on any Android device. Real devices recommended; emulator performance on macOS hosts can be sluggish for graphics-heavy screens.
+
+---
+
 ## 📸 Screens
 
 | Welcome | Home | Dashboard |

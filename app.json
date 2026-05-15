@@ -17,7 +17,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.moonrhythms.app",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Moon Rhythms uses your location to calculate accurate moon positions for your exact coordinates."
+        "NSLocationWhenInUseUsageDescription": "Moon Rhythms uses your location to calculate accurate moon positions for your exact coordinates.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -32,6 +33,23 @@
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
-    "plugins": ["expo-router", "expo-font", "expo-sqlite"]
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-sqlite"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "2875280b-3adf-4c30-baa8-60cf9c20abd9"
+      }
+    },
+    "owner": "beausterling",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/2875280b-3adf-4c30-baa8-60cf9c20abd9"
+    }
   }
 }
