@@ -1,395 +1,475 @@
-import { useState, useMemo, useCallback } from "react";
+import { useMemo, useState } from "react";
 import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  Dimensions,
   ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Switch,
+  Text,
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  runOnJS,
-} from "react-native-reanimated";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { useMoonPosition } from "../../hooks/useMoonPosition";
+import { useMoonLive } from "../../hooks/useMoonLive";
+import { useTimeScrub } from "../../hooks/useTimeScrub";
 import {
   getFrameFromAngle,
   getMoonFrameUri,
-  interpolatePosition,
-  formatDegrees,
-  formatOffsetLabel,
+  getZodiacFromLongitude,
 } from "../../lib/moon-calc";
+import { Screen } from "../../components/ui/Screen";
+import { NumericValue } from "../../components/ui/NumericValue";
+import { GhostPillButton } from "../../components/ui/GhostPillButton";
+import { TimeScrubberTrack } from "../../components/ui/TimeScrubberTrack";
 
-// U+FE0E forces text-style rendering so iOS doesn't substitute color emoji.
-const TEXT_VARIATION_SELECTOR = "︎";
-const SYMBOL_FONT_FAMILY = "Apple Symbols";
-
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const TRACK_PADDING = 32;
-const TRACK_WIDTH = SCREEN_WIDTH - TRACK_PADDING * 2;
-const HALF_TRACK = TRACK_WIDTH / 2;
-const THUMB_SIZE = 28;
-const MAX_HOURS = 36;
 const MOON_IMAGE_SIZE = 260;
+const SCRUB_RANGE_MS = 72 * 60 * 60 * 1000; // ±3 days
+const SYMBOL_FONT_FAMILY = "Apple Symbols";
+const TEXT_VARIATION_SELECTOR = "︎";
+const HAIRLINE = "rgba(255,255,255,0.10)";
+
+const ORDINAL_RE = /(\d+)(st|nd|rd|th)?$/;
+
+function ordinal(n: number) {
+  const v = n % 100;
+  if (v >= 11 && v <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1:
+      return `${n}st`;
+    case 2:
+      return `${n}nd`;
+    case 3:
+      return `${n}rd`;
+    default:
+      return `${n}th`;
+  }
+}
+
+/**
+ * "Saturday, May 16th 12:45:14 AM"
+ */
+function formatLiveTime(date: Date) {
+  const weekday = date.toLocaleDateString("en-US", { weekday: "long" });
+  const month = date.toLocaleDateString("en-US", { month: "long" });
+  const day = ordinal(date.getDate());
+  const time = date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+  return `${weekday}, ${month} ${day} ${time}`.replace(ORDINAL_RE, (m) => m);
+}
+
+function formatLongitude(deg: number) {
+  return `${deg.toFixed(6)}°`;
+}
+
+function formatDistance(km: number) {
+  return `${km.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} km`;
+}
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { data, isLoading, error, isStale, refresh } = useMoonPosition();
+  const [showDetails, setShowDetails] = useState(false);
 
-  // Scrubber state
-  const [displayOffset, setDisplayOffset] = useState(0);
-  const thumbX = useSharedValue(0);
-  const startX = useSharedValue(0);
+  const scrub = useTimeScrub({ rangeHours: 72, intervalHours: 2 });
+  const live = useMoonLive(scrub.isScrubbingRef);
 
-  const updateOffset = useCallback((hours: number) => {
-    setDisplayOffset(hours);
-  }, []);
+  const isScrubbing = scrub.isScrubbing;
+  const sd = scrub.scrubDisplayData;
+  const server = live.server;
 
-  const gesture = Gesture.Pan()
-    .onStart(() => {
-      "worklet";
-      startX.value = thumbX.value;
-    })
-    .onUpdate((e) => {
-      "worklet";
-      const newX = Math.max(
-        -HALF_TRACK,
-        Math.min(HALF_TRACK, startX.value + e.translationX),
-      );
-      thumbX.value = newX;
-      const hours = (newX / HALF_TRACK) * MAX_HOURS;
-      runOnJS(updateOffset)(hours);
-    })
-    .onEnd(() => {
-      "worklet";
-      // Snap to center if close
-      if (Math.abs(thumbX.value) < 12) {
-        thumbX.value = withSpring(0, { damping: 20, stiffness: 300 });
-        runOnJS(updateOffset)(0);
-      }
-    });
-
-  const thumbStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: thumbX.value }],
-  }));
-
-  const resetToNow = useCallback(() => {
-    thumbX.value = withSpring(0, { damping: 20, stiffness: 300 });
-    setDisplayOffset(0);
-  }, []);
-
-  // Compute display values
+  // Active display lon/angle/illum — live (rAF-extrapolated) or scrub-interpolated
   const display = useMemo(() => {
-    if (!data) return null;
-
-    if (Math.abs(displayOffset) < 0.5) {
-      // Live data from API
-      const frameIndex = getFrameFromAngle(data.moonPhase.angle);
+    if (isScrubbing && sd) {
       return {
-        frameUri: getMoonFrameUri(frameIndex),
-        phaseName: data.moonPhase.name,
-        illumination: data.illuminationPercent,
-        zodiacName: data.zodiacSign.name,
-        zodiacSymbol: data.zodiacSign.symbol,
-        degrees: data.zodiacSign.degrees,
-        minutes: data.zodiacSign.minutes,
-        source: data.source,
-        isLive: true,
-        time: new Date(data.timestamp),
+        lon: sd.moonLongitude,
+        angle: sd.moonPhase.angle,
+        illum: sd.illuminationPercent,
       };
     }
+    return live.display;
+  }, [isScrubbing, sd, live.display, live.tick]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Interpolated data for scrubber
-    const interp = interpolatePosition(data, displayOffset);
-    const time = new Date(
-      new Date(data.timestamp).getTime() + displayOffset * 3600_000,
-    );
-    return {
-      frameUri: interp.frameUri,
-      phaseName: interp.phaseName,
-      illumination: interp.illuminationPercent,
-      zodiacName: interp.zodiac.name,
-      zodiacSymbol: interp.zodiac.symbol,
-      degrees: interp.zodiac.degrees,
-      minutes: interp.zodiac.minutes,
-      source: data.source,
-      isLive: false,
-      time,
-    };
-  }, [data, displayOffset]);
+  // Active sample (for fields that don't extrapolate: distance, altitude, etc.)
+  const sample = isScrubbing && sd ? sd : server;
 
-  // Loading state
-  if (isLoading) {
+  // Active timestamp
+  const displayedTime = useMemo(() => {
+    if (isScrubbing && sd) return new Date(sd.timestamp);
+    return new Date(Date.now());
+    // re-evaluated every tick (live.tick is in `display`'s deps above)
+  }, [isScrubbing, sd, live.tick]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Loading / error gates
+  if (live.isLoading && !display) {
     return (
-      <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator size="large" color="#7BA5FF" />
-        <Text className="text-text-secondary text-sm font-josefin mt-4">
-          Locating the Moon...
-        </Text>
-      </View>
+      <Screen starfield>
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator color="#FFFFFF" />
+          <Text
+            className="font-josefin mt-4"
+            style={{ color: "#D4D4D8", fontSize: 14 }}
+          >
+            Locating the Moon…
+          </Text>
+        </View>
+      </Screen>
     );
   }
 
-  // Error state (no cached data)
-  if (error && !data) {
+  if (live.error && !display) {
     return (
-      <View className="flex-1 bg-background items-center justify-center px-8">
-        <Text className="text-text-primary text-xl font-josefin-semibold mb-2">
-          Unable to reach the sky
-        </Text>
-        <Text className="text-text-secondary text-sm font-josefin text-center mb-6">
-          {error}
-        </Text>
-        <Pressable
-          onPress={refresh}
-          className="h-[44px] px-6 bg-accent rounded-xl items-center justify-center"
-          style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
-        >
-          <Text className="text-background text-sm font-josefin-semibold">
-            Try again
+      <Screen starfield>
+        <View className="flex-1 items-center justify-center px-8">
+          <Text
+            className="text-white font-josefin-semibold mb-2"
+            style={{ fontSize: 20 }}
+          >
+            Unable to reach the sky
           </Text>
-        </Pressable>
-      </View>
+          <Text
+            className="font-josefin text-center mb-6"
+            style={{ color: "#D4D4D8", fontSize: 14 }}
+          >
+            {live.error}
+          </Text>
+          <View style={{ minWidth: 200 }}>
+            <GhostPillButton
+              label="Try again"
+              onPress={() => void live.refresh()}
+              shimmer={false}
+            />
+          </View>
+        </View>
+      </Screen>
     );
   }
 
   if (!display) return null;
 
-  const timeString = display.time.toLocaleTimeString([], {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-  const dateString = display.time.toLocaleDateString([], {
-    month: "short",
-    day: "numeric",
-  });
+  const zodiac = getZodiacFromLongitude(display.lon);
+  const frameUri = getMoonFrameUri(getFrameFromAngle(display.angle));
 
   return (
-    <View className="flex-1 bg-background">
+    <Screen starfield>
       <ScrollView
         contentContainerStyle={{
-          paddingTop: insets.top + 16,
-          paddingBottom: 56 + insets.bottom + 24, // tab bar height + safe area
+          paddingTop: 8,
+          paddingBottom: 56 + insets.bottom + 24,
           alignItems: "center",
         }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Stale indicator */}
-        {isStale && (
-          <View
-            className="mx-8 mb-4 px-4 py-2 rounded-lg"
-            style={{ backgroundColor: "rgba(245,158,11,0.15)" }}
-          >
-            <Text
-              className="text-center text-xs font-josefin"
-              style={{ color: "#f59e0b" }}
-            >
-              Showing cached data &middot; Tap to retry
-            </Text>
-          </View>
-        )}
-
-        {/* Time offset banner */}
-        {!display.isLive && (
-          <Pressable onPress={resetToNow} className="mb-2">
+        {/* Stale banner */}
+        {live.isStale && !isScrubbing && (
+          <Pressable onPress={() => void live.refresh()} className="mx-8 mb-3">
             <View
-              className="px-4 py-1.5 rounded-full"
-              style={{ backgroundColor: "rgba(123,165,255,0.1)" }}
+              style={{
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                borderRadius: 999,
+                borderWidth: 1,
+                borderColor: "rgba(255,255,255,0.35)",
+              }}
             >
-              <Text className="text-accent text-xs font-josefin text-center">
-                {formatOffsetLabel(displayOffset)} &middot; {dateString}{" "}
-                {timeString} &middot; Tap for Now
+              <Text
+                className="font-josefin text-center text-white"
+                style={{
+                  fontSize: 12,
+                  textShadowColor: "rgba(255,255,255,0.25)",
+                  textShadowOffset: { width: 0, height: 0 },
+                  textShadowRadius: 8,
+                }}
+              >
+                Showing cached data · Tap to retry
               </Text>
             </View>
           </Pressable>
         )}
 
-        {/* Moon phase image */}
+        {/* Moon image */}
         <View
-          className="overflow-hidden mt-4"
+          className="overflow-hidden"
           style={{
             width: MOON_IMAGE_SIZE,
             height: MOON_IMAGE_SIZE,
             borderRadius: MOON_IMAGE_SIZE / 2,
+            marginTop: 8,
           }}
         >
           <Image
-            source={{ uri: display.frameUri }}
+            source={{ uri: frameUri }}
             style={{ width: MOON_IMAGE_SIZE, height: MOON_IMAGE_SIZE }}
             contentFit="cover"
             cachePolicy="memory-disk"
-            transition={200}
+            transition={120}
           />
         </View>
 
-        {/* Phase name */}
+        {/* Live (or scrubbed) date+time */}
         <Text
-          className="text-text-primary font-josefin-semibold mt-6"
-          style={{ fontSize: 28, lineHeight: 34 }}
+          className="font-josefin text-white mt-6"
+          style={{
+            fontSize: 16,
+            textShadowColor: "rgba(255,255,255,0.25)",
+            textShadowOffset: { width: 0, height: 0 },
+            textShadowRadius: 8,
+          }}
         >
-          {display.phaseName}
+          {formatLiveTime(displayedTime)}
         </Text>
 
-        {/* Illumination */}
-        <Text className="text-text-secondary text-base font-josefin mt-1">
-          {display.illumination.toFixed(1)}% illuminated
-        </Text>
+        {/* Scrubber */}
+        <View style={{ width: "100%", marginTop: 12, marginBottom: 4 }}>
+          <TimeScrubberTrack
+            rangeMs={SCRUB_RANGE_MS}
+            offsetMs={scrub.scrubOffsetMs}
+            isScrubbing={isScrubbing}
+            onScrubStart={scrub.startScrub}
+            onScrubUpdate={scrub.updateScrubOffset}
+          />
+        </View>
 
-        {/* Zodiac card */}
+        {/* Snap-to-live button — only while scrubbing */}
+        {isScrubbing && (
+          <Pressable onPress={scrub.snapToLive} className="mt-1 mb-2">
+            <Text
+              className="font-josefin text-text-tertiary"
+              style={{
+                fontSize: 11,
+                letterSpacing: 1.98,
+                textTransform: "uppercase",
+              }}
+            >
+              Tap for Now
+            </Text>
+          </Pressable>
+        )}
+
+        {/* Zodiac + arcseconds — transparent panel, stars visible through it */}
         <View
-          className="mt-6 mx-8 rounded-2xl px-6 py-5 items-center"
-          style={{ backgroundColor: "rgba(18,18,42,0.8)" }}
+          style={{
+            width: "100%",
+            paddingHorizontal: 16,
+            marginTop: 12,
+          }}
         >
-          <Text
+          <View
             style={{
-              fontSize: 48,
-              lineHeight: 56,
-              color: "#e8e8f0",
-              fontFamily: SYMBOL_FONT_FAMILY,
+              backgroundColor: "rgba(0,0,0,0.35)",
+              borderRadius: 20,
+              borderWidth: 1,
+              borderColor: HAIRLINE,
+              padding: 20,
             }}
           >
-            {display.zodiacSymbol}
-            {TEXT_VARIATION_SELECTOR}
-          </Text>
-          <Text
-            className="text-text-primary font-josefin-semibold mt-2"
-            style={{ fontSize: 22 }}
-          >
-            {display.zodiacName}
-          </Text>
-          <Text className="text-text-secondary text-base font-josefin mt-1">
-            {formatDegrees(display.degrees, display.minutes)}
-          </Text>
-        </View>
-
-        {/* 72-Hour Time Scrubber */}
-        <View
-          className="mt-8 w-full"
-          style={{ paddingHorizontal: TRACK_PADDING }}
-        >
-          <Text className="text-text-secondary text-xs font-josefin text-center mb-3">
-            72-Hour Time Scrubber
-          </Text>
-
-          <GestureDetector gesture={gesture}>
-            <View style={{ height: 48, justifyContent: "center" }}>
-              {/* Track background */}
+            <View style={{ alignItems: "center" }}>
               <View
-                className="rounded-full"
-                style={{
-                  height: 3,
-                  backgroundColor: "rgba(42,42,74,0.8)",
-                  width: "100%",
-                }}
-              />
-
-              {/* Center tick (Now) */}
-              <View
-                style={{
-                  position: "absolute",
-                  left: HALF_TRACK - 0.5,
-                  width: 1,
-                  height: 12,
-                  backgroundColor: "rgba(136,136,170,0.4)",
-                  top: 18,
-                }}
-              />
-
-              {/* Quarter ticks */}
-              {[-0.5, -0.25, 0.25, 0.5].map((pct) => (
-                <View
-                  key={pct}
+                className="flex-row items-center"
+                style={{ marginBottom: 4 }}
+              >
+                <Text
                   style={{
-                    position: "absolute",
-                    left: HALF_TRACK + pct * TRACK_WIDTH - 0.5,
-                    width: 1,
-                    height: 8,
-                    backgroundColor: "rgba(136,136,170,0.2)",
-                    top: 20,
+                    fontSize: 32,
+                    lineHeight: 38,
+                    color: "#FFFFFF",
+                    fontFamily: SYMBOL_FONT_FAMILY,
+                    textShadowColor: "rgba(255,255,255,0.6)",
+                    textShadowOffset: { width: 0, height: 0 },
+                    textShadowRadius: 12,
+                    marginRight: 12,
                   }}
-                />
-              ))}
-
-              {/* Thumb */}
-              <Animated.View
-                style={[
-                  {
-                    position: "absolute",
-                    left: HALF_TRACK - THUMB_SIZE / 2,
-                    top: (48 - THUMB_SIZE) / 2,
-                    width: THUMB_SIZE,
-                    height: THUMB_SIZE,
-                    borderRadius: THUMB_SIZE / 2,
-                    backgroundColor: "#7BA5FF",
-                    shadowColor: "#7BA5FF",
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.5,
-                    shadowRadius: 8,
-                    elevation: 6,
-                  },
-                  thumbStyle,
-                ]}
-              />
+                >
+                  {zodiac.symbol}
+                  {TEXT_VARIATION_SELECTOR}
+                </Text>
+                <Text
+                  className="text-white font-josefin-semibold"
+                  style={{
+                    fontSize: 26,
+                    textShadowColor: "rgba(255,255,255,0.25)",
+                    textShadowOffset: { width: 0, height: 0 },
+                    textShadowRadius: 8,
+                  }}
+                >
+                  {zodiac.name}
+                </Text>
+              </View>
+              <NumericValue size="md" emphasis>
+                {zodiac.degrees}°{" "}
+                {String(zodiac.minutes).padStart(2, "0")}'{" "}
+                {String(zodiac.seconds).padStart(2, "0")}"
+              </NumericValue>
             </View>
-          </GestureDetector>
 
-          {/* Scrubber labels */}
-          <View className="flex-row justify-between mt-1">
-            <Text
-              className="text-text-secondary text-xs font-josefin"
-              style={{ opacity: 0.5 }}
-            >
-              -36h
-            </Text>
-            <Text
-              className="text-text-secondary text-xs font-josefin"
-              style={{ opacity: 0.5 }}
-            >
-              Now
-            </Text>
-            <Text
-              className="text-text-secondary text-xs font-josefin"
-              style={{ opacity: 0.5 }}
-            >
-              +36h
-            </Text>
-          </View>
-        </View>
-
-        {/* Source attribution */}
-        <Text
-          className="text-text-secondary text-xs font-josefin mt-8"
-          style={{ opacity: 0.4 }}
-        >
-          {display.source}
-        </Text>
-
-        {/* Live indicator */}
-        {display.isLive && (
-          <View className="flex-row items-center mt-3">
+            {/* Divider */}
             <View
               style={{
-                width: 6,
-                height: 6,
-                borderRadius: 3,
-                backgroundColor: "#7BA5FF",
-                marginRight: 6,
+                height: 1,
+                backgroundColor: HAIRLINE,
+                marginTop: 16,
+                marginBottom: 12,
               }}
             />
-            <Text
-              className="text-text-secondary text-xs font-josefin"
-              style={{ opacity: 0.5 }}
+
+            {/* Detailed data toggle */}
+            <View
+              className="flex-row items-center justify-center"
+              style={{ paddingVertical: 4, gap: 12 }}
             >
-              Live
-            </Text>
+              <Text
+                className="font-josefin text-text-tertiary"
+                style={{
+                  fontSize: 12,
+                  lineHeight: 16,
+                  letterSpacing: 2.16,
+                  textTransform: "uppercase",
+                }}
+              >
+                Detailed data
+              </Text>
+              <Switch
+                value={showDetails}
+                onValueChange={setShowDetails}
+                trackColor={{ false: HAIRLINE, true: "rgba(255,255,255,0.35)" }}
+                thumbColor="#FFFFFF"
+                ios_backgroundColor={HAIRLINE}
+              />
+            </View>
+
+            {showDetails && (
+              <View style={{ marginTop: 16, gap: 10 }}>
+                <DetailRow
+                  label="Phase"
+                  value={
+                    <Text
+                      className="font-josefin text-white"
+                      style={{ fontSize: 13 }}
+                    >
+                      {sample?.moonPhase?.name ?? "—"}
+                    </Text>
+                  }
+                />
+                <DetailRow
+                  label="Phase angle"
+                  value={
+                    <NumericValue size="sm">
+                      {display.angle.toFixed(4)}°
+                    </NumericValue>
+                  }
+                />
+                <DetailRow
+                  label="Longitude"
+                  value={
+                    <NumericValue size="sm">
+                      {formatLongitude(display.lon)}
+                    </NumericValue>
+                  }
+                />
+                {sample?.moonLatitude != null && (
+                  <DetailRow
+                    label="Latitude"
+                    value={
+                      <NumericValue size="sm">
+                        {sample.moonLatitude.toFixed(6)}°
+                      </NumericValue>
+                    }
+                  />
+                )}
+                {sample?.moonDistanceKm != null && (
+                  <DetailRow
+                    label="Distance"
+                    value={
+                      <NumericValue size="sm">
+                        {formatDistance(sample.moonDistanceKm)}
+                      </NumericValue>
+                    }
+                  />
+                )}
+                <DetailRow
+                  label="Illumination"
+                  value={
+                    <NumericValue size="sm">
+                      {display.illum.toFixed(2)}%
+                    </NumericValue>
+                  }
+                />
+                {sample?.phaseDaysPast != null && (
+                  <DetailRow
+                    label="Lunation age"
+                    value={
+                      <NumericValue size="sm">
+                        {sample.phaseDaysPast.toFixed(2)} days
+                      </NumericValue>
+                    }
+                  />
+                )}
+                {sample?.altitude ? (
+                  <>
+                    <DetailRow
+                      label="Altitude"
+                      value={
+                        <NumericValue size="sm">
+                          {sample.altitude.apparentAltitude.toFixed(2)}°
+                        </NumericValue>
+                      }
+                    />
+                    <DetailRow
+                      label="Azimuth"
+                      value={
+                        <NumericValue size="sm">
+                          {sample.altitude.azimuth.toFixed(2)}°
+                        </NumericValue>
+                      }
+                    />
+                  </>
+                ) : null}
+                {sample?.source && (
+                  <DetailRow
+                    label="Source"
+                    value={
+                      <Text
+                        className="font-josefin text-text-tertiary"
+                        style={{ fontSize: 11 }}
+                        numberOfLines={1}
+                      >
+                        {sample.source}
+                      </Text>
+                    }
+                  />
+                )}
+              </View>
+            )}
           </View>
-        )}
+        </View>
       </ScrollView>
+    </Screen>
+  );
+}
+
+function DetailRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <View style={{ paddingVertical: 2 }}>
+      <Text
+        className="font-josefin text-text-tertiary"
+        style={{
+          fontSize: 10,
+          letterSpacing: 1.8,
+          textTransform: "uppercase",
+          marginBottom: 2,
+        }}
+        numberOfLines={1}
+      >
+        {label}
+      </Text>
+      <View>{value}</View>
     </View>
   );
 }

@@ -1,11 +1,16 @@
+// Palette tokens used outside Tailwind (inline `style={{ color: ... }}`).
+// Mirrors MOBILE-DESIGN.md v1. Tailwind class names live in tailwind.config.js.
 export const COLORS = {
   background: "#000000",
-  surface: "#12122a",
-  border: "#2a2a4a",
-  textPrimary: "#e8e8f0",
-  textSecondary: "#8888aa",
-  accent: "#7BA5FF",
-  destructive: "#ef4444",
+  surface1: "#0A0A0F",
+  surface2: "#14141C",
+  textPrimary: "#FFFFFF",
+  textSecondary: "#D4D4D8",
+  textTertiary: "#8A8A90",
+  textDisabled: "#5A5A60",
+  hairline: "rgba(255,255,255,0.10)",
+  strong: "rgba(255,255,255,0.35)",
+  destructive: "#EF4444",
 } as const;
 
 export const API_BASE =

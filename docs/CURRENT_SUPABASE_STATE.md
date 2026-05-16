@@ -1,5 +1,11 @@
 # Current Supabase State — Reconciliation Report
 
+> ⚠️ **STALE — DO NOT TRUST.** This was a pre-rebuild snapshot from 2026-05-14, before Phase 1A. The schema has changed substantially since:
+> - The full multi-table rebuild landed (migrations 0002–0009): accounts, profiles, birth_data, charts, profile_summaries, relationships, subscriptions, chat_sessions/messages, ai_responses, knowledge_chunks, plus astro_* spine.
+> - Migration 0010 (2026-05-16) added chinese_zodiac_readings, human_design_readings, numerology_readings.
+>
+> **For current schema, read `supabase_master_doc.md` at the repo root — it is the source of truth.** This file is kept only for historical context.
+
 **Generated:** 2026-05-14
 **Authored by:** Claude Code (per Section 8 of `supabase_master_doc.md`)
 **Status:** Read-only inventory. NO tables created, NO migrations run.

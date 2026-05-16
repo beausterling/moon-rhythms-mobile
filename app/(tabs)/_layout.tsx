@@ -1,17 +1,44 @@
 import { Tabs } from "expo-router";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { BlurView } from "expo-blur";
 import Ionicons from "@expo/vector-icons/Ionicons";
+
+function GlowIcon({
+  name,
+  focused,
+  color,
+}: {
+  name: keyof typeof Ionicons.glyphMap;
+  focused: boolean;
+  color: string;
+}) {
+  return (
+    <View
+      style={
+        focused
+          ? {
+              shadowColor: "#FFFFFF",
+              shadowOffset: { width: 0, height: 0 },
+              shadowOpacity: 0.4,
+              shadowRadius: 6,
+            }
+          : undefined
+      }
+    >
+      <Ionicons name={name} size={24} color={color} />
+    </View>
+  );
+}
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#7BA5FF",
-        tabBarInactiveTintColor: "#8888aa",
+        tabBarActiveTintColor: "#FFFFFF",
+        tabBarInactiveTintColor: "#8A8A90",
         tabBarStyle: {
-          backgroundColor: "rgba(10, 10, 26, 0.8)",
+          backgroundColor: "rgba(0, 0, 0, 0.6)",
           borderTopColor: "rgba(255, 255, 255, 0.08)",
           borderTopWidth: 1,
           height: 56,
@@ -35,9 +62,35 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ focused, color }) => (
-            <Ionicons
+            <GlowIcon
               name={focused ? "moon" : "moon-outline"}
-              size={24}
+              focused={focused}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="birth-matrix"
+        options={{
+          title: "Birth Matrix",
+          tabBarIcon: ({ focused, color }) => (
+            <GlowIcon
+              name={focused ? "compass" : "compass-outline"}
+              focused={focused}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="chat"
+        options={{
+          title: "Chat",
+          tabBarIcon: ({ focused, color }) => (
+            <GlowIcon
+              name={focused ? "chatbubbles" : "chatbubbles-outline"}
+              focused={focused}
               color={color}
             />
           ),
@@ -46,14 +99,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="quizzes"
         options={{
-          title: "Quizzes",
-          tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? "help-circle" : "help-circle-outline"}
-              size={24}
-              color={color}
-            />
-          ),
+          href: null,
         }}
       />
       <Tabs.Screen
@@ -61,9 +107,9 @@ export default function TabLayout() {
         options={{
           title: "Dashboard",
           tabBarIcon: ({ focused, color }) => (
-            <Ionicons
+            <GlowIcon
               name={focused ? "grid" : "grid-outline"}
-              size={24}
+              focused={focused}
               color={color}
             />
           ),

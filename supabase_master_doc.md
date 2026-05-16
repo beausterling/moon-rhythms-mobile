@@ -1086,25 +1086,41 @@ When built, will require:
 
 Tied to `profiles.id`. Doesn't change existing tables.
 
-### Human Design (deferred — licensing investigated, see master-build-doc.md)
+### Human Design (BUILT — 2026-05-16, migration 0010)
 
-When built, will require:
-- `human_design_data` (JSONB per profile with bodygraph data)
-- `human_design_chunks` (interpretive content, commissioned — IP risk on copying)
+Storage live. Calculation via `natalengine` (web `pages/api/human-design.api.js`, ESM-only — dynamic import on Vercel). Custom union-find definition override on top of library output. Bodygraph render via web `components/BodyGraph.js`.
 
-Tied to `profiles.id`. Calculation via third-party API (`humandesignapi.nl` or `bodygraph.com`) or open-source `hdkit`.
+Table:
+- `human_design_readings(id, profile_id UNIQUE, data jsonb, calculation_engine='natalengine', calculation_version='v1', calculated_at, created_at, updated_at)` — one row per profile, upsert on profile_id.
+- RLS mirrors `charts`: read/insert/update gated by `user_owns_profile()`, no delete (rows overwritten via UPSERT).
 
-### Numerology (deferred)
+Interpretation embeddings still deferred — when built, add `human_design_interpretations(reading_id FK → human_design_readings.id, embedding vector, content text, …)` without touching reading rows.
 
-When built, will require:
-- `numerology_data` (JSONB per profile)
-- `numerology_chunks` (interpretive content)
+Mobile: not yet consumed; web detail page at `/human-design-display`.
 
-Tied to `profiles.id`. Calculation already exists on the web app — reuse.
+### Numerology (BUILT — 2026-05-16, migration 0010)
 
-### Chinese zodiac (deferred)
+Storage live. Calculation via web `pages/api/numerology.api.js` (Pythagorean, in `lib/numerology.js`).
 
-Same pattern as numerology. One JSONB column on a future `chinese_zodiac_data` table tied to profile.
+Table:
+- `numerology_readings(id, profile_id UNIQUE, data jsonb, calculation_engine='pythagorean', calculation_version='v1', calculated_at, created_at, updated_at)` — one row per profile, upsert on profile_id.
+- Same RLS pattern as `human_design_readings`.
+
+Interpretation embeddings still deferred.
+
+Mobile: not yet consumed; web detail page at `/numerology-display`.
+
+### Chinese zodiac (BUILT — 2026-05-16, migration 0010)
+
+Storage live. Calculation via web `pages/api/chinese-zodiac.api.js` (four pillars + animal/element via `lunar-javascript`).
+
+Table:
+- `chinese_zodiac_readings(id, profile_id UNIQUE, data jsonb, calculation_engine='lunar-javascript', calculation_version='v1', calculated_at, created_at, updated_at)` — one row per profile, upsert on profile_id.
+- Same RLS pattern.
+
+Interpretation embeddings still deferred.
+
+Mobile: not yet consumed; web detail page at `/chinese-zodiac-display`.
 
 ### Transit notifications (deferred)
 

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
+import { Inter_400Regular } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AuthProvider, useAuth } from '../lib/auth';
@@ -38,6 +39,7 @@ export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     'JosefinSans-Regular': require('../assets/fonts/JosefinSans-Regular.ttf'),
     'JosefinSans-SemiBold': require('../assets/fonts/JosefinSans-SemiBold.ttf'),
+    'Inter-Regular': Inter_400Regular,
   });
 
   useEffect(() => {
