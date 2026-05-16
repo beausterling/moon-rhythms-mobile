@@ -8,9 +8,7 @@ Built with **Expo SDK 54**, **React Native**, **TypeScript**, and **Supabase**. 
 
 ## 📲 Try It On Your Phone
 
-You can install the app directly — no code, no Xcode, no Android Studio. The latest build of either platform is always available at:
-
-**👉 [expo.dev/accounts/beausterling/projects/moon-rhythms](https://expo.dev/accounts/beausterling/projects/moon-rhythms) 👈**
+You can install the app directly — no code, no Xcode, no Android Studio. Direct install links to the latest build for each platform are below. (These are *internal distribution* builds, not App Store / Play Store releases, so you won't find them in the project page's default "production" filter — use the direct links.)
 
 Pick your platform below for step-by-step instructions.
 
@@ -21,12 +19,15 @@ Pick your platform below for step-by-step instructions.
 iOS has one extra step (Apple's rules for testing outside the App Store): your device needs to be registered with my developer account first. Takes about a minute.
 
 1. **Reach out** — [open an issue here](https://github.com/beausterling/moon-rhythms-mobile/issues/new?title=iOS+test+access+request) or message me directly. I just need to know you want to try it.
-2. **I'll send you a registration link.** Open it in Safari *on your iPhone* (not your laptop). Tap **Allow** → go to **Settings → Profile Downloaded → Install** → enter your passcode.
-3. **Open the build page** ([expo.dev/.../moon-rhythms](https://expo.dev/accounts/beausterling/projects/moon-rhythms)) in Safari on the same iPhone.
-4. **Find the latest iOS build** (top of the list), tap it, then tap **Install**. iOS will ask you to confirm — say yes.
+2. **I'll send you a registration link.** Open it in **Safari** *on your iPhone* (not your laptop, not Chrome). Tap **Allow** → go to **Settings → Profile Downloaded → Install** → enter your passcode.
+3. **Open the latest iOS build link in Safari** on the same iPhone:
+   👉 **[Install latest iOS build](https://expo.dev/accounts/beausterling/projects/moon-rhythms/builds/9bfcad05-2c2d-4ea0-925b-44fc9813cc7f)** 👈
+4. **Tap Install** on that page. iOS will ask you to confirm — say yes.
 5. **App appears on your home screen.** Open it and you're in.
 
 > The first time you run it, you may need to go to **Settings → General → VPN & Device Management** and trust my developer profile. iOS will prompt you if so.
+
+> **Note:** the build link above points to a specific build and updates whenever I push a new native build. If the link is stale and the install doesn't work, check the [project page](https://expo.dev/accounts/beausterling/projects/moon-rhythms) (filter by "Internal distribution") for the newest one, or ping me.
 
 ---
 
@@ -34,12 +35,15 @@ iOS has one extra step (Apple's rules for testing outside the App Store): your d
 
 No registration step — just install the APK.
 
-1. **Open the build page** on your Android phone: [expo.dev/.../moon-rhythms](https://expo.dev/accounts/beausterling/projects/moon-rhythms).
-2. **Find the latest Android build** at the top of the list and tap **Install**. The `.apk` file (~50 MB) will download.
+1. **Open the latest Android build link** on your Android phone (any browser is fine):
+   👉 **[Install latest Android build](https://expo.dev/accounts/beausterling/projects/moon-rhythms/builds/b60f6841-e21c-49c1-8aca-e4d5e7496891)** 👈
+2. **Tap Install** on that page. The `.apk` file (~50 MB) will download.
 3. **Tap the downloaded file.** Android will warn you about installing from a non-Play Store source — tap **Settings**, enable **Allow from this source**, then go back and tap **Install**.
 4. **App appears in your app drawer.** Open it and you're in.
 
 > Real devices strongly recommended. Mac-hosted Android emulators can be sluggish on graphics-heavy screens like the Welcome animation — that's a known emulator limitation, not an app bug. The app runs smoothly on real Android hardware.
+
+> **Note:** the Android link updates with each new native build. If it's stale, grab the latest from the [project page](https://expo.dev/accounts/beausterling/projects/moon-rhythms) (filter by "Internal distribution") or ping me.
 
 ---
 
