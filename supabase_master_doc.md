@@ -32,9 +32,9 @@ Moon Rhythms is a mobile-first astrology app focused on **moon signs, self-aware
 - Solo: user signs up → enters birth data → sees their natal chart → chats with the AI about themselves
 - Relationship Light: paid users can add one or more partner profiles. The partner does not need to consent or join. The AI advisor uses both charts to advise the user about that relationship.
 
-**Out of MVP scope (do not build):** invited partner mode (where the partner actually joins), group chats, transit notifications, quizzes, Human Design, numerology, Chinese zodiac, composite charts, daily check-ins, proactive AI messages.
+**Out of MVP scope (do not build):** invited partner mode (where the partner actually joins), group chats, transit notifications, quizzes, composite charts, daily check-ins, proactive AI messages. _(Human Design, numerology, and Chinese zodiac were originally in this list but have since been BUILT — storage live as of migration 0010, 2026-05-16. See §7.)_
 
-**Out of MVP scope but scaffolded:** the schema includes documented future-table shapes for the deferred features so they can be added cleanly later. Do not create empty tables for these — just understand they're coming and don't design choices that would make them harder later.
+**Out of MVP scope but scaffolded:** the schema includes documented future-table shapes for the still-deferred features so they can be added cleanly later. Do not create empty tables for these — just understand they're coming and don't design choices that would make them harder later. _(Some originally-scaffolded features — Human Design, numerology, Chinese zodiac — have since been built; see §7 for their live shapes.)_
 
 **Tech stack:**
 
@@ -106,7 +106,7 @@ We're pre-revenue. Every LLM call is real money.
 
 ### 2.8 No premature normalization
 
-The MVP schema is intentionally small. Tables for features we're not building (transits, quizzes, Human Design, numerology, notifications) are documented in Section 7 but not created. Don't create empty tables. They add migration weight, complicate RLS thinking, and create false expectations.
+The MVP schema is intentionally small. Tables for features we're not building (transits, quizzes, notifications) are documented in Section 7 but not created. Don't create empty tables. They add migration weight, complicate RLS thinking, and create false expectations. _(Human Design, numerology, and Chinese zodiac were once in this "not created" list but have since been built — migration 0010, 2026-05-16. The rule still holds for the remaining deferred features.)_
 
 ---
 
