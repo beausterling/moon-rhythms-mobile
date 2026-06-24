@@ -1,0 +1,2818 @@
+{
+  "metadata": {
+    "name": "Moon Rhythms Human Design Mechanical Reference",
+    "version": "v1",
+    "generated": "2026-06-23",
+    "system": "human_design",
+    "description": "Single source of truth for the deterministic, structured-lookup mechanical data of the Human Design system used by Moon Rhythms. Mirrors the format of deterministic_data.json (astrology spine). This file is for STRUCTURED LOOKUP and the AI assembler/engine; it does NOT go into the RAG vector database, and it deliberately contains NO long proprietary interpretive prose. Load into Supabase as relational tables and reference from chart calculation and AI prompt assembly.",
+    "primary_extraction_source": "natalengine npm package (src/calculators/humandesign.js and src/data/incarnation-crosses.js) as installed in the moonrhythms.io web app. The app computes Human Design via this library and overrides the definition type with a union-find over channels (pages/api/human-design.api.js).",
+    "design_decisions": {
+      "copyright_boundary": "Human Design's MECHANICAL structure (gate-to-hexagram mapping, gate-to-center assignments, the 36 channels, 9 centers, 5 types, strategies, 7 authorities, 12 profiles, definition types, incarnation crosses, gate zodiac degree ranges, planetary activations) is factual and is encoded here in full. Long proprietary interpretive descriptions from Jovian Archive or commercial HD books are NOT included. Where a short descriptor appears (theme / keyword / strategy / signature / not-self), it is brief, factual, and in neutral wording carried over from the app's own data, not lifted prose. Line-level (384) and gate-level interpretive text is intentionally OUT of this file and is a RAG/commissioned-content concern.",
+      "lineage": "Standard Ra Uru Hu / Jovian-lineage mechanics. Where HD sources differ, the Jovian-standard is implemented and alternatives are noted in this file or the research report.",
+      "degree_table_source": "Gate zodiac degree ranges computed deterministically from GATE_ORDER + GATE_WHEEL_OFFSET (358.25 deg = 28 deg 15' Pisces, where Gate 25 begins) with each gate spanning exactly 5.625 deg (360/64). Cross-checked against published gate-zodiac-degree tables at barneyandflow.com/gate-zodiac-degrees and bonniesorsby.com (accessed 2026-06-23): wheel order, Gate 25 offset, and 5.625 deg span all confirmed. See human_design_RESEARCH.md.",
+      "iching_mapping_source": "HD gate number maps 1:1 to the canonical I Ching (King Wen / Wilhelm-Baynes) hexagram number (Gate N = Hexagram N). Verified against jovianarchive.com, castiching.com, and Wikipedia's hexagram list (accessed 2026-06-23). hexagram_name carries the natalengine spelling, which matches Wilhelm-Baynes primary titles with only cosmetic variants (e.g. 'Break-through' for hex 43, 'The Cauldron' vs archaic 'Caldron' for hex 50). See human_design_RESEARCH.md.",
+      "type_determination_source": "Type is determined from the set of DEFINED centers (centers connected by at least one fully-defined channel), via the rules in natalengine humandesign.js: motor-to-throat connectivity (BFS over the defined-channel network) plus defined-Sacral state. Encoded verbatim in types[].determination_rule and type_determination_algorithm.",
+      "authority_determination_source": "Authority is assigned by strict precedence over defined centers (Emotional/Solar Plexus > Sacral > Splenic > Ego/Heart > Self/G > None/Mental > Lunar), per natalengine determineAuthority(). Encoded in authorities[].precedence and authority_precedence_order.",
+      "definition_taxonomy_source": "Definition type is the number of connected components among defined centers (union-find / BFS over channel-connected centers): 1=Single, 2=Split, 3=Triple Split, 4=Quadruple Split, 0=No Definition. This matches the app's override in pages/api/human-design.api.js (calculateDefinition). NOTE: the bundled natalengine humandesign.js uses a cruder channel-COUNT heuristic for definition; the app override (component-count) is the correct mechanic and is the one encoded here.",
+      "planetary_activations": "13 bodies per side (Personality/conscious at birth, Design/unconscious ~88 deg of solar arc before birth). Earth = Sun + 180 deg; South Node = North Node + 180 deg. The Design moment is the exact time when the Sun was 88 deg of ecliptic longitude before its birth position (natalengine solves this iteratively, not a fixed 88-day offset).",
+      "verification_conflicts": "None material. Gate->hexagram numbering, wheel order, Gate 25 offset, 5.625 deg span, 6 lines per gate, and the 6 line-name archetypes were all confirmed across >=2 reputable sources. Only cosmetic naming variants exist (documented above). The line value 0.9375 deg/line was not found printed verbatim in a source but is arithmetically forced by 5.625/6 and is internally consistent."
+    },
+    "counts": {
+      "centers": 9,
+      "gates": 64,
+      "channels": 36,
+      "types": 5,
+      "authorities": 7,
+      "profiles": 12,
+      "lines": 6,
+      "definition_types": 5,
+      "planetary_activations_per_side": 13,
+      "incarnation_cross_gate_index": 64,
+      "incarnation_cross_named_per_gate": 3
+    }
+  },
+  "centers": {
+    "_schema": "The 9 Human Design centers (energy hubs). category classifies each center: pressure (Head, Root), awareness (Ajna, Spleen), motor (Heart/Ego, Sacral, Solar Plexus; Root is also a pressure+motor center), throat (the only manifestation/expression center), identity (G Center). A center is 'defined' when at least one channel connecting it is fully activated (both its gates active); otherwise it is 'undefined' (open). 'gates' lists every gate that sits in this center.",
+    "motor_centers": [
+      "sacral",
+      "heart",
+      "solar",
+      "root"
+    ],
+    "pressure_centers": [
+      "head",
+      "root"
+    ],
+    "awareness_centers": [
+      "ajna",
+      "spleen"
+    ],
+    "throat_center": "throat",
+    "identity_center": "g",
+    "defined_vs_undefined": "Defined = consistent, reliable energy the person broadcasts. Undefined/open = a place of conditioning, amplification, and potential wisdom. Defined centers are computed from active channels; type, authority, and definition all derive from the set of defined centers.",
+    "centers": {
+      "head": {
+        "id": "head",
+        "order": 1,
+        "name": "Head",
+        "theme": "Inspiration",
+        "biological": "Pineal gland",
+        "pressure": "Mental pressure to answer questions",
+        "category": "pressure",
+        "gates": [
+          61,
+          63,
+          64
+        ]
+      },
+      "ajna": {
+        "id": "ajna",
+        "order": 2,
+        "name": "Ajna",
+        "theme": "Conceptualization",
+        "biological": "Pituitary",
+        "pressure": "Mental awareness and processing",
+        "category": "awareness",
+        "gates": [
+          4,
+          11,
+          17,
+          24,
+          43,
+          47
+        ]
+      },
+      "throat": {
+        "id": "throat",
+        "order": 3,
+        "name": "Throat",
+        "theme": "Manifestation",
+        "biological": "Thyroid",
+        "pressure": "Communication and action",
+        "category": "throat",
+        "gates": [
+          8,
+          12,
+          16,
+          20,
+          23,
+          31,
+          33,
+          35,
+          45,
+          56,
+          62
+        ]
+      },
+      "g": {
+        "id": "g",
+        "order": 4,
+        "name": "G Center",
+        "theme": "Identity",
+        "biological": "Liver/Blood",
+        "pressure": "Love, direction, identity",
+        "category": "identity",
+        "gates": [
+          1,
+          2,
+          7,
+          10,
+          13,
+          15,
+          25,
+          46
+        ]
+      },
+      "heart": {
+        "id": "heart",
+        "order": 5,
+        "name": "Heart/Ego",
+        "theme": "Willpower",
+        "biological": "Heart/Stomach",
+        "pressure": "Material world, ego, willpower",
+        "category": "motor",
+        "gates": [
+          21,
+          26,
+          40,
+          51
+        ]
+      },
+      "sacral": {
+        "id": "sacral",
+        "order": 6,
+        "name": "Sacral",
+        "theme": "Life Force",
+        "biological": "Ovaries/Testes",
+        "pressure": "Vital energy, sexuality, work",
+        "category": "motor",
+        "gates": [
+          3,
+          5,
+          9,
+          14,
+          27,
+          29,
+          34,
+          42,
+          59
+        ]
+      },
+      "spleen": {
+        "id": "spleen",
+        "order": 7,
+        "name": "Spleen",
+        "theme": "Intuition",
+        "biological": "Spleen/Lymph",
+        "pressure": "Survival, health, intuition",
+        "category": "awareness",
+        "gates": [
+          18,
+          28,
+          32,
+          44,
+          48,
+          50,
+          57
+        ]
+      },
+      "solar": {
+        "id": "solar",
+        "order": 8,
+        "name": "Solar Plexus",
+        "theme": "Emotion",
+        "biological": "Kidneys/Pancreas",
+        "pressure": "Emotional wave, feelings",
+        "category": "motor",
+        "gates": [
+          6,
+          22,
+          30,
+          36,
+          37,
+          49,
+          55
+        ]
+      },
+      "root": {
+        "id": "root",
+        "order": 9,
+        "name": "Root",
+        "theme": "Pressure",
+        "biological": "Adrenals",
+        "pressure": "Stress, adrenaline, drive",
+        "category": "pressure_and_motor",
+        "gates": [
+          19,
+          38,
+          39,
+          41,
+          52,
+          53,
+          54,
+          58,
+          60
+        ]
+      }
+    }
+  },
+  "gates": {
+    "_schema": "The 64 gates. Each gate maps 1:1 to an I Ching hexagram (hexagram_number = gate, hexagram_name = canonical hexagram title). center = which of the 9 centers the gate belongs to. theme = brief neutral keyword. degree_range = the gate's span on the 360-degree tropical zodiac wheel (start/end absolute degrees and zodiac notation), span_degrees 5.625, wheel_index its position in GATE_ORDER. Gate 25 wraps the 0/360 (Aries) point (wraps_aries_point=true). lines=6 for every gate (see lines section). Gate-line interpretation (384 combinations) is intentionally NOT here; it is a RAG/commissioned concern.",
+    "gates": {
+      "1": {
+        "gate": 1,
+        "hd_name": "The Creative",
+        "center": "g",
+        "hexagram_number": 1,
+        "hexagram_name": "The Creative",
+        "theme": "Self-expression",
+        "degree_range": {
+          "start": 223.25,
+          "end": 228.875,
+          "start_zodiac": "13°15' Scorpio",
+          "end_zodiac": "18°53' Scorpio",
+          "span_degrees": 5.625,
+          "wheel_index": 40,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "2": {
+        "gate": 2,
+        "hd_name": "The Receptive",
+        "center": "g",
+        "hexagram_number": 2,
+        "hexagram_name": "The Receptive",
+        "theme": "Higher knowing",
+        "degree_range": {
+          "start": 43.25,
+          "end": 48.875,
+          "start_zodiac": "13°15' Taurus",
+          "end_zodiac": "18°53' Taurus",
+          "span_degrees": 5.625,
+          "wheel_index": 8,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "3": {
+        "gate": 3,
+        "hd_name": "Ordering",
+        "center": "sacral",
+        "hexagram_number": 3,
+        "hexagram_name": "Difficulty at the Beginning",
+        "theme": "Innovation",
+        "degree_range": {
+          "start": 26.375,
+          "end": 32,
+          "start_zodiac": "26°23' Aries",
+          "end_zodiac": "2°00' Taurus",
+          "span_degrees": 5.625,
+          "wheel_index": 5,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "4": {
+        "gate": 4,
+        "hd_name": "Formulization",
+        "center": "ajna",
+        "hexagram_number": 4,
+        "hexagram_name": "Youthful Folly",
+        "theme": "Mental solutions",
+        "degree_range": {
+          "start": 138.875,
+          "end": 144.5,
+          "start_zodiac": "18°53' Leo",
+          "end_zodiac": "24°30' Leo",
+          "span_degrees": 5.625,
+          "wheel_index": 25,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "5": {
+        "gate": 5,
+        "hd_name": "Fixed Rhythms",
+        "center": "sacral",
+        "hexagram_number": 5,
+        "hexagram_name": "Waiting",
+        "theme": "Natural rhythms",
+        "degree_range": {
+          "start": 251.375,
+          "end": 257,
+          "start_zodiac": "11°23' Sagittarius",
+          "end_zodiac": "17°00' Sagittarius",
+          "span_degrees": 5.625,
+          "wheel_index": 45,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "6": {
+        "gate": 6,
+        "hd_name": "Friction",
+        "center": "solar",
+        "hexagram_number": 6,
+        "hexagram_name": "Conflict",
+        "theme": "Emotional clarity",
+        "degree_range": {
+          "start": 172.625,
+          "end": 178.25,
+          "start_zodiac": "22°38' Virgo",
+          "end_zodiac": "28°15' Virgo",
+          "span_degrees": 5.625,
+          "wheel_index": 31,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "7": {
+        "gate": 7,
+        "hd_name": "The Role of Self",
+        "center": "g",
+        "hexagram_number": 7,
+        "hexagram_name": "The Army",
+        "theme": "Leadership",
+        "degree_range": {
+          "start": 133.25,
+          "end": 138.875,
+          "start_zodiac": "13°15' Leo",
+          "end_zodiac": "18°53' Leo",
+          "span_degrees": 5.625,
+          "wheel_index": 24,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "8": {
+        "gate": 8,
+        "hd_name": "Contribution",
+        "center": "throat",
+        "hexagram_number": 8,
+        "hexagram_name": "Holding Together",
+        "theme": "Making a contribution",
+        "degree_range": {
+          "start": 54.5,
+          "end": 60.125,
+          "start_zodiac": "24°30' Taurus",
+          "end_zodiac": "0°08' Gemini",
+          "span_degrees": 5.625,
+          "wheel_index": 10,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "9": {
+        "gate": 9,
+        "hd_name": "Focus",
+        "center": "sacral",
+        "hexagram_number": 9,
+        "hexagram_name": "The Taming Power of the Small",
+        "theme": "Determination",
+        "degree_range": {
+          "start": 245.75,
+          "end": 251.375,
+          "start_zodiac": "5°45' Sagittarius",
+          "end_zodiac": "11°23' Sagittarius",
+          "span_degrees": 5.625,
+          "wheel_index": 44,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "10": {
+        "gate": 10,
+        "hd_name": "Behavior of Self",
+        "center": "g",
+        "hexagram_number": 10,
+        "hexagram_name": "Treading",
+        "theme": "Self-love",
+        "degree_range": {
+          "start": 268.25,
+          "end": 273.875,
+          "start_zodiac": "28°15' Sagittarius",
+          "end_zodiac": "3°53' Capricorn",
+          "span_degrees": 5.625,
+          "wheel_index": 48,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "11": {
+        "gate": 11,
+        "hd_name": "Ideas",
+        "center": "ajna",
+        "hexagram_number": 11,
+        "hexagram_name": "Peace",
+        "theme": "New ideas",
+        "degree_range": {
+          "start": 262.625,
+          "end": 268.25,
+          "start_zodiac": "22°38' Sagittarius",
+          "end_zodiac": "28°15' Sagittarius",
+          "span_degrees": 5.625,
+          "wheel_index": 47,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "12": {
+        "gate": 12,
+        "hd_name": "Caution",
+        "center": "throat",
+        "hexagram_number": 12,
+        "hexagram_name": "Standstill",
+        "theme": "Social caution",
+        "degree_range": {
+          "start": 82.625,
+          "end": 88.25,
+          "start_zodiac": "22°38' Gemini",
+          "end_zodiac": "28°15' Gemini",
+          "span_degrees": 5.625,
+          "wheel_index": 15,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "13": {
+        "gate": 13,
+        "hd_name": "The Listener",
+        "center": "g",
+        "hexagram_number": 13,
+        "hexagram_name": "Fellowship with Men",
+        "theme": "Listening",
+        "degree_range": {
+          "start": 313.25,
+          "end": 318.875,
+          "start_zodiac": "13°15' Aquarius",
+          "end_zodiac": "18°53' Aquarius",
+          "span_degrees": 5.625,
+          "wheel_index": 56,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "14": {
+        "gate": 14,
+        "hd_name": "Power Skills",
+        "center": "sacral",
+        "hexagram_number": 14,
+        "hexagram_name": "Possession in Great Measure",
+        "theme": "Wealth",
+        "degree_range": {
+          "start": 234.5,
+          "end": 240.125,
+          "start_zodiac": "24°30' Scorpio",
+          "end_zodiac": "0°08' Sagittarius",
+          "span_degrees": 5.625,
+          "wheel_index": 42,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "15": {
+        "gate": 15,
+        "hd_name": "Extremes",
+        "center": "g",
+        "hexagram_number": 15,
+        "hexagram_name": "Modesty",
+        "theme": "Humanity",
+        "degree_range": {
+          "start": 88.25,
+          "end": 93.875,
+          "start_zodiac": "28°15' Gemini",
+          "end_zodiac": "3°53' Cancer",
+          "span_degrees": 5.625,
+          "wheel_index": 16,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "16": {
+        "gate": 16,
+        "hd_name": "Skills",
+        "center": "throat",
+        "hexagram_number": 16,
+        "hexagram_name": "Enthusiasm",
+        "theme": "Mastery",
+        "degree_range": {
+          "start": 65.75,
+          "end": 71.375,
+          "start_zodiac": "5°45' Gemini",
+          "end_zodiac": "11°23' Gemini",
+          "span_degrees": 5.625,
+          "wheel_index": 12,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "17": {
+        "gate": 17,
+        "hd_name": "Opinions",
+        "center": "ajna",
+        "hexagram_number": 17,
+        "hexagram_name": "Following",
+        "theme": "Opinions",
+        "degree_range": {
+          "start": 3.875,
+          "end": 9.5,
+          "start_zodiac": "3°53' Aries",
+          "end_zodiac": "9°30' Aries",
+          "span_degrees": 5.625,
+          "wheel_index": 1,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "18": {
+        "gate": 18,
+        "hd_name": "Correction",
+        "center": "spleen",
+        "hexagram_number": 18,
+        "hexagram_name": "Work on What Has Been Spoiled",
+        "theme": "Correction",
+        "degree_range": {
+          "start": 183.875,
+          "end": 189.5,
+          "start_zodiac": "3°53' Libra",
+          "end_zodiac": "9°30' Libra",
+          "span_degrees": 5.625,
+          "wheel_index": 33,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "19": {
+        "gate": 19,
+        "hd_name": "Wanting",
+        "center": "root",
+        "hexagram_number": 19,
+        "hexagram_name": "Approach",
+        "theme": "Sensitivity",
+        "degree_range": {
+          "start": 307.625,
+          "end": 313.25,
+          "start_zodiac": "7°38' Aquarius",
+          "end_zodiac": "13°15' Aquarius",
+          "span_degrees": 5.625,
+          "wheel_index": 55,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "20": {
+        "gate": 20,
+        "hd_name": "The Now",
+        "center": "throat",
+        "hexagram_number": 20,
+        "hexagram_name": "Contemplation",
+        "theme": "Presence",
+        "degree_range": {
+          "start": 60.125,
+          "end": 65.75,
+          "start_zodiac": "0°08' Gemini",
+          "end_zodiac": "5°45' Gemini",
+          "span_degrees": 5.625,
+          "wheel_index": 11,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "21": {
+        "gate": 21,
+        "hd_name": "The Hunter",
+        "center": "heart",
+        "hexagram_number": 21,
+        "hexagram_name": "Biting Through",
+        "theme": "Control",
+        "degree_range": {
+          "start": 9.5,
+          "end": 15.125,
+          "start_zodiac": "9°30' Aries",
+          "end_zodiac": "15°08' Aries",
+          "span_degrees": 5.625,
+          "wheel_index": 2,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "22": {
+        "gate": 22,
+        "hd_name": "Openness",
+        "center": "solar",
+        "hexagram_number": 22,
+        "hexagram_name": "Grace",
+        "theme": "Social grace",
+        "degree_range": {
+          "start": 347,
+          "end": 352.625,
+          "start_zodiac": "17°00' Pisces",
+          "end_zodiac": "22°38' Pisces",
+          "span_degrees": 5.625,
+          "wheel_index": 62,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "23": {
+        "gate": 23,
+        "hd_name": "Assimilation",
+        "center": "throat",
+        "hexagram_number": 23,
+        "hexagram_name": "Splitting Apart",
+        "theme": "Expression",
+        "degree_range": {
+          "start": 48.875,
+          "end": 54.5,
+          "start_zodiac": "18°53' Taurus",
+          "end_zodiac": "24°30' Taurus",
+          "span_degrees": 5.625,
+          "wheel_index": 9,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "24": {
+        "gate": 24,
+        "hd_name": "Rationalization",
+        "center": "ajna",
+        "hexagram_number": 24,
+        "hexagram_name": "Return",
+        "theme": "Returning",
+        "degree_range": {
+          "start": 37.625,
+          "end": 43.25,
+          "start_zodiac": "7°38' Taurus",
+          "end_zodiac": "13°15' Taurus",
+          "span_degrees": 5.625,
+          "wheel_index": 7,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "25": {
+        "gate": 25,
+        "hd_name": "Innocence",
+        "center": "g",
+        "hexagram_number": 25,
+        "hexagram_name": "Innocence",
+        "theme": "Universal love",
+        "degree_range": {
+          "start": 358.25,
+          "end": 3.875,
+          "start_zodiac": "28°15' Pisces",
+          "end_zodiac": "3°53' Aries",
+          "span_degrees": 5.625,
+          "wheel_index": 0,
+          "wraps_aries_point": true
+        },
+        "lines": 6
+      },
+      "26": {
+        "gate": 26,
+        "hd_name": "The Trickster",
+        "center": "heart",
+        "hexagram_number": 26,
+        "hexagram_name": "The Taming Power of the Great",
+        "theme": "Influence",
+        "degree_range": {
+          "start": 257,
+          "end": 262.625,
+          "start_zodiac": "17°00' Sagittarius",
+          "end_zodiac": "22°38' Sagittarius",
+          "span_degrees": 5.625,
+          "wheel_index": 46,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "27": {
+        "gate": 27,
+        "hd_name": "Caring",
+        "center": "sacral",
+        "hexagram_number": 27,
+        "hexagram_name": "The Corners of the Mouth",
+        "theme": "Nourishment",
+        "degree_range": {
+          "start": 32,
+          "end": 37.625,
+          "start_zodiac": "2°00' Taurus",
+          "end_zodiac": "7°38' Taurus",
+          "span_degrees": 5.625,
+          "wheel_index": 6,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "28": {
+        "gate": 28,
+        "hd_name": "The Player",
+        "center": "spleen",
+        "hexagram_number": 28,
+        "hexagram_name": "Preponderance of the Great",
+        "theme": "Struggle",
+        "degree_range": {
+          "start": 212,
+          "end": 217.625,
+          "start_zodiac": "2°00' Scorpio",
+          "end_zodiac": "7°38' Scorpio",
+          "span_degrees": 5.625,
+          "wheel_index": 38,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "29": {
+        "gate": 29,
+        "hd_name": "Perseverance",
+        "center": "sacral",
+        "hexagram_number": 29,
+        "hexagram_name": "The Abysmal",
+        "theme": "Commitment",
+        "degree_range": {
+          "start": 144.5,
+          "end": 150.125,
+          "start_zodiac": "24°30' Leo",
+          "end_zodiac": "0°08' Virgo",
+          "span_degrees": 5.625,
+          "wheel_index": 26,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "30": {
+        "gate": 30,
+        "hd_name": "Recognition of Feelings",
+        "center": "solar",
+        "hexagram_number": 30,
+        "hexagram_name": "The Clinging",
+        "theme": "Desire",
+        "degree_range": {
+          "start": 324.5,
+          "end": 330.125,
+          "start_zodiac": "24°30' Aquarius",
+          "end_zodiac": "0°08' Pisces",
+          "span_degrees": 5.625,
+          "wheel_index": 58,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "31": {
+        "gate": 31,
+        "hd_name": "Leading",
+        "center": "throat",
+        "hexagram_number": 31,
+        "hexagram_name": "Influence",
+        "theme": "Leadership",
+        "degree_range": {
+          "start": 122,
+          "end": 127.625,
+          "start_zodiac": "2°00' Leo",
+          "end_zodiac": "7°38' Leo",
+          "span_degrees": 5.625,
+          "wheel_index": 22,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "32": {
+        "gate": 32,
+        "hd_name": "Continuity",
+        "center": "spleen",
+        "hexagram_number": 32,
+        "hexagram_name": "Duration",
+        "theme": "Endurance",
+        "degree_range": {
+          "start": 200.75,
+          "end": 206.375,
+          "start_zodiac": "20°45' Libra",
+          "end_zodiac": "26°23' Libra",
+          "span_degrees": 5.625,
+          "wheel_index": 36,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "33": {
+        "gate": 33,
+        "hd_name": "Privacy",
+        "center": "throat",
+        "hexagram_number": 33,
+        "hexagram_name": "Retreat",
+        "theme": "Remembering",
+        "degree_range": {
+          "start": 127.625,
+          "end": 133.25,
+          "start_zodiac": "7°38' Leo",
+          "end_zodiac": "13°15' Leo",
+          "span_degrees": 5.625,
+          "wheel_index": 23,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "34": {
+        "gate": 34,
+        "hd_name": "Power",
+        "center": "sacral",
+        "hexagram_number": 34,
+        "hexagram_name": "The Power of the Great",
+        "theme": "Pure power",
+        "degree_range": {
+          "start": 240.125,
+          "end": 245.75,
+          "start_zodiac": "0°08' Sagittarius",
+          "end_zodiac": "5°45' Sagittarius",
+          "span_degrees": 5.625,
+          "wheel_index": 43,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "35": {
+        "gate": 35,
+        "hd_name": "Change",
+        "center": "throat",
+        "hexagram_number": 35,
+        "hexagram_name": "Progress",
+        "theme": "Experience",
+        "degree_range": {
+          "start": 71.375,
+          "end": 77,
+          "start_zodiac": "11°23' Gemini",
+          "end_zodiac": "17°00' Gemini",
+          "span_degrees": 5.625,
+          "wheel_index": 13,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "36": {
+        "gate": 36,
+        "hd_name": "Crisis",
+        "center": "solar",
+        "hexagram_number": 36,
+        "hexagram_name": "Darkening of the Light",
+        "theme": "Exploration",
+        "degree_range": {
+          "start": 352.625,
+          "end": 358.25,
+          "start_zodiac": "22°38' Pisces",
+          "end_zodiac": "28°15' Pisces",
+          "span_degrees": 5.625,
+          "wheel_index": 63,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "37": {
+        "gate": 37,
+        "hd_name": "Friendship",
+        "center": "solar",
+        "hexagram_number": 37,
+        "hexagram_name": "The Family",
+        "theme": "Family",
+        "degree_range": {
+          "start": 335.75,
+          "end": 341.375,
+          "start_zodiac": "5°45' Pisces",
+          "end_zodiac": "11°23' Pisces",
+          "span_degrees": 5.625,
+          "wheel_index": 60,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "38": {
+        "gate": 38,
+        "hd_name": "The Fighter",
+        "center": "root",
+        "hexagram_number": 38,
+        "hexagram_name": "Opposition",
+        "theme": "Struggle",
+        "degree_range": {
+          "start": 279.5,
+          "end": 285.125,
+          "start_zodiac": "9°30' Capricorn",
+          "end_zodiac": "15°08' Capricorn",
+          "span_degrees": 5.625,
+          "wheel_index": 50,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "39": {
+        "gate": 39,
+        "hd_name": "Provocation",
+        "center": "root",
+        "hexagram_number": 39,
+        "hexagram_name": "Obstruction",
+        "theme": "Provocation",
+        "degree_range": {
+          "start": 99.5,
+          "end": 105.125,
+          "start_zodiac": "9°30' Cancer",
+          "end_zodiac": "15°08' Cancer",
+          "span_degrees": 5.625,
+          "wheel_index": 18,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "40": {
+        "gate": 40,
+        "hd_name": "Aloneness",
+        "center": "heart",
+        "hexagram_number": 40,
+        "hexagram_name": "Deliverance",
+        "theme": "Delivery",
+        "degree_range": {
+          "start": 155.75,
+          "end": 161.375,
+          "start_zodiac": "5°45' Virgo",
+          "end_zodiac": "11°23' Virgo",
+          "span_degrees": 5.625,
+          "wheel_index": 28,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "41": {
+        "gate": 41,
+        "hd_name": "Contraction",
+        "center": "root",
+        "hexagram_number": 41,
+        "hexagram_name": "Decrease",
+        "theme": "Fantasy",
+        "degree_range": {
+          "start": 302,
+          "end": 307.625,
+          "start_zodiac": "2°00' Aquarius",
+          "end_zodiac": "7°38' Aquarius",
+          "span_degrees": 5.625,
+          "wheel_index": 54,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "42": {
+        "gate": 42,
+        "hd_name": "Growth",
+        "center": "sacral",
+        "hexagram_number": 42,
+        "hexagram_name": "Increase",
+        "theme": "Completion",
+        "degree_range": {
+          "start": 20.75,
+          "end": 26.375,
+          "start_zodiac": "20°45' Aries",
+          "end_zodiac": "26°23' Aries",
+          "span_degrees": 5.625,
+          "wheel_index": 4,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "43": {
+        "gate": 43,
+        "hd_name": "Insight",
+        "center": "ajna",
+        "hexagram_number": 43,
+        "hexagram_name": "Break-through",
+        "theme": "Insight",
+        "degree_range": {
+          "start": 228.875,
+          "end": 234.5,
+          "start_zodiac": "18°53' Scorpio",
+          "end_zodiac": "24°30' Scorpio",
+          "span_degrees": 5.625,
+          "wheel_index": 41,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "44": {
+        "gate": 44,
+        "hd_name": "Coming to Meet",
+        "center": "spleen",
+        "hexagram_number": 44,
+        "hexagram_name": "Coming to Meet",
+        "theme": "Alertness",
+        "degree_range": {
+          "start": 217.625,
+          "end": 223.25,
+          "start_zodiac": "7°38' Scorpio",
+          "end_zodiac": "13°15' Scorpio",
+          "span_degrees": 5.625,
+          "wheel_index": 39,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "45": {
+        "gate": 45,
+        "hd_name": "Gathering",
+        "center": "throat",
+        "hexagram_number": 45,
+        "hexagram_name": "Gathering Together",
+        "theme": "Gathering",
+        "degree_range": {
+          "start": 77,
+          "end": 82.625,
+          "start_zodiac": "17°00' Gemini",
+          "end_zodiac": "22°38' Gemini",
+          "span_degrees": 5.625,
+          "wheel_index": 14,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "46": {
+        "gate": 46,
+        "hd_name": "Love of Body",
+        "center": "g",
+        "hexagram_number": 46,
+        "hexagram_name": "Pushing Upward",
+        "theme": "Serendipity",
+        "degree_range": {
+          "start": 178.25,
+          "end": 183.875,
+          "start_zodiac": "28°15' Virgo",
+          "end_zodiac": "3°53' Libra",
+          "span_degrees": 5.625,
+          "wheel_index": 32,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "47": {
+        "gate": 47,
+        "hd_name": "Realization",
+        "center": "ajna",
+        "hexagram_number": 47,
+        "hexagram_name": "Oppression",
+        "theme": "Realization",
+        "degree_range": {
+          "start": 167,
+          "end": 172.625,
+          "start_zodiac": "17°00' Virgo",
+          "end_zodiac": "22°38' Virgo",
+          "span_degrees": 5.625,
+          "wheel_index": 30,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "48": {
+        "gate": 48,
+        "hd_name": "Depth",
+        "center": "spleen",
+        "hexagram_number": 48,
+        "hexagram_name": "The Well",
+        "theme": "Depth",
+        "degree_range": {
+          "start": 189.5,
+          "end": 195.125,
+          "start_zodiac": "9°30' Libra",
+          "end_zodiac": "15°08' Libra",
+          "span_degrees": 5.625,
+          "wheel_index": 34,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "49": {
+        "gate": 49,
+        "hd_name": "Principles",
+        "center": "solar",
+        "hexagram_number": 49,
+        "hexagram_name": "Revolution",
+        "theme": "Revolution",
+        "degree_range": {
+          "start": 318.875,
+          "end": 324.5,
+          "start_zodiac": "18°53' Aquarius",
+          "end_zodiac": "24°30' Aquarius",
+          "span_degrees": 5.625,
+          "wheel_index": 57,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "50": {
+        "gate": 50,
+        "hd_name": "Values",
+        "center": "spleen",
+        "hexagram_number": 50,
+        "hexagram_name": "The Cauldron",
+        "theme": "Values",
+        "degree_range": {
+          "start": 206.375,
+          "end": 212,
+          "start_zodiac": "26°23' Libra",
+          "end_zodiac": "2°00' Scorpio",
+          "span_degrees": 5.625,
+          "wheel_index": 37,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "51": {
+        "gate": 51,
+        "hd_name": "Shock",
+        "center": "heart",
+        "hexagram_number": 51,
+        "hexagram_name": "The Arousing",
+        "theme": "Initiation",
+        "degree_range": {
+          "start": 15.125,
+          "end": 20.75,
+          "start_zodiac": "15°08' Aries",
+          "end_zodiac": "20°45' Aries",
+          "span_degrees": 5.625,
+          "wheel_index": 3,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "52": {
+        "gate": 52,
+        "hd_name": "Stillness",
+        "center": "root",
+        "hexagram_number": 52,
+        "hexagram_name": "Keeping Still",
+        "theme": "Inaction",
+        "degree_range": {
+          "start": 93.875,
+          "end": 99.5,
+          "start_zodiac": "3°53' Cancer",
+          "end_zodiac": "9°30' Cancer",
+          "span_degrees": 5.625,
+          "wheel_index": 17,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "53": {
+        "gate": 53,
+        "hd_name": "Beginnings",
+        "center": "root",
+        "hexagram_number": 53,
+        "hexagram_name": "Development",
+        "theme": "Starting",
+        "degree_range": {
+          "start": 105.125,
+          "end": 110.75,
+          "start_zodiac": "15°08' Cancer",
+          "end_zodiac": "20°45' Cancer",
+          "span_degrees": 5.625,
+          "wheel_index": 19,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "54": {
+        "gate": 54,
+        "hd_name": "Ambition",
+        "center": "root",
+        "hexagram_number": 54,
+        "hexagram_name": "The Marrying Maiden",
+        "theme": "Ambition",
+        "degree_range": {
+          "start": 285.125,
+          "end": 290.75,
+          "start_zodiac": "15°08' Capricorn",
+          "end_zodiac": "20°45' Capricorn",
+          "span_degrees": 5.625,
+          "wheel_index": 51,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "55": {
+        "gate": 55,
+        "hd_name": "Spirit",
+        "center": "solar",
+        "hexagram_number": 55,
+        "hexagram_name": "Abundance",
+        "theme": "Abundance",
+        "degree_range": {
+          "start": 330.125,
+          "end": 335.75,
+          "start_zodiac": "0°08' Pisces",
+          "end_zodiac": "5°45' Pisces",
+          "span_degrees": 5.625,
+          "wheel_index": 59,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "56": {
+        "gate": 56,
+        "hd_name": "Stimulation",
+        "center": "throat",
+        "hexagram_number": 56,
+        "hexagram_name": "The Wanderer",
+        "theme": "Stimulation",
+        "degree_range": {
+          "start": 116.375,
+          "end": 122,
+          "start_zodiac": "26°23' Cancer",
+          "end_zodiac": "2°00' Leo",
+          "span_degrees": 5.625,
+          "wheel_index": 21,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "57": {
+        "gate": 57,
+        "hd_name": "Intuition",
+        "center": "spleen",
+        "hexagram_number": 57,
+        "hexagram_name": "The Gentle",
+        "theme": "Intuitive clarity",
+        "degree_range": {
+          "start": 195.125,
+          "end": 200.75,
+          "start_zodiac": "15°08' Libra",
+          "end_zodiac": "20°45' Libra",
+          "span_degrees": 5.625,
+          "wheel_index": 35,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "58": {
+        "gate": 58,
+        "hd_name": "Vitality",
+        "center": "root",
+        "hexagram_number": 58,
+        "hexagram_name": "The Joyous",
+        "theme": "Vitality",
+        "degree_range": {
+          "start": 273.875,
+          "end": 279.5,
+          "start_zodiac": "3°53' Capricorn",
+          "end_zodiac": "9°30' Capricorn",
+          "span_degrees": 5.625,
+          "wheel_index": 49,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "59": {
+        "gate": 59,
+        "hd_name": "Sexuality",
+        "center": "sacral",
+        "hexagram_number": 59,
+        "hexagram_name": "Dispersion",
+        "theme": "Intimacy",
+        "degree_range": {
+          "start": 150.125,
+          "end": 155.75,
+          "start_zodiac": "0°08' Virgo",
+          "end_zodiac": "5°45' Virgo",
+          "span_degrees": 5.625,
+          "wheel_index": 27,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "60": {
+        "gate": 60,
+        "hd_name": "Limitation",
+        "center": "root",
+        "hexagram_number": 60,
+        "hexagram_name": "Limitation",
+        "theme": "Acceptance",
+        "degree_range": {
+          "start": 296.375,
+          "end": 302,
+          "start_zodiac": "26°23' Capricorn",
+          "end_zodiac": "2°00' Aquarius",
+          "span_degrees": 5.625,
+          "wheel_index": 53,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "61": {
+        "gate": 61,
+        "hd_name": "Mystery",
+        "center": "head",
+        "hexagram_number": 61,
+        "hexagram_name": "Inner Truth",
+        "theme": "Inner truth",
+        "degree_range": {
+          "start": 290.75,
+          "end": 296.375,
+          "start_zodiac": "20°45' Capricorn",
+          "end_zodiac": "26°23' Capricorn",
+          "span_degrees": 5.625,
+          "wheel_index": 52,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "62": {
+        "gate": 62,
+        "hd_name": "Details",
+        "center": "throat",
+        "hexagram_number": 62,
+        "hexagram_name": "Preponderance of the Small",
+        "theme": "Details",
+        "degree_range": {
+          "start": 110.75,
+          "end": 116.375,
+          "start_zodiac": "20°45' Cancer",
+          "end_zodiac": "26°23' Cancer",
+          "span_degrees": 5.625,
+          "wheel_index": 20,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "63": {
+        "gate": 63,
+        "hd_name": "Doubt",
+        "center": "head",
+        "hexagram_number": 63,
+        "hexagram_name": "After Completion",
+        "theme": "Doubt",
+        "degree_range": {
+          "start": 341.375,
+          "end": 347,
+          "start_zodiac": "11°23' Pisces",
+          "end_zodiac": "17°00' Pisces",
+          "span_degrees": 5.625,
+          "wheel_index": 61,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      },
+      "64": {
+        "gate": 64,
+        "hd_name": "Confusion",
+        "center": "head",
+        "hexagram_number": 64,
+        "hexagram_name": "Before Completion",
+        "theme": "Confusion",
+        "degree_range": {
+          "start": 161.375,
+          "end": 167,
+          "start_zodiac": "11°23' Virgo",
+          "end_zodiac": "17°00' Virgo",
+          "span_degrees": 5.625,
+          "wheel_index": 29,
+          "wraps_aries_point": false
+        },
+        "lines": 6
+      }
+    }
+  },
+  "channels": {
+    "_schema": "The 36 channels. Each channel is a pair of gates [a,b] that, when both gates are active, fully defines the two centers it connects. name and theme are brief neutral descriptors carried from the app data. A channel defines its two centers; the union of all active channels' centers gives the defined centers, which drive type/authority/definition.",
+    "count": 36,
+    "channels": [
+      {
+        "gates": [
+          1,
+          8
+        ],
+        "name": "Inspiration",
+        "centers": [
+          "g",
+          "throat"
+        ],
+        "theme": "Creative role model"
+      },
+      {
+        "gates": [
+          2,
+          14
+        ],
+        "name": "The Beat",
+        "centers": [
+          "g",
+          "sacral"
+        ],
+        "theme": "Keeper of keys"
+      },
+      {
+        "gates": [
+          3,
+          60
+        ],
+        "name": "Mutation",
+        "centers": [
+          "sacral",
+          "root"
+        ],
+        "theme": "Energy for mutation"
+      },
+      {
+        "gates": [
+          4,
+          63
+        ],
+        "name": "Logic",
+        "centers": [
+          "ajna",
+          "head"
+        ],
+        "theme": "Mental ease in doubt"
+      },
+      {
+        "gates": [
+          5,
+          15
+        ],
+        "name": "Rhythm",
+        "centers": [
+          "sacral",
+          "g"
+        ],
+        "theme": "Being in flow"
+      },
+      {
+        "gates": [
+          6,
+          59
+        ],
+        "name": "Intimacy",
+        "centers": [
+          "solar",
+          "sacral"
+        ],
+        "theme": "Focused on reproduction"
+      },
+      {
+        "gates": [
+          7,
+          31
+        ],
+        "name": "Alpha",
+        "centers": [
+          "g",
+          "throat"
+        ],
+        "theme": "Leadership"
+      },
+      {
+        "gates": [
+          9,
+          52
+        ],
+        "name": "Concentration",
+        "centers": [
+          "sacral",
+          "root"
+        ],
+        "theme": "Focused determination"
+      },
+      {
+        "gates": [
+          10,
+          20
+        ],
+        "name": "Awakening",
+        "centers": [
+          "g",
+          "throat"
+        ],
+        "theme": "Commitment to self"
+      },
+      {
+        "gates": [
+          10,
+          34
+        ],
+        "name": "Exploration",
+        "centers": [
+          "g",
+          "sacral"
+        ],
+        "theme": "Following convictions"
+      },
+      {
+        "gates": [
+          10,
+          57
+        ],
+        "name": "Perfected Form",
+        "centers": [
+          "g",
+          "spleen"
+        ],
+        "theme": "Survival"
+      },
+      {
+        "gates": [
+          11,
+          56
+        ],
+        "name": "Curiosity",
+        "centers": [
+          "ajna",
+          "throat"
+        ],
+        "theme": "A searcher"
+      },
+      {
+        "gates": [
+          12,
+          22
+        ],
+        "name": "Openness",
+        "centers": [
+          "throat",
+          "solar"
+        ],
+        "theme": "Social being"
+      },
+      {
+        "gates": [
+          13,
+          33
+        ],
+        "name": "The Prodigal",
+        "centers": [
+          "g",
+          "throat"
+        ],
+        "theme": "A witness"
+      },
+      {
+        "gates": [
+          16,
+          48
+        ],
+        "name": "The Wavelength",
+        "centers": [
+          "throat",
+          "spleen"
+        ],
+        "theme": "Talent"
+      },
+      {
+        "gates": [
+          17,
+          62
+        ],
+        "name": "Acceptance",
+        "centers": [
+          "ajna",
+          "throat"
+        ],
+        "theme": "An organizational being"
+      },
+      {
+        "gates": [
+          18,
+          58
+        ],
+        "name": "Judgement",
+        "centers": [
+          "spleen",
+          "root"
+        ],
+        "theme": "Insatiability"
+      },
+      {
+        "gates": [
+          19,
+          49
+        ],
+        "name": "Synthesis",
+        "centers": [
+          "root",
+          "solar"
+        ],
+        "theme": "Sensitivity"
+      },
+      {
+        "gates": [
+          20,
+          34
+        ],
+        "name": "Charisma",
+        "centers": [
+          "throat",
+          "sacral"
+        ],
+        "theme": "Busy-ness"
+      },
+      {
+        "gates": [
+          20,
+          57
+        ],
+        "name": "The Brainwave",
+        "centers": [
+          "throat",
+          "spleen"
+        ],
+        "theme": "Penetrating awareness"
+      },
+      {
+        "gates": [
+          21,
+          45
+        ],
+        "name": "Money",
+        "centers": [
+          "heart",
+          "throat"
+        ],
+        "theme": "A materialist"
+      },
+      {
+        "gates": [
+          23,
+          43
+        ],
+        "name": "Structuring",
+        "centers": [
+          "throat",
+          "ajna"
+        ],
+        "theme": "Individuality"
+      },
+      {
+        "gates": [
+          24,
+          61
+        ],
+        "name": "Awareness",
+        "centers": [
+          "ajna",
+          "head"
+        ],
+        "theme": "A thinker"
+      },
+      {
+        "gates": [
+          25,
+          51
+        ],
+        "name": "Initiation",
+        "centers": [
+          "g",
+          "heart"
+        ],
+        "theme": "Needing to be first"
+      },
+      {
+        "gates": [
+          26,
+          44
+        ],
+        "name": "Surrender",
+        "centers": [
+          "heart",
+          "spleen"
+        ],
+        "theme": "A transmitter"
+      },
+      {
+        "gates": [
+          27,
+          50
+        ],
+        "name": "Preservation",
+        "centers": [
+          "sacral",
+          "spleen"
+        ],
+        "theme": "Custodianship"
+      },
+      {
+        "gates": [
+          28,
+          38
+        ],
+        "name": "Struggle",
+        "centers": [
+          "spleen",
+          "root"
+        ],
+        "theme": "Stubbornness"
+      },
+      {
+        "gates": [
+          29,
+          46
+        ],
+        "name": "Discovery",
+        "centers": [
+          "sacral",
+          "g"
+        ],
+        "theme": "Succeeding where others fail"
+      },
+      {
+        "gates": [
+          30,
+          41
+        ],
+        "name": "Recognition",
+        "centers": [
+          "solar",
+          "root"
+        ],
+        "theme": "Focused energy"
+      },
+      {
+        "gates": [
+          32,
+          54
+        ],
+        "name": "Transformation",
+        "centers": [
+          "spleen",
+          "root"
+        ],
+        "theme": "Being driven"
+      },
+      {
+        "gates": [
+          34,
+          57
+        ],
+        "name": "Power",
+        "centers": [
+          "sacral",
+          "spleen"
+        ],
+        "theme": "An archetype"
+      },
+      {
+        "gates": [
+          35,
+          36
+        ],
+        "name": "Transitoriness",
+        "centers": [
+          "throat",
+          "solar"
+        ],
+        "theme": "A jack of all trades"
+      },
+      {
+        "gates": [
+          37,
+          40
+        ],
+        "name": "Community",
+        "centers": [
+          "solar",
+          "heart"
+        ],
+        "theme": "Part of a bargain"
+      },
+      {
+        "gates": [
+          39,
+          55
+        ],
+        "name": "Emoting",
+        "centers": [
+          "root",
+          "solar"
+        ],
+        "theme": "Moodiness"
+      },
+      {
+        "gates": [
+          42,
+          53
+        ],
+        "name": "Maturation",
+        "centers": [
+          "sacral",
+          "root"
+        ],
+        "theme": "Balanced development"
+      },
+      {
+        "gates": [
+          47,
+          64
+        ],
+        "name": "Abstraction",
+        "centers": [
+          "ajna",
+          "head"
+        ],
+        "theme": "Mental activity/clarity"
+      }
+    ]
+  },
+  "types": {
+    "_schema": "The 5 energy types with aura, strategy, signature (the feeling of living correctly), not_self theme (the feeling of resistance), approximate population percentage, and the mechanical determination_rule (which defined-center condition produces this type). type_determination_algorithm gives the ordered decision logic used by the engine.",
+    "type_determination_algorithm": [
+      "1. Compute defined centers from active channels.",
+      "2. hasSacral = Sacral center is defined.",
+      "3. hasMotorToThroat = there exists a path through the defined-channel network from the Throat center to any motor center (Sacral, Heart/Ego, Solar Plexus, Root), found by BFS. Requires Throat to be defined.",
+      "4. If NOT hasSacral AND hasMotorToThroat -> Manifestor.",
+      "5. Else if hasSacral AND hasMotorToThroat -> Manifesting Generator.",
+      "6. Else if hasSacral (and not motor-to-throat) -> Generator.",
+      "7. Else if zero centers are defined -> Reflector.",
+      "8. Otherwise -> Projector (default: defined centers but no defined Sacral and no motor-to-throat)."
+    ],
+    "motor_centers": [
+      "sacral",
+      "heart",
+      "solar",
+      "root"
+    ],
+    "types": {
+      "manifestor": {
+        "id": "manifestor",
+        "name": "Manifestor",
+        "aura": "Closed and repelling",
+        "strategy": "Inform",
+        "signature": "Peace",
+        "not_self": "Anger",
+        "percentage": "9%",
+        "determination_rule": "Sacral undefined AND a motor center connected to the Throat (motor-to-throat). Initiating energy type.",
+        "descriptor": "Independent initiators who can make things happen"
+      },
+      "generator": {
+        "id": "generator",
+        "name": "Generator",
+        "aura": "Open and enveloping",
+        "strategy": "Wait to Respond",
+        "signature": "Satisfaction",
+        "not_self": "Frustration",
+        "percentage": "37%",
+        "determination_rule": "Sacral defined AND no motor-to-throat connection.",
+        "descriptor": "Life force beings who respond to what life brings"
+      },
+      "manifestingGenerator": {
+        "id": "manifestingGenerator",
+        "name": "Manifesting Generator",
+        "aura": "Open and enveloping",
+        "strategy": "Wait to Respond, then Inform",
+        "signature": "Satisfaction",
+        "not_self": "Frustration/Anger",
+        "percentage": "33%",
+        "determination_rule": "Sacral defined AND a motor center connected to the Throat (motor-to-throat).",
+        "descriptor": "Multi-passionate beings who can move quickly"
+      },
+      "projector": {
+        "id": "projector",
+        "name": "Projector",
+        "aura": "Focused and absorbing",
+        "strategy": "Wait for the Invitation",
+        "signature": "Success",
+        "not_self": "Bitterness",
+        "percentage": "20%",
+        "determination_rule": "Sacral undefined AND no motor-to-throat connection, with at least one defined center.",
+        "descriptor": "Guides and managers who see others deeply"
+      },
+      "reflector": {
+        "id": "reflector",
+        "name": "Reflector",
+        "aura": "Resistant and sampling",
+        "strategy": "Wait a Lunar Cycle",
+        "signature": "Surprise",
+        "not_self": "Disappointment",
+        "percentage": "1%",
+        "determination_rule": "No centers defined (completely open chart).",
+        "descriptor": "Mirrors of community health and wisdom"
+      }
+    }
+  },
+  "authorities": {
+    "_schema": "The 7 inner authorities (the body's decision-making mechanism). Authority is assigned by STRICT PRECEDENCE over defined centers: the first matching rule in precedence order wins. precedence = the integer rank (1 = checked first / highest). authority_precedence_order lists the decision sequence.",
+    "authority_precedence_order": [
+      "1. Solar Plexus (Emotional) defined -> Emotional Authority.",
+      "2. else Sacral defined -> Sacral Authority.",
+      "3. else Spleen defined -> Splenic Authority.",
+      "4. else Heart/Ego defined -> Ego/Heart Authority.",
+      "5. else G Center defined -> Self-Projected Authority.",
+      "6. else no centers defined -> Lunar Authority (Reflector).",
+      "7. else (remaining defined centers, none of the above) -> Mental/Environmental (no inner authority)."
+    ],
+    "authorities": {
+      "emotional": {
+        "id": "emotional",
+        "name": "Emotional Authority",
+        "precedence": 1,
+        "deciding_center": "solar",
+        "rule": "Solar Plexus (Emotional) center is defined.",
+        "descriptor": "Wait for emotional clarity over time; no truth in the now."
+      },
+      "sacral": {
+        "id": "sacral",
+        "name": "Sacral Authority",
+        "precedence": 2,
+        "deciding_center": "sacral",
+        "rule": "Sacral defined and Solar Plexus undefined.",
+        "descriptor": "Listen to the gut response in the moment."
+      },
+      "splenic": {
+        "id": "splenic",
+        "name": "Splenic Authority",
+        "precedence": 3,
+        "deciding_center": "spleen",
+        "rule": "Spleen defined; Solar Plexus and Sacral undefined.",
+        "descriptor": "Trust the instant, quiet intuitive knowing."
+      },
+      "ego": {
+        "id": "ego",
+        "name": "Ego/Heart Authority",
+        "precedence": 4,
+        "deciding_center": "heart",
+        "rule": "Heart/Ego defined; Solar Plexus, Sacral, Spleen undefined.",
+        "descriptor": "Follow what the heart truly wants and will commit to."
+      },
+      "self": {
+        "id": "self",
+        "name": "Self-Projected Authority",
+        "precedence": 5,
+        "deciding_center": "g",
+        "rule": "G Center defined; Solar Plexus, Sacral, Spleen, Heart undefined.",
+        "descriptor": "Hear your own truth by talking it out; the voice reveals direction."
+      },
+      "lunar": {
+        "id": "lunar",
+        "name": "Lunar Authority",
+        "precedence": 6,
+        "deciding_center": null,
+        "rule": "No centers defined (Reflector).",
+        "descriptor": "Wait a full lunar cycle (about 28 days) before major decisions."
+      },
+      "mental": {
+        "id": "mental",
+        "name": "Mental/Environmental Authority",
+        "precedence": 7,
+        "deciding_center": null,
+        "rule": "Defined centers exist but none of the inner-authority centers above are defined (e.g. only Head/Ajna/Throat defined).",
+        "descriptor": "No inner authority; process out loud with trusted people in the right environment (sounding board)."
+      }
+    }
+  },
+  "lines": {
+    "_schema": "Each of the 64 gates is divided into 6 lines of 0.9375 deg each (5.625/6). The 6 lines are universal archetypes; combined with the gate they form 384 gate.line pairs whose interpretation is OUT of this mechanical file (RAG/commissioned). The personality_line (Personality Sun line) over design_line (Design Sun line) forms the Profile.",
+    "degrees_per_line": 0.9375,
+    "lines": {
+      "1": {
+        "line": 1,
+        "name": "Investigator",
+        "keyword": "Foundation"
+      },
+      "2": {
+        "line": 2,
+        "name": "Hermit",
+        "keyword": "Projection / natural talent"
+      },
+      "3": {
+        "line": 3,
+        "name": "Martyr",
+        "keyword": "Trial and error"
+      },
+      "4": {
+        "line": 4,
+        "name": "Opportunist",
+        "keyword": "Network / influence"
+      },
+      "5": {
+        "line": 5,
+        "name": "Heretic",
+        "keyword": "Universalizer / projected onto"
+      },
+      "6": {
+        "line": 6,
+        "name": "Role Model",
+        "keyword": "Role model / three life phases"
+      }
+    }
+  },
+  "profiles": {
+    "_schema": "The 12 profiles. profile = 'personality_line/design_line', derived from the Personality Sun line over the Design Sun line. name combines the two line archetypes. angle = incarnation-cross angle keyed to the profile (Right Angle = personal destiny, Left Angle = transpersonal/karmic, Juxtaposition = fixed fate; the single 4/1 profile is the only Juxtaposition).",
+    "derivation": "personality_line = line of the Personality (conscious) Sun; design_line = line of the Design (unconscious) Sun. profile string is personality_line + '/' + design_line.",
+    "angle_mapping": {
+      "right": [
+        "1/3",
+        "1/4",
+        "2/4",
+        "2/5",
+        "3/5",
+        "3/6",
+        "4/6"
+      ],
+      "left": [
+        "5/1",
+        "5/2",
+        "6/2",
+        "6/3"
+      ],
+      "juxtaposition": [
+        "4/1"
+      ]
+    },
+    "profiles": {
+      "1/3": {
+        "profile": "1/3",
+        "personality_line": 1,
+        "design_line": 3,
+        "name": "Investigator/Martyr",
+        "theme": "Learning through trial and error",
+        "angle": "right"
+      },
+      "1/4": {
+        "profile": "1/4",
+        "personality_line": 1,
+        "design_line": 4,
+        "name": "Investigator/Opportunist",
+        "theme": "Foundation through relationships",
+        "angle": "right"
+      },
+      "2/4": {
+        "profile": "2/4",
+        "personality_line": 2,
+        "design_line": 4,
+        "name": "Hermit/Opportunist",
+        "theme": "Natural talent shared with others",
+        "angle": "right"
+      },
+      "2/5": {
+        "profile": "2/5",
+        "personality_line": 2,
+        "design_line": 5,
+        "name": "Hermit/Heretic",
+        "theme": "Called out for natural gifts",
+        "angle": "right"
+      },
+      "3/5": {
+        "profile": "3/5",
+        "personality_line": 3,
+        "design_line": 5,
+        "name": "Martyr/Heretic",
+        "theme": "Learning through experience to save others",
+        "angle": "right"
+      },
+      "3/6": {
+        "profile": "3/6",
+        "personality_line": 3,
+        "design_line": 6,
+        "name": "Martyr/Role Model",
+        "theme": "Trial and error becoming wisdom",
+        "angle": "right"
+      },
+      "4/6": {
+        "profile": "4/6",
+        "personality_line": 4,
+        "design_line": 6,
+        "name": "Opportunist/Role Model",
+        "theme": "Networking toward role modeling",
+        "angle": "right"
+      },
+      "4/1": {
+        "profile": "4/1",
+        "personality_line": 4,
+        "design_line": 1,
+        "name": "Opportunist/Investigator",
+        "theme": "Influencing through research",
+        "angle": "juxtaposition"
+      },
+      "5/1": {
+        "profile": "5/1",
+        "personality_line": 5,
+        "design_line": 1,
+        "name": "Heretic/Investigator",
+        "theme": "Practical solutions from study",
+        "angle": "left"
+      },
+      "5/2": {
+        "profile": "5/2",
+        "personality_line": 5,
+        "design_line": 2,
+        "name": "Heretic/Hermit",
+        "theme": "Called out but needs alone time",
+        "angle": "left"
+      },
+      "6/2": {
+        "profile": "6/2",
+        "personality_line": 6,
+        "design_line": 2,
+        "name": "Role Model/Hermit",
+        "theme": "Wise but needs solitude",
+        "angle": "left"
+      },
+      "6/3": {
+        "profile": "6/3",
+        "personality_line": 6,
+        "design_line": 3,
+        "name": "Role Model/Martyr",
+        "theme": "Wisdom from life experience",
+        "angle": "left"
+      }
+    }
+  },
+  "definition_types": {
+    "_schema": "Definition = how the defined centers connect into groups. Computed as the number of connected components among defined centers (union-find / BFS over channel-connected centers). This is the app's corrected mechanic (pages/api/human-design.api.js calculateDefinition), which overrides the cruder channel-count heuristic in the bundled natalengine library.",
+    "algorithm": "Build an adjacency graph where each channel connects its two centers. Count connected components among the centers that appear in any active channel. components: 0 -> No Definition, 1 -> Single, 2 -> Split, 3 -> Triple Split, 4 -> Quadruple Split.",
+    "types": {
+      "none": {
+        "id": "none",
+        "name": "No Definition",
+        "components": 0,
+        "descriptor": "No fully-defined channels (only Reflectors)."
+      },
+      "single": {
+        "id": "single",
+        "name": "Single Definition",
+        "components": 1,
+        "descriptor": "All defined centers form one connected group."
+      },
+      "split": {
+        "id": "split",
+        "name": "Split Definition",
+        "components": 2,
+        "descriptor": "Defined centers form two separate groups."
+      },
+      "triple_split": {
+        "id": "triple_split",
+        "name": "Triple Split Definition",
+        "components": 3,
+        "descriptor": "Defined centers form three separate groups."
+      },
+      "quadruple_split": {
+        "id": "quadruple_split",
+        "name": "Quadruple Split Definition",
+        "components": 4,
+        "descriptor": "Defined centers form four separate groups."
+      }
+    }
+  },
+  "planetary_activations": {
+    "_schema": "Human Design uses 13 planetary bodies, activated twice: Personality (conscious, calculated at the exact birth moment) and Design (unconscious, calculated at the moment the Sun was 88 deg of ecliptic longitude before the birth Sun position). Each activation maps a body's zodiac longitude to a gate.line. Sun/Earth Personality + Sun/Earth Design form the Incarnation Cross; Personality + Design Sun lines form the Profile.",
+    "bodies_count_per_side": 13,
+    "sides": [
+      "personality",
+      "design"
+    ],
+    "design_calculation_rule": "The Design moment is the exact time at which the Sun's ecliptic longitude was 88 deg less than the Personality (birth) Sun longitude. This is approximately 88 days before birth but is NOT a fixed day offset; the engine solves for the exact moment iteratively (the Sun moves ~0.9856 deg/day on average, faster near perihelion in winter, slower near aphelion in summer).",
+    "bodies": [
+      {
+        "id": "sun",
+        "name": "Sun",
+        "note": "Conscious self / life purpose (Personality); core unconscious nature (Design). Profile and Incarnation Cross anchor."
+      },
+      {
+        "id": "earth",
+        "name": "Earth",
+        "note": "Grounding / balance. Earth longitude = Sun longitude + 180 deg (always opposite the Sun)."
+      },
+      {
+        "id": "moon",
+        "name": "Moon",
+        "note": "Drive / what moves you."
+      },
+      {
+        "id": "northNode",
+        "name": "North Node",
+        "note": "Future direction / environment in the second half of life."
+      },
+      {
+        "id": "southNode",
+        "name": "South Node",
+        "note": "Past / environment in the first half of life. South Node longitude = North Node + 180 deg (always opposite the North Node)."
+      },
+      {
+        "id": "mercury",
+        "name": "Mercury",
+        "note": "Communication / what you need to express."
+      },
+      {
+        "id": "venus",
+        "name": "Venus",
+        "note": "Values / morality."
+      },
+      {
+        "id": "mars",
+        "name": "Mars",
+        "note": "Immaturity / energy / drive to mature."
+      },
+      {
+        "id": "jupiter",
+        "name": "Jupiter",
+        "note": "Law / protection / expansion."
+      },
+      {
+        "id": "saturn",
+        "name": "Saturn",
+        "note": "Discipline / structure / limitation."
+      },
+      {
+        "id": "uranus",
+        "name": "Uranus",
+        "note": "Unusualness / the unexpected."
+      },
+      {
+        "id": "neptune",
+        "name": "Neptune",
+        "note": "Spirituality / illusion."
+      },
+      {
+        "id": "pluto",
+        "name": "Pluto",
+        "note": "Truth / transformation."
+      }
+    ],
+    "derived_rules": {
+      "earth": "earth_longitude = (sun_longitude + 180) mod 360",
+      "south_node": "south_node_longitude = (north_node_longitude + 180) mod 360",
+      "profile": "profile = personality.sun.line + '/' + design.sun.line",
+      "incarnation_cross_gates": "[personality.sun.gate, personality.earth.gate, design.sun.gate, design.earth.gate]"
+    }
+  },
+  "gate_wheel": {
+    "_schema": "The mapping from tropical zodiac longitude to gate. 64 gates evenly tile the 360-degree wheel, each spanning degrees_per_gate (5.625). offset_degrees is where Gate 25 begins (28 deg 15' Pisces). order is the gate sequence around the wheel starting at Gate 25 and proceeding through the zodiac. A longitude L maps to gate via: index = floor(((L - offset) mod 360) / 5.625); gate = order[index].",
+    "offset_degrees": 358.25,
+    "offset_zodiac": "28°15' Pisces",
+    "offset_note": "Gate 25 begins at 358.25 deg absolute (28 deg 15' Pisces) and wraps the 0/360 (Aries) point.",
+    "degrees_per_gate": 5.625,
+    "degrees_per_line": 0.9375,
+    "lines_per_gate": 6,
+    "gates_count": 64,
+    "order": [
+      25,
+      17,
+      21,
+      51,
+      42,
+      3,
+      27,
+      24,
+      2,
+      23,
+      8,
+      20,
+      16,
+      35,
+      45,
+      12,
+      15,
+      52,
+      39,
+      53,
+      62,
+      56,
+      31,
+      33,
+      7,
+      4,
+      29,
+      59,
+      40,
+      64,
+      47,
+      6,
+      46,
+      18,
+      48,
+      57,
+      32,
+      50,
+      28,
+      44,
+      1,
+      43,
+      14,
+      34,
+      9,
+      5,
+      26,
+      11,
+      10,
+      58,
+      38,
+      54,
+      61,
+      60,
+      41,
+      19,
+      13,
+      49,
+      30,
+      55,
+      37,
+      63,
+      22,
+      36
+    ],
+    "order_by_sign": {
+      "Aries": [
+        25,
+        17,
+        21,
+        51,
+        42,
+        3
+      ],
+      "Taurus": [
+        27,
+        24,
+        2,
+        23,
+        8,
+        20
+      ],
+      "Gemini": [
+        16,
+        35,
+        45,
+        12,
+        15,
+        52
+      ],
+      "Cancer": [
+        39,
+        53,
+        62,
+        56
+      ],
+      "Leo": [
+        31,
+        33,
+        7,
+        4,
+        29
+      ],
+      "Virgo": [
+        59,
+        40,
+        64,
+        47,
+        6
+      ],
+      "Libra": [
+        46,
+        18,
+        48,
+        57,
+        32,
+        50
+      ],
+      "Scorpio": [
+        28,
+        44,
+        1,
+        43,
+        14
+      ],
+      "Sagittarius": [
+        34,
+        9,
+        5,
+        26,
+        11
+      ],
+      "Capricorn": [
+        10,
+        58,
+        38,
+        54,
+        61
+      ],
+      "Aquarius": [
+        60,
+        41,
+        19,
+        13,
+        49,
+        30
+      ],
+      "Pisces": [
+        55,
+        37,
+        63,
+        22,
+        36
+      ],
+      "_note": "Sign buckets are approximate human-readable groupings; some gates straddle a sign boundary. The authoritative position is each gate's degree_range in the gates section, derived from order + offset. Gate 25 straddles Pisces/Aries."
+    }
+  },
+  "incarnation_crosses": {
+    "_schema": "There are 192 named Incarnation Crosses (64 Personality-Sun gates x 3 angles). The cross is keyed by the Personality Sun gate and the profile's angle. Its four gates are [Personality Sun, Personality Earth, Design Sun, Design Earth]. crosses_by_personality_sun_gate gives, for each of the 64 gates, the cross NAME for each of the 3 angles. Full title format: 'The {Right Angle Cross of|Juxtaposition Cross of|Left Angle Cross of} {name}'.",
+    "angle_from_profile": {
+      "right": [
+        "1/3",
+        "1/4",
+        "2/4",
+        "2/5",
+        "3/5",
+        "3/6",
+        "4/6"
+      ],
+      "left": [
+        "5/1",
+        "5/2",
+        "6/2",
+        "6/3"
+      ],
+      "juxtaposition": [
+        "4/1"
+      ]
+    },
+    "cross_gates_rule": "gates = [Personality Sun gate, Personality Earth gate (= Personality Sun + 180 deg), Design Sun gate, Design Earth gate (= Design Sun + 180 deg)].",
+    "full_name_format": {
+      "right": "The Right Angle Cross of {name}",
+      "juxtaposition": "The Juxtaposition Cross of {name}",
+      "left": "The Left Angle Cross of {name}"
+    },
+    "crosses_by_personality_sun_gate": {
+      "1": {
+        "personality_sun_gate": 1,
+        "right_angle": "The Sphinx",
+        "juxtaposition": "Self-Expression",
+        "left_angle": "Defiance"
+      },
+      "2": {
+        "personality_sun_gate": 2,
+        "right_angle": "The Sphinx",
+        "juxtaposition": "The Driver",
+        "left_angle": "Defiance"
+      },
+      "3": {
+        "personality_sun_gate": 3,
+        "right_angle": "Laws",
+        "juxtaposition": "Mutation",
+        "left_angle": "Wishes"
+      },
+      "4": {
+        "personality_sun_gate": 4,
+        "right_angle": "Explanation",
+        "juxtaposition": "Formulization",
+        "left_angle": "Revolution"
+      },
+      "5": {
+        "personality_sun_gate": 5,
+        "right_angle": "Consciousness",
+        "juxtaposition": "Habits",
+        "left_angle": "Separation"
+      },
+      "6": {
+        "personality_sun_gate": 6,
+        "right_angle": "Eden",
+        "juxtaposition": "Conflict",
+        "left_angle": "The Plane"
+      },
+      "7": {
+        "personality_sun_gate": 7,
+        "right_angle": "The Sphinx",
+        "juxtaposition": "Interaction",
+        "left_angle": "The Masks"
+      },
+      "8": {
+        "personality_sun_gate": 8,
+        "right_angle": "Contagion",
+        "juxtaposition": "Contribution",
+        "left_angle": "Uncertainty"
+      },
+      "9": {
+        "personality_sun_gate": 9,
+        "right_angle": "Planning",
+        "juxtaposition": "Focus",
+        "left_angle": "Identification"
+      },
+      "10": {
+        "personality_sun_gate": 10,
+        "right_angle": "The Vessel of Love",
+        "juxtaposition": "Behavior",
+        "left_angle": "Prevention"
+      },
+      "11": {
+        "personality_sun_gate": 11,
+        "right_angle": "Eden",
+        "juxtaposition": "Ideas",
+        "left_angle": "Education"
+      },
+      "12": {
+        "personality_sun_gate": 12,
+        "right_angle": "Eden",
+        "juxtaposition": "Articulation",
+        "left_angle": "Education"
+      },
+      "13": {
+        "personality_sun_gate": 13,
+        "right_angle": "The Sphinx",
+        "juxtaposition": "Listening",
+        "left_angle": "The Masks"
+      },
+      "14": {
+        "personality_sun_gate": 14,
+        "right_angle": "Contagion",
+        "juxtaposition": "Power Skills",
+        "left_angle": "Uncertainty"
+      },
+      "15": {
+        "personality_sun_gate": 15,
+        "right_angle": "The Vessel of Love",
+        "juxtaposition": "Extremes",
+        "left_angle": "Prevention"
+      },
+      "16": {
+        "personality_sun_gate": 16,
+        "right_angle": "Planning",
+        "juxtaposition": "Experimentation",
+        "left_angle": "Identification"
+      },
+      "17": {
+        "personality_sun_gate": 17,
+        "right_angle": "Service",
+        "juxtaposition": "Opinions",
+        "left_angle": "Upheaval"
+      },
+      "18": {
+        "personality_sun_gate": 18,
+        "right_angle": "Service",
+        "juxtaposition": "Correction",
+        "left_angle": "Upheaval"
+      },
+      "19": {
+        "personality_sun_gate": 19,
+        "right_angle": "The Four Ways",
+        "juxtaposition": "Wanting",
+        "left_angle": "Refinement"
+      },
+      "20": {
+        "personality_sun_gate": 20,
+        "right_angle": "The Sleeping Phoenix",
+        "juxtaposition": "The Now",
+        "left_angle": "Duality"
+      },
+      "21": {
+        "personality_sun_gate": 21,
+        "right_angle": "Tension",
+        "juxtaposition": "Control",
+        "left_angle": "Endeavor"
+      },
+      "22": {
+        "personality_sun_gate": 22,
+        "right_angle": "Rulership",
+        "juxtaposition": "Grace",
+        "left_angle": "Informing"
+      },
+      "23": {
+        "personality_sun_gate": 23,
+        "right_angle": "Explanation",
+        "juxtaposition": "Assimilation",
+        "left_angle": "Dedication"
+      },
+      "24": {
+        "personality_sun_gate": 24,
+        "right_angle": "The Four Ways",
+        "juxtaposition": "Rationalization",
+        "left_angle": "Incarnation"
+      },
+      "25": {
+        "personality_sun_gate": 25,
+        "right_angle": "The Vessel of Love",
+        "juxtaposition": "Innocence",
+        "left_angle": "The Spirit"
+      },
+      "26": {
+        "personality_sun_gate": 26,
+        "right_angle": "Rulership",
+        "juxtaposition": "The Trickster",
+        "left_angle": "Confrontation"
+      },
+      "27": {
+        "personality_sun_gate": 27,
+        "right_angle": "The Unexpected",
+        "juxtaposition": "Caring",
+        "left_angle": "Alignment"
+      },
+      "28": {
+        "personality_sun_gate": 28,
+        "right_angle": "The Unexpected",
+        "juxtaposition": "Risks",
+        "left_angle": "Alignment"
+      },
+      "29": {
+        "personality_sun_gate": 29,
+        "right_angle": "Contagion",
+        "juxtaposition": "Commitment",
+        "left_angle": "Industry"
+      },
+      "30": {
+        "personality_sun_gate": 30,
+        "right_angle": "Contagion",
+        "juxtaposition": "Fates",
+        "left_angle": "Industry"
+      },
+      "31": {
+        "personality_sun_gate": 31,
+        "right_angle": "The Unexpected",
+        "juxtaposition": "Influence",
+        "left_angle": "The Alpha"
+      },
+      "32": {
+        "personality_sun_gate": 32,
+        "right_angle": "Maya",
+        "juxtaposition": "Conservation",
+        "left_angle": "Limitation"
+      },
+      "33": {
+        "personality_sun_gate": 33,
+        "right_angle": "The Four Ways",
+        "juxtaposition": "Privacy",
+        "left_angle": "Refinement"
+      },
+      "34": {
+        "personality_sun_gate": 34,
+        "right_angle": "The Sleeping Phoenix",
+        "juxtaposition": "Power",
+        "left_angle": "Duality"
+      },
+      "35": {
+        "personality_sun_gate": 35,
+        "right_angle": "Consciousness",
+        "juxtaposition": "Experience",
+        "left_angle": "Separation"
+      },
+      "36": {
+        "personality_sun_gate": 36,
+        "right_angle": "Eden",
+        "juxtaposition": "Crisis",
+        "left_angle": "The Plane"
+      },
+      "37": {
+        "personality_sun_gate": 37,
+        "right_angle": "Planning",
+        "juxtaposition": "Bargains",
+        "left_angle": "Migration"
+      },
+      "38": {
+        "personality_sun_gate": 38,
+        "right_angle": "Tension",
+        "juxtaposition": "Opposition",
+        "left_angle": "Individualism"
+      },
+      "39": {
+        "personality_sun_gate": 39,
+        "right_angle": "Tension",
+        "juxtaposition": "Provocation",
+        "left_angle": "Individualism"
+      },
+      "40": {
+        "personality_sun_gate": 40,
+        "right_angle": "Planning",
+        "juxtaposition": "Denial",
+        "left_angle": "Migration"
+      },
+      "41": {
+        "personality_sun_gate": 41,
+        "right_angle": "The Unexpected",
+        "juxtaposition": "Fantasy",
+        "left_angle": "The Alpha"
+      },
+      "42": {
+        "personality_sun_gate": 42,
+        "right_angle": "Maya",
+        "juxtaposition": "Completion",
+        "left_angle": "Limitation"
+      },
+      "43": {
+        "personality_sun_gate": 43,
+        "right_angle": "Explanation",
+        "juxtaposition": "Insight",
+        "left_angle": "Dedication"
+      },
+      "44": {
+        "personality_sun_gate": 44,
+        "right_angle": "The Four Ways",
+        "juxtaposition": "Alertness",
+        "left_angle": "Incarnation"
+      },
+      "45": {
+        "personality_sun_gate": 45,
+        "right_angle": "Rulership",
+        "juxtaposition": "Possession",
+        "left_angle": "Confrontation"
+      },
+      "46": {
+        "personality_sun_gate": 46,
+        "right_angle": "The Vessel of Love",
+        "juxtaposition": "Serendipity",
+        "left_angle": "The Spirit"
+      },
+      "47": {
+        "personality_sun_gate": 47,
+        "right_angle": "Rulership",
+        "juxtaposition": "Oppression",
+        "left_angle": "Informing"
+      },
+      "48": {
+        "personality_sun_gate": 48,
+        "right_angle": "Tension",
+        "juxtaposition": "Depth",
+        "left_angle": "Endeavor"
+      },
+      "49": {
+        "personality_sun_gate": 49,
+        "right_angle": "Explanation",
+        "juxtaposition": "Principles",
+        "left_angle": "Revolution"
+      },
+      "50": {
+        "personality_sun_gate": 50,
+        "right_angle": "Laws",
+        "juxtaposition": "Values",
+        "left_angle": "Wishes"
+      },
+      "51": {
+        "personality_sun_gate": 51,
+        "right_angle": "Penetration",
+        "juxtaposition": "Shock",
+        "left_angle": "The Clarion"
+      },
+      "52": {
+        "personality_sun_gate": 52,
+        "right_angle": "Service",
+        "juxtaposition": "Stillness",
+        "left_angle": "Demands"
+      },
+      "53": {
+        "personality_sun_gate": 53,
+        "right_angle": "Penetration",
+        "juxtaposition": "Beginnings",
+        "left_angle": "Cycles"
+      },
+      "54": {
+        "personality_sun_gate": 54,
+        "right_angle": "Penetration",
+        "juxtaposition": "Ambition",
+        "left_angle": "Cycles"
+      },
+      "55": {
+        "personality_sun_gate": 55,
+        "right_angle": "The Sleeping Phoenix",
+        "juxtaposition": "Moods",
+        "left_angle": "Spirit"
+      },
+      "56": {
+        "personality_sun_gate": 56,
+        "right_angle": "Laws",
+        "juxtaposition": "Stimulation",
+        "left_angle": "Distraction"
+      },
+      "57": {
+        "personality_sun_gate": 57,
+        "right_angle": "Penetration",
+        "juxtaposition": "Intuition",
+        "left_angle": "The Clarion"
+      },
+      "58": {
+        "personality_sun_gate": 58,
+        "right_angle": "Service",
+        "juxtaposition": "Vitality",
+        "left_angle": "Demands"
+      },
+      "59": {
+        "personality_sun_gate": 59,
+        "right_angle": "The Sleeping Phoenix",
+        "juxtaposition": "Sexuality",
+        "left_angle": "Spirit"
+      },
+      "60": {
+        "personality_sun_gate": 60,
+        "right_angle": "Laws",
+        "juxtaposition": "Limitation",
+        "left_angle": "Distraction"
+      },
+      "61": {
+        "personality_sun_gate": 61,
+        "right_angle": "Maya",
+        "juxtaposition": "Thinking",
+        "left_angle": "Obscuration"
+      },
+      "62": {
+        "personality_sun_gate": 62,
+        "right_angle": "Maya",
+        "juxtaposition": "Details",
+        "left_angle": "Obscuration"
+      },
+      "63": {
+        "personality_sun_gate": 63,
+        "right_angle": "Consciousness",
+        "juxtaposition": "Doubts",
+        "left_angle": "Dominion"
+      },
+      "64": {
+        "personality_sun_gate": 64,
+        "right_angle": "Consciousness",
+        "juxtaposition": "Confusion",
+        "left_angle": "Dominion"
+      }
+    }
+  }
+}

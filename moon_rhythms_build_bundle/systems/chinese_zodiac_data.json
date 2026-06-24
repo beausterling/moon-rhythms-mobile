@@ -1,0 +1,2728 @@
+{
+  "metadata": {
+    "name": "Moon Rhythms Deterministic Chinese Zodiac / BaZi Reference",
+    "version": "v1",
+    "generated": "2026-06-23",
+    "description": "Single source of truth for all deterministic Chinese astrology / BaZi (Four Pillars) data used by Moon Rhythms. STRUCTURED LOOKUP only — it does NOT go into the RAG vector database. Mirrors the structure and voice of deterministic_data.json (the Western astrology spine). Long interpretive prose belongs in a separate RAG corpus. The app's date->pillar conversion is done by the lunar-javascript library; this file supplies the reference tables the app and the AI assembler read from.",
+    "companion_to": "deterministic_data.json (Western astrology spine)",
+    "calculation_engine": "lunar-javascript (Solar.fromYmdHms -> getLunar -> getEightChar) computes the four pillars at runtime; this file is reference data, not a calculator.",
+    "design_decisions": {
+      "voice": "Modern, grounded, warm. No mystical/woo language, no fate-talk in user-facing descriptor strings. Concise. No emojis and no em dashes in descriptor prose (per Moon Rhythms global rules). The app stores animal emoji separately; an `emoji` field preserves the app's exact values but no emoji appear in prose.",
+      "extracted_vs_added": "All exact mappings from the app's pages/api/chinese-zodiac.api.js are preserved verbatim: 12 animals (char->English), 10 stems (char/pinyin/element/polarity), 12 branches (char/pinyin/animal), the 30 English NaYin translations the app already chose, 5 element colors, and ANIMAL_TRAITS (traits/lucky numbers/colors/compatible/incompatible) plus ANIMAL_EMOJIS. Everything else (full 60-cycle, hidden stems, solar terms, shichen, compatibility group structures, Wu Xing cycles, fixed elements, San Hui, year-boundary rules, inner/secret animal mapping) is added from fresh cross-checked research.",
+      "year_boundary_rule": "CRITICAL CORRECTNESS DETAIL. There are TWO different year boundaries and they disagree by up to ~5 weeks. (1) The popular ZODIAC ANIMAL year rolls over at Chinese Lunar New Year (variable, late Jan to mid Feb). (2) The formal BaZi YEAR PILLAR (year stem-branch / sexagenary year designation) changes at the solar term Li Chun (立春, ~Feb 4), NOT at Lunar New Year. A person born between Lunar New Year and Li Chun belongs to the PREVIOUS year pillar in formal BaZi but the NEW animal year popularly. WHICH THE APP USES: the app calls lunar-javascript's getYearShengXiao()/getYearGan()/getYearNaYin(), which use the LUNAR NEW YEAR boundary for the year animal and year stem. So the app currently follows the popular Lunar-New-Year convention, NOT the Li-Chun BaZi convention. Both rules are documented in the `year_boundary_rules` section. If formal BaZi accuracy is ever required, switch the year pillar to lunar-javascript's getEightChar() year (eightchar uses solar terms) rather than getYearGan(). Similarly, BaZi months switch on solar terms (jie 节), not lunar calendar months.",
+      "nayin_english_source": "The 30 NaYin English names are taken VERBATIM from the app's existing NAYIN map in chinese-zodiac.api.js (the app ships exactly 30 because the 60-cycle shares 30 NaYin names, each spanning 2 consecutive cycle positions). The full 60-cycle (sixty_cycle) therefore reuses these same 30 English names; no new English names were invented. Each of the 60 entries carries its NaYin Chinese + the app's English + the NaYin element.",
+      "fixed_element_vs_year_element": "Two distinct element concepts are kept as separate fields and must not be conflated. (a) ANIMAL FIXED ELEMENT: each of the 12 animals/branches has an intrinsic fixed element (Rat=Water, Ox=Earth, Tiger=Wood, Rabbit=Wood, Dragon=Earth, Snake=Fire, Horse=Fire, Goat=Earth, Monkey=Metal, Rooster=Metal, Dog=Earth, Pig=Water) — this never changes. (b) YEAR ELEMENT: the element of the year's HEAVENLY STEM (Wood/Fire/Earth/Metal/Water + Yin/Yang), which cycles every 10 years and is what the app reports as `element` (e.g. 'Wood Tiger'). (c) NAYIN ELEMENT: a third, independent element from the 60-cycle melodic phase, often different from both (e.g. 甲子 has stem element Wood but NaYin element Metal). The app's `fullSign` ('Wood Tiger') uses the YEAR STEM element, not the fixed element.",
+      "hidden_stems_source": "Hidden stems (cangan / 藏干) cross-verified verbatim across Imperial Harvest, bazifortune, shaogn, fatemaster with zero discrepancy. Each branch holds a primary (main qi 本气) and optionally a middle (中气) and residual (余气) stem. Note Wu (午) carries 丁 primary + 己 middle in the canonical table (some simplified tables drop 己); the canonical 己 is included here.",
+      "compatibility_reconciliation": "The app ships LOOSE per-animal compatible/incompatible strings (from ANIMAL_TRAITS, preserved verbatim under animals[].compatible/incompatible). Those are popular-astrology approximations and do NOT cleanly equal the canonical group structures. The canonical deterministic structures (San He trines, Liu He harmonies, Liu Chong clashes, Liu Hai harms, Xing punishments, San Hui seasonal groups) are added separately under `compatibility`. Prefer the canonical group structures for any rigorous compatibility logic; the app's loose strings are kept only for backward compatibility with existing UI.",
+      "solar_term_convention": "Branch month boundaries use the BaZi jie (节 / odd-numbered 'node') solar terms that BEGIN each month (Yin month starts at Li Chun, etc.), NOT the zhongqi (中气) mid-month terms that Wikipedia's Sexagenary-cycle table lists. Solar-term DATES drift +/-1 day per year and must be computed astronomically (15-degree increments of solar longitude); the ~dates here are approximate labels only.",
+      "source_disagreements": "(1) 午未 Liu He produces Earth in the standard reading; a minority of schools say Fire or 'no transformation' — Earth is recorded as canonical with the alternates noted. (2) Wu (午) middle hidden stem 己 is included per the canonical table; simplified tables omit it. (3) Several NaYin names have accepted glyph variants (城头土~城墙土, 沙中金~砂中金, 金箔金~锡箔金, 桑柘木~桑拓木, 大溪水~大谿水); the app's canonical forms are used. (4) The Gregorian->cycle formula is (year-4) mod 60 for a 0-indexed array (1984=index 0=甲子) or (year-3) mod 60 with 0->60 for human 1-60 numbering; both are equivalent and documented."
+    }
+  },
+  "five_elements": {
+    "_schema": "Wu Xing (五行). The five elements that underlie stems, branches, and NaYin. Each carries the app's display color (from ELEMENT_COLORS) and short neutral keywords. The directed relationship cycles live in `relationships`.",
+    "wood": {
+      "id": "wood",
+      "name": "Wood",
+      "chinese": "木",
+      "pinyin": "Mù",
+      "color": "#4ade80",
+      "season": "spring",
+      "direction": "east",
+      "modern_keywords": [
+        "growth",
+        "expansion",
+        "flexibility",
+        "vision",
+        "initiative"
+      ]
+    },
+    "fire": {
+      "id": "fire",
+      "name": "Fire",
+      "chinese": "火",
+      "pinyin": "Huǒ",
+      "color": "#f87171",
+      "season": "summer",
+      "direction": "south",
+      "modern_keywords": [
+        "passion",
+        "visibility",
+        "warmth",
+        "drive",
+        "expression"
+      ]
+    },
+    "earth": {
+      "id": "earth",
+      "name": "Earth",
+      "chinese": "土",
+      "pinyin": "Tǔ",
+      "color": "#fbbf24",
+      "season": "late summer / transitions",
+      "direction": "center",
+      "modern_keywords": [
+        "stability",
+        "nourishment",
+        "reliability",
+        "groundedness",
+        "mediation"
+      ]
+    },
+    "metal": {
+      "id": "metal",
+      "name": "Metal",
+      "chinese": "金",
+      "pinyin": "Jīn",
+      "color": "#e2e8f0",
+      "season": "autumn",
+      "direction": "west",
+      "modern_keywords": [
+        "structure",
+        "precision",
+        "discernment",
+        "resolve",
+        "refinement"
+      ]
+    },
+    "water": {
+      "id": "water",
+      "name": "Water",
+      "chinese": "水",
+      "pinyin": "Shuǐ",
+      "color": "#60a5fa",
+      "season": "winter",
+      "direction": "north",
+      "modern_keywords": [
+        "depth",
+        "adaptability",
+        "intuition",
+        "communication",
+        "flow"
+      ]
+    },
+    "relationships": {
+      "_schema": "The four standard Wu Xing interaction cycles as explicit directed pairs. `from` acts on `to`.",
+      "generating_sheng": {
+        "chinese": "生",
+        "meaning": "produces / feeds / nourishes",
+        "pairs": [
+          {
+            "from": "wood",
+            "to": "fire",
+            "note": "Wood feeds Fire"
+          },
+          {
+            "from": "fire",
+            "to": "earth",
+            "note": "Fire creates Earth (ash)"
+          },
+          {
+            "from": "earth",
+            "to": "metal",
+            "note": "Earth bears Metal"
+          },
+          {
+            "from": "metal",
+            "to": "water",
+            "note": "Metal carries Water"
+          },
+          {
+            "from": "water",
+            "to": "wood",
+            "note": "Water nourishes Wood"
+          }
+        ]
+      },
+      "controlling_ke": {
+        "chinese": "克",
+        "meaning": "controls / overcomes / restrains",
+        "pairs": [
+          {
+            "from": "wood",
+            "to": "earth",
+            "note": "Wood parts Earth"
+          },
+          {
+            "from": "earth",
+            "to": "water",
+            "note": "Earth dams Water"
+          },
+          {
+            "from": "water",
+            "to": "fire",
+            "note": "Water extinguishes Fire"
+          },
+          {
+            "from": "fire",
+            "to": "metal",
+            "note": "Fire melts Metal"
+          },
+          {
+            "from": "metal",
+            "to": "wood",
+            "note": "Metal chops Wood"
+          }
+        ]
+      },
+      "weakening_xie": {
+        "chinese": "泄",
+        "meaning": "draining: the reverse of the generating cycle; the producer is weakened by what it produces (child drains mother)",
+        "pairs": [
+          {
+            "from": "fire",
+            "to": "wood",
+            "note": "Fire drains Wood"
+          },
+          {
+            "from": "earth",
+            "to": "fire",
+            "note": "Earth drains Fire"
+          },
+          {
+            "from": "metal",
+            "to": "earth",
+            "note": "Metal drains Earth"
+          },
+          {
+            "from": "water",
+            "to": "metal",
+            "note": "Water drains Metal"
+          },
+          {
+            "from": "wood",
+            "to": "water",
+            "note": "Wood drains Water"
+          }
+        ]
+      },
+      "insulting_wu": {
+        "chinese": "侮",
+        "meaning": "insulting / rebellion: the reverse of the controlling cycle; a too-strong controlled element pushes back against its controller",
+        "pairs": [
+          {
+            "from": "earth",
+            "to": "wood",
+            "note": "Earth insults Wood"
+          },
+          {
+            "from": "water",
+            "to": "earth",
+            "note": "Water insults Earth"
+          },
+          {
+            "from": "fire",
+            "to": "water",
+            "note": "Fire insults Water"
+          },
+          {
+            "from": "metal",
+            "to": "fire",
+            "note": "Metal insults Fire"
+          },
+          {
+            "from": "wood",
+            "to": "metal",
+            "note": "Wood insults Metal"
+          }
+        ]
+      },
+      "_note_overacting_cheng": "TCM also names 乘 (Cheng, 'over-acting') = the same direction as the controlling_ke cycle but excessive. It shares the exact five directed pairs as controlling_ke and is not listed separately."
+    }
+  },
+  "heavenly_stems": {
+    "_schema": "The 10 Heavenly Stems (Tian Gan / 天干) in canonical order. Each has element + yin/yang polarity (extracted verbatim from the app's STEMS map) plus a short neutral imagery descriptor (standard BaZi yang-wood vs yin-wood symbolism, added from research). The stem determines a pillar's element and polarity in the app's translatePillar().",
+    "甲": {
+      "chinese": "甲",
+      "pinyin": "Jiǎ",
+      "element": "Wood",
+      "polarity": "Yang",
+      "imagery": "yang wood — the upright tree, pioneering and growth-oriented"
+    },
+    "乙": {
+      "chinese": "乙",
+      "pinyin": "Yǐ",
+      "element": "Wood",
+      "polarity": "Yin",
+      "imagery": "yin wood — the bending grass or vine, flexible and persistent"
+    },
+    "丙": {
+      "chinese": "丙",
+      "pinyin": "Bǐng",
+      "element": "Fire",
+      "polarity": "Yang",
+      "imagery": "yang fire — the sun, radiant and outwardly warm"
+    },
+    "丁": {
+      "chinese": "丁",
+      "pinyin": "Dīng",
+      "element": "Fire",
+      "polarity": "Yin",
+      "imagery": "yin fire — the candle or lamp, focused and intimate"
+    },
+    "戊": {
+      "chinese": "戊",
+      "pinyin": "Wù",
+      "element": "Earth",
+      "polarity": "Yang",
+      "imagery": "yang earth — the mountain, steady and immovable"
+    },
+    "己": {
+      "chinese": "己",
+      "pinyin": "Jǐ",
+      "element": "Earth",
+      "polarity": "Yin",
+      "imagery": "yin earth — the field or garden soil, receptive and cultivating"
+    },
+    "庚": {
+      "chinese": "庚",
+      "pinyin": "Gēng",
+      "element": "Metal",
+      "polarity": "Yang",
+      "imagery": "yang metal — the axe or raw ore, decisive and forceful"
+    },
+    "辛": {
+      "chinese": "辛",
+      "pinyin": "Xīn",
+      "element": "Metal",
+      "polarity": "Yin",
+      "imagery": "yin metal — the jewel or refined blade, precise and discerning"
+    },
+    "壬": {
+      "chinese": "壬",
+      "pinyin": "Rén",
+      "element": "Water",
+      "polarity": "Yang",
+      "imagery": "yang water — the ocean or river, expansive and resourceful"
+    },
+    "癸": {
+      "chinese": "癸",
+      "pinyin": "Guǐ",
+      "element": "Water",
+      "polarity": "Yin",
+      "imagery": "yin water — the mist or rain, gentle and pervasive"
+    }
+  },
+  "earthly_branches": {
+    "_schema": "The 12 Earthly Branches (Di Zhi / 地支) in canonical order. animal + pinyin extracted from the app's BRANCHES map. Added from research: fixed_element (the branch's intrinsic element), polarity, hidden_stems (cangan: primary/middle/residual qi), the shichen two-hour time period the branch rules, the lunar month, and the BaZi month-start solar term (jie). Note fixed_element is the BRANCH element and is distinct from the year STEM element the app reports.",
+    "子": {
+      "chinese": "子",
+      "pinyin": "Zǐ",
+      "animal": "Rat",
+      "fixed_element": "Water",
+      "polarity": "Yang",
+      "hidden_stems": [
+        {
+          "stem": "癸",
+          "pinyin": "Guǐ",
+          "qi": "primary",
+          "element": "Water",
+          "polarity": "Yin"
+        }
+      ],
+      "shichen": "23:00-01:00",
+      "lunar_month": 11,
+      "month_start_solar_term": {
+        "name": "Da Xue",
+        "chinese": "大雪",
+        "approx_date": "~Dec 7"
+      }
+    },
+    "丑": {
+      "chinese": "丑",
+      "pinyin": "Chǒu",
+      "animal": "Ox",
+      "fixed_element": "Earth",
+      "polarity": "Yin",
+      "hidden_stems": [
+        {
+          "stem": "己",
+          "pinyin": "Jǐ",
+          "qi": "primary",
+          "element": "Earth",
+          "polarity": "Yin"
+        },
+        {
+          "stem": "癸",
+          "pinyin": "Guǐ",
+          "qi": "middle",
+          "element": "Water",
+          "polarity": "Yin"
+        },
+        {
+          "stem": "辛",
+          "pinyin": "Xīn",
+          "qi": "residual",
+          "element": "Metal",
+          "polarity": "Yin"
+        }
+      ],
+      "shichen": "01:00-03:00",
+      "lunar_month": 12,
+      "month_start_solar_term": {
+        "name": "Xiao Han",
+        "chinese": "小寒",
+        "approx_date": "~Jan 6"
+      }
+    },
+    "寅": {
+      "chinese": "寅",
+      "pinyin": "Yín",
+      "animal": "Tiger",
+      "fixed_element": "Wood",
+      "polarity": "Yang",
+      "hidden_stems": [
+        {
+          "stem": "甲",
+          "pinyin": "Jiǎ",
+          "qi": "primary",
+          "element": "Wood",
+          "polarity": "Yang"
+        },
+        {
+          "stem": "丙",
+          "pinyin": "Bǐng",
+          "qi": "middle",
+          "element": "Fire",
+          "polarity": "Yang"
+        },
+        {
+          "stem": "戊",
+          "pinyin": "Wù",
+          "qi": "residual",
+          "element": "Earth",
+          "polarity": "Yang"
+        }
+      ],
+      "shichen": "03:00-05:00",
+      "lunar_month": 1,
+      "month_start_solar_term": {
+        "name": "Li Chun",
+        "chinese": "立春",
+        "approx_date": "~Feb 4"
+      }
+    },
+    "卯": {
+      "chinese": "卯",
+      "pinyin": "Mǎo",
+      "animal": "Rabbit",
+      "fixed_element": "Wood",
+      "polarity": "Yin",
+      "hidden_stems": [
+        {
+          "stem": "乙",
+          "pinyin": "Yǐ",
+          "qi": "primary",
+          "element": "Wood",
+          "polarity": "Yin"
+        }
+      ],
+      "shichen": "05:00-07:00",
+      "lunar_month": 2,
+      "month_start_solar_term": {
+        "name": "Jing Zhe",
+        "chinese": "惊蛰",
+        "approx_date": "~Mar 6"
+      }
+    },
+    "辰": {
+      "chinese": "辰",
+      "pinyin": "Chén",
+      "animal": "Dragon",
+      "fixed_element": "Earth",
+      "polarity": "Yang",
+      "hidden_stems": [
+        {
+          "stem": "戊",
+          "pinyin": "Wù",
+          "qi": "primary",
+          "element": "Earth",
+          "polarity": "Yang"
+        },
+        {
+          "stem": "乙",
+          "pinyin": "Yǐ",
+          "qi": "middle",
+          "element": "Wood",
+          "polarity": "Yin"
+        },
+        {
+          "stem": "癸",
+          "pinyin": "Guǐ",
+          "qi": "residual",
+          "element": "Water",
+          "polarity": "Yin"
+        }
+      ],
+      "shichen": "07:00-09:00",
+      "lunar_month": 3,
+      "month_start_solar_term": {
+        "name": "Qing Ming",
+        "chinese": "清明",
+        "approx_date": "~Apr 5"
+      }
+    },
+    "巳": {
+      "chinese": "巳",
+      "pinyin": "Sì",
+      "animal": "Snake",
+      "fixed_element": "Fire",
+      "polarity": "Yin",
+      "hidden_stems": [
+        {
+          "stem": "丙",
+          "pinyin": "Bǐng",
+          "qi": "primary",
+          "element": "Fire",
+          "polarity": "Yang"
+        },
+        {
+          "stem": "庚",
+          "pinyin": "Gēng",
+          "qi": "middle",
+          "element": "Metal",
+          "polarity": "Yang"
+        },
+        {
+          "stem": "戊",
+          "pinyin": "Wù",
+          "qi": "residual",
+          "element": "Earth",
+          "polarity": "Yang"
+        }
+      ],
+      "shichen": "09:00-11:00",
+      "lunar_month": 4,
+      "month_start_solar_term": {
+        "name": "Li Xia",
+        "chinese": "立夏",
+        "approx_date": "~May 5"
+      }
+    },
+    "午": {
+      "chinese": "午",
+      "pinyin": "Wǔ",
+      "animal": "Horse",
+      "fixed_element": "Fire",
+      "polarity": "Yang",
+      "hidden_stems": [
+        {
+          "stem": "丁",
+          "pinyin": "Dīng",
+          "qi": "primary",
+          "element": "Fire",
+          "polarity": "Yin"
+        },
+        {
+          "stem": "己",
+          "pinyin": "Jǐ",
+          "qi": "middle",
+          "element": "Earth",
+          "polarity": "Yin"
+        }
+      ],
+      "shichen": "11:00-13:00",
+      "lunar_month": 5,
+      "month_start_solar_term": {
+        "name": "Mang Zhong",
+        "chinese": "芒种",
+        "approx_date": "~Jun 6"
+      }
+    },
+    "未": {
+      "chinese": "未",
+      "pinyin": "Wèi",
+      "animal": "Goat",
+      "fixed_element": "Earth",
+      "polarity": "Yin",
+      "hidden_stems": [
+        {
+          "stem": "己",
+          "pinyin": "Jǐ",
+          "qi": "primary",
+          "element": "Earth",
+          "polarity": "Yin"
+        },
+        {
+          "stem": "丁",
+          "pinyin": "Dīng",
+          "qi": "middle",
+          "element": "Fire",
+          "polarity": "Yin"
+        },
+        {
+          "stem": "乙",
+          "pinyin": "Yǐ",
+          "qi": "residual",
+          "element": "Wood",
+          "polarity": "Yin"
+        }
+      ],
+      "shichen": "13:00-15:00",
+      "lunar_month": 6,
+      "month_start_solar_term": {
+        "name": "Xiao Shu",
+        "chinese": "小暑",
+        "approx_date": "~Jul 7"
+      }
+    },
+    "申": {
+      "chinese": "申",
+      "pinyin": "Shēn",
+      "animal": "Monkey",
+      "fixed_element": "Metal",
+      "polarity": "Yang",
+      "hidden_stems": [
+        {
+          "stem": "庚",
+          "pinyin": "Gēng",
+          "qi": "primary",
+          "element": "Metal",
+          "polarity": "Yang"
+        },
+        {
+          "stem": "壬",
+          "pinyin": "Rén",
+          "qi": "middle",
+          "element": "Water",
+          "polarity": "Yang"
+        },
+        {
+          "stem": "戊",
+          "pinyin": "Wù",
+          "qi": "residual",
+          "element": "Earth",
+          "polarity": "Yang"
+        }
+      ],
+      "shichen": "15:00-17:00",
+      "lunar_month": 7,
+      "month_start_solar_term": {
+        "name": "Li Qiu",
+        "chinese": "立秋",
+        "approx_date": "~Aug 7"
+      }
+    },
+    "酉": {
+      "chinese": "酉",
+      "pinyin": "Yǒu",
+      "animal": "Rooster",
+      "fixed_element": "Metal",
+      "polarity": "Yin",
+      "hidden_stems": [
+        {
+          "stem": "辛",
+          "pinyin": "Xīn",
+          "qi": "primary",
+          "element": "Metal",
+          "polarity": "Yin"
+        }
+      ],
+      "shichen": "17:00-19:00",
+      "lunar_month": 8,
+      "month_start_solar_term": {
+        "name": "Bai Lu",
+        "chinese": "白露",
+        "approx_date": "~Sep 7"
+      }
+    },
+    "戌": {
+      "chinese": "戌",
+      "pinyin": "Xū",
+      "animal": "Dog",
+      "fixed_element": "Earth",
+      "polarity": "Yang",
+      "hidden_stems": [
+        {
+          "stem": "戊",
+          "pinyin": "Wù",
+          "qi": "primary",
+          "element": "Earth",
+          "polarity": "Yang"
+        },
+        {
+          "stem": "辛",
+          "pinyin": "Xīn",
+          "qi": "middle",
+          "element": "Metal",
+          "polarity": "Yin"
+        },
+        {
+          "stem": "丁",
+          "pinyin": "Dīng",
+          "qi": "residual",
+          "element": "Fire",
+          "polarity": "Yin"
+        }
+      ],
+      "shichen": "19:00-21:00",
+      "lunar_month": 9,
+      "month_start_solar_term": {
+        "name": "Han Lu",
+        "chinese": "寒露",
+        "approx_date": "~Oct 8"
+      }
+    },
+    "亥": {
+      "chinese": "亥",
+      "pinyin": "Hài",
+      "animal": "Pig",
+      "fixed_element": "Water",
+      "polarity": "Yin",
+      "hidden_stems": [
+        {
+          "stem": "壬",
+          "pinyin": "Rén",
+          "qi": "primary",
+          "element": "Water",
+          "polarity": "Yang"
+        },
+        {
+          "stem": "甲",
+          "pinyin": "Jiǎ",
+          "qi": "middle",
+          "element": "Wood",
+          "polarity": "Yang"
+        }
+      ],
+      "shichen": "21:00-23:00",
+      "lunar_month": 10,
+      "month_start_solar_term": {
+        "name": "Li Dong",
+        "chinese": "立冬",
+        "approx_date": "~Nov 7"
+      }
+    }
+  },
+  "animals": {
+    "_schema": "The 12 zodiac animals in canonical order (the order the cycle begins with Rat). name->chinese, emoji, traits, lucky numbers, lucky colors, and the LOOSE compatible/incompatible strings are extracted verbatim from the app's ANIMALS, ANIMAL_EMOJIS, and ANIMAL_TRAITS. Added from research: the branch each animal maps to (1:1) and the animal's FIXED element. For rigorous compatibility use the group structures in `compatibility`, not the loose strings here. The `compatible`/`incompatible` strings are popular-astrology approximations kept for UI backward-compatibility.",
+    "Rat": {
+      "name": "Rat",
+      "chinese": "鼠",
+      "emoji": "🐀",
+      "branch": "子",
+      "ordinal": 1,
+      "fixed_element": "Water",
+      "traits": "Quick-witted, resourceful, versatile",
+      "lucky_numbers": "2, 3",
+      "lucky_colors": "Blue, Gold, Green",
+      "compatible_loose": "Ox, Dragon, Monkey",
+      "incompatible_loose": "Horse, Goat"
+    },
+    "Ox": {
+      "name": "Ox",
+      "chinese": "牛",
+      "emoji": "🐂",
+      "branch": "丑",
+      "ordinal": 2,
+      "fixed_element": "Earth",
+      "traits": "Diligent, dependable, strong, determined",
+      "lucky_numbers": "1, 4",
+      "lucky_colors": "Blue, Yellow, Green",
+      "compatible_loose": "Rat, Snake, Rooster",
+      "incompatible_loose": "Tiger, Dragon, Horse, Goat"
+    },
+    "Tiger": {
+      "name": "Tiger",
+      "chinese": "虎",
+      "emoji": "🐅",
+      "branch": "寅",
+      "ordinal": 3,
+      "fixed_element": "Wood",
+      "traits": "Brave, competitive, unpredictable, confident",
+      "lucky_numbers": "1, 3, 4",
+      "lucky_colors": "Blue, Gray, Orange",
+      "compatible_loose": "Dragon, Horse, Pig",
+      "incompatible_loose": "Ox, Tiger, Snake, Monkey"
+    },
+    "Rabbit": {
+      "name": "Rabbit",
+      "chinese": "兔",
+      "emoji": "🐇",
+      "branch": "卯",
+      "ordinal": 4,
+      "fixed_element": "Wood",
+      "traits": "Quiet, elegant, kind, responsible",
+      "lucky_numbers": "3, 4, 6",
+      "lucky_colors": "Red, Pink, Purple, Blue",
+      "compatible_loose": "Goat, Monkey, Dog, Pig",
+      "incompatible_loose": "Snake, Rooster"
+    },
+    "Dragon": {
+      "name": "Dragon",
+      "chinese": "龙",
+      "emoji": "🐉",
+      "branch": "辰",
+      "ordinal": 5,
+      "fixed_element": "Earth",
+      "traits": "Confident, intelligent, enthusiastic",
+      "lucky_numbers": "1, 6, 7",
+      "lucky_colors": "Gold, Silver, Gray",
+      "compatible_loose": "Rooster, Rat, Monkey",
+      "incompatible_loose": "Ox, Goat, Dog"
+    },
+    "Snake": {
+      "name": "Snake",
+      "chinese": "蛇",
+      "emoji": "🐍",
+      "branch": "巳",
+      "ordinal": 6,
+      "fixed_element": "Fire",
+      "traits": "Enigmatic, intelligent, wise",
+      "lucky_numbers": "2, 8, 9",
+      "lucky_colors": "Black, Red, Yellow",
+      "compatible_loose": "Dragon, Rooster",
+      "incompatible_loose": "Tiger, Rabbit, Snake, Pig"
+    },
+    "Horse": {
+      "name": "Horse",
+      "chinese": "马",
+      "emoji": "🐴",
+      "branch": "午",
+      "ordinal": 7,
+      "fixed_element": "Fire",
+      "traits": "Animated, active, energetic",
+      "lucky_numbers": "2, 3, 7",
+      "lucky_colors": "Yellow, Green",
+      "compatible_loose": "Tiger, Goat, Rabbit",
+      "incompatible_loose": "Rat, Ox, Rooster, Horse"
+    },
+    "Goat": {
+      "name": "Goat",
+      "chinese": "羊",
+      "emoji": "🐐",
+      "branch": "未",
+      "ordinal": 8,
+      "fixed_element": "Earth",
+      "traits": "Calm, gentle, sympathetic",
+      "lucky_numbers": "2, 7",
+      "lucky_colors": "Brown, Red, Purple",
+      "compatible_loose": "Rabbit, Horse, Pig",
+      "incompatible_loose": "Ox, Tiger, Dog"
+    },
+    "Monkey": {
+      "name": "Monkey",
+      "chinese": "猴",
+      "emoji": "🐒",
+      "branch": "申",
+      "ordinal": 9,
+      "fixed_element": "Metal",
+      "traits": "Sharp, smart, curious",
+      "lucky_numbers": "4, 9",
+      "lucky_colors": "White, Blue, Gold",
+      "compatible_loose": "Ox, Rabbit",
+      "incompatible_loose": "Tiger, Pig"
+    },
+    "Rooster": {
+      "name": "Rooster",
+      "chinese": "鸡",
+      "emoji": "🐓",
+      "branch": "酉",
+      "ordinal": 10,
+      "fixed_element": "Metal",
+      "traits": "Observant, hardworking, courageous",
+      "lucky_numbers": "5, 7, 8",
+      "lucky_colors": "Gold, Brown, Yellow",
+      "compatible_loose": "Ox, Snake",
+      "incompatible_loose": "Rat, Rabbit, Horse, Rooster, Dog"
+    },
+    "Dog": {
+      "name": "Dog",
+      "chinese": "狗",
+      "emoji": "🐕",
+      "branch": "戌",
+      "ordinal": 11,
+      "fixed_element": "Earth",
+      "traits": "Loyal, honest, amiable, kind",
+      "lucky_numbers": "3, 4, 9",
+      "lucky_colors": "Red, Green, Purple",
+      "compatible_loose": "Rabbit",
+      "incompatible_loose": "Dragon, Goat, Rooster"
+    },
+    "Pig": {
+      "name": "Pig",
+      "chinese": "猪",
+      "emoji": "🐖",
+      "branch": "亥",
+      "ordinal": 12,
+      "fixed_element": "Water",
+      "traits": "Compassionate, generous, diligent",
+      "lucky_numbers": "2, 5, 8",
+      "lucky_colors": "Yellow, Gray, Brown, Gold",
+      "compatible_loose": "Tiger, Rabbit, Goat",
+      "incompatible_loose": "Snake, Monkey"
+    }
+  },
+  "sixty_cycle": {
+    "_schema": "The complete 60-year sexagenary cycle (Jiazi / 六十甲子). 60 entries in order, each combining one of the 10 stems with one of the 12 branches (position i 0-indexed: stem = i mod 10, branch = i mod 12). Each carries stem/branch/animal, the stem's element + polarity, and the NaYin (纳音) with the app's English name + the NaYin element. The 60 entries share 30 NaYin names, each spanning 2 consecutive positions. Generated deterministically and validated (position 1 = 甲子 Gold in the Sea; position 60 = 癸亥 Water of the Great Sea).",
+    "entries": [
+      {
+        "position": 1,
+        "index0": 0,
+        "ganzhi": "甲子",
+        "stem": "甲",
+        "stem_pinyin": "Jiǎ",
+        "branch": "子",
+        "branch_pinyin": "Zǐ",
+        "animal": "Rat",
+        "stem_element": "Wood",
+        "polarity": "Yang",
+        "nayin_chinese": "海中金",
+        "nayin_english": "Gold in the Sea",
+        "nayin_element": "Metal"
+      },
+      {
+        "position": 2,
+        "index0": 1,
+        "ganzhi": "乙丑",
+        "stem": "乙",
+        "stem_pinyin": "Yǐ",
+        "branch": "丑",
+        "branch_pinyin": "Chǒu",
+        "animal": "Ox",
+        "stem_element": "Wood",
+        "polarity": "Yin",
+        "nayin_chinese": "海中金",
+        "nayin_english": "Gold in the Sea",
+        "nayin_element": "Metal"
+      },
+      {
+        "position": 3,
+        "index0": 2,
+        "ganzhi": "丙寅",
+        "stem": "丙",
+        "stem_pinyin": "Bǐng",
+        "branch": "寅",
+        "branch_pinyin": "Yín",
+        "animal": "Tiger",
+        "stem_element": "Fire",
+        "polarity": "Yang",
+        "nayin_chinese": "炉中火",
+        "nayin_english": "Fire in the Furnace",
+        "nayin_element": "Fire"
+      },
+      {
+        "position": 4,
+        "index0": 3,
+        "ganzhi": "丁卯",
+        "stem": "丁",
+        "stem_pinyin": "Dīng",
+        "branch": "卯",
+        "branch_pinyin": "Mǎo",
+        "animal": "Rabbit",
+        "stem_element": "Fire",
+        "polarity": "Yin",
+        "nayin_chinese": "炉中火",
+        "nayin_english": "Fire in the Furnace",
+        "nayin_element": "Fire"
+      },
+      {
+        "position": 5,
+        "index0": 4,
+        "ganzhi": "戊辰",
+        "stem": "戊",
+        "stem_pinyin": "Wù",
+        "branch": "辰",
+        "branch_pinyin": "Chén",
+        "animal": "Dragon",
+        "stem_element": "Earth",
+        "polarity": "Yang",
+        "nayin_chinese": "大林木",
+        "nayin_english": "Wood of the Great Forest",
+        "nayin_element": "Wood"
+      },
+      {
+        "position": 6,
+        "index0": 5,
+        "ganzhi": "己巳",
+        "stem": "己",
+        "stem_pinyin": "Jǐ",
+        "branch": "巳",
+        "branch_pinyin": "Sì",
+        "animal": "Snake",
+        "stem_element": "Earth",
+        "polarity": "Yin",
+        "nayin_chinese": "大林木",
+        "nayin_english": "Wood of the Great Forest",
+        "nayin_element": "Wood"
+      },
+      {
+        "position": 7,
+        "index0": 6,
+        "ganzhi": "庚午",
+        "stem": "庚",
+        "stem_pinyin": "Gēng",
+        "branch": "午",
+        "branch_pinyin": "Wǔ",
+        "animal": "Horse",
+        "stem_element": "Metal",
+        "polarity": "Yang",
+        "nayin_chinese": "路旁土",
+        "nayin_english": "Earth by the Roadside",
+        "nayin_element": "Earth"
+      },
+      {
+        "position": 8,
+        "index0": 7,
+        "ganzhi": "辛未",
+        "stem": "辛",
+        "stem_pinyin": "Xīn",
+        "branch": "未",
+        "branch_pinyin": "Wèi",
+        "animal": "Goat",
+        "stem_element": "Metal",
+        "polarity": "Yin",
+        "nayin_chinese": "路旁土",
+        "nayin_english": "Earth by the Roadside",
+        "nayin_element": "Earth"
+      },
+      {
+        "position": 9,
+        "index0": 8,
+        "ganzhi": "壬申",
+        "stem": "壬",
+        "stem_pinyin": "Rén",
+        "branch": "申",
+        "branch_pinyin": "Shēn",
+        "animal": "Monkey",
+        "stem_element": "Water",
+        "polarity": "Yang",
+        "nayin_chinese": "剑锋金",
+        "nayin_english": "Gold of the Sword Edge",
+        "nayin_element": "Metal"
+      },
+      {
+        "position": 10,
+        "index0": 9,
+        "ganzhi": "癸酉",
+        "stem": "癸",
+        "stem_pinyin": "Guǐ",
+        "branch": "酉",
+        "branch_pinyin": "Yǒu",
+        "animal": "Rooster",
+        "stem_element": "Water",
+        "polarity": "Yin",
+        "nayin_chinese": "剑锋金",
+        "nayin_english": "Gold of the Sword Edge",
+        "nayin_element": "Metal"
+      },
+      {
+        "position": 11,
+        "index0": 10,
+        "ganzhi": "甲戌",
+        "stem": "甲",
+        "stem_pinyin": "Jiǎ",
+        "branch": "戌",
+        "branch_pinyin": "Xū",
+        "animal": "Dog",
+        "stem_element": "Wood",
+        "polarity": "Yang",
+        "nayin_chinese": "山头火",
+        "nayin_english": "Fire on the Mountaintop",
+        "nayin_element": "Fire"
+      },
+      {
+        "position": 12,
+        "index0": 11,
+        "ganzhi": "乙亥",
+        "stem": "乙",
+        "stem_pinyin": "Yǐ",
+        "branch": "亥",
+        "branch_pinyin": "Hài",
+        "animal": "Pig",
+        "stem_element": "Wood",
+        "polarity": "Yin",
+        "nayin_chinese": "山头火",
+        "nayin_english": "Fire on the Mountaintop",
+        "nayin_element": "Fire"
+      },
+      {
+        "position": 13,
+        "index0": 12,
+        "ganzhi": "丙子",
+        "stem": "丙",
+        "stem_pinyin": "Bǐng",
+        "branch": "子",
+        "branch_pinyin": "Zǐ",
+        "animal": "Rat",
+        "stem_element": "Fire",
+        "polarity": "Yang",
+        "nayin_chinese": "涧下水",
+        "nayin_english": "Water beneath the Stream",
+        "nayin_element": "Water"
+      },
+      {
+        "position": 14,
+        "index0": 13,
+        "ganzhi": "丁丑",
+        "stem": "丁",
+        "stem_pinyin": "Dīng",
+        "branch": "丑",
+        "branch_pinyin": "Chǒu",
+        "animal": "Ox",
+        "stem_element": "Fire",
+        "polarity": "Yin",
+        "nayin_chinese": "涧下水",
+        "nayin_english": "Water beneath the Stream",
+        "nayin_element": "Water"
+      },
+      {
+        "position": 15,
+        "index0": 14,
+        "ganzhi": "戊寅",
+        "stem": "戊",
+        "stem_pinyin": "Wù",
+        "branch": "寅",
+        "branch_pinyin": "Yín",
+        "animal": "Tiger",
+        "stem_element": "Earth",
+        "polarity": "Yang",
+        "nayin_chinese": "城头土",
+        "nayin_english": "Earth on the City Wall",
+        "nayin_element": "Earth"
+      },
+      {
+        "position": 16,
+        "index0": 15,
+        "ganzhi": "己卯",
+        "stem": "己",
+        "stem_pinyin": "Jǐ",
+        "branch": "卯",
+        "branch_pinyin": "Mǎo",
+        "animal": "Rabbit",
+        "stem_element": "Earth",
+        "polarity": "Yin",
+        "nayin_chinese": "城头土",
+        "nayin_english": "Earth on the City Wall",
+        "nayin_element": "Earth"
+      },
+      {
+        "position": 17,
+        "index0": 16,
+        "ganzhi": "庚辰",
+        "stem": "庚",
+        "stem_pinyin": "Gēng",
+        "branch": "辰",
+        "branch_pinyin": "Chén",
+        "animal": "Dragon",
+        "stem_element": "Metal",
+        "polarity": "Yang",
+        "nayin_chinese": "白蜡金",
+        "nayin_english": "White Wax Gold",
+        "nayin_element": "Metal"
+      },
+      {
+        "position": 18,
+        "index0": 17,
+        "ganzhi": "辛巳",
+        "stem": "辛",
+        "stem_pinyin": "Xīn",
+        "branch": "巳",
+        "branch_pinyin": "Sì",
+        "animal": "Snake",
+        "stem_element": "Metal",
+        "polarity": "Yin",
+        "nayin_chinese": "白蜡金",
+        "nayin_english": "White Wax Gold",
+        "nayin_element": "Metal"
+      },
+      {
+        "position": 19,
+        "index0": 18,
+        "ganzhi": "壬午",
+        "stem": "壬",
+        "stem_pinyin": "Rén",
+        "branch": "午",
+        "branch_pinyin": "Wǔ",
+        "animal": "Horse",
+        "stem_element": "Water",
+        "polarity": "Yang",
+        "nayin_chinese": "杨柳木",
+        "nayin_english": "Willow Wood",
+        "nayin_element": "Wood"
+      },
+      {
+        "position": 20,
+        "index0": 19,
+        "ganzhi": "癸未",
+        "stem": "癸",
+        "stem_pinyin": "Guǐ",
+        "branch": "未",
+        "branch_pinyin": "Wèi",
+        "animal": "Goat",
+        "stem_element": "Water",
+        "polarity": "Yin",
+        "nayin_chinese": "杨柳木",
+        "nayin_english": "Willow Wood",
+        "nayin_element": "Wood"
+      },
+      {
+        "position": 21,
+        "index0": 20,
+        "ganzhi": "甲申",
+        "stem": "甲",
+        "stem_pinyin": "Jiǎ",
+        "branch": "申",
+        "branch_pinyin": "Shēn",
+        "animal": "Monkey",
+        "stem_element": "Wood",
+        "polarity": "Yang",
+        "nayin_chinese": "泉中水",
+        "nayin_english": "Water in the Spring",
+        "nayin_element": "Water"
+      },
+      {
+        "position": 22,
+        "index0": 21,
+        "ganzhi": "乙酉",
+        "stem": "乙",
+        "stem_pinyin": "Yǐ",
+        "branch": "酉",
+        "branch_pinyin": "Yǒu",
+        "animal": "Rooster",
+        "stem_element": "Wood",
+        "polarity": "Yin",
+        "nayin_chinese": "泉中水",
+        "nayin_english": "Water in the Spring",
+        "nayin_element": "Water"
+      },
+      {
+        "position": 23,
+        "index0": 22,
+        "ganzhi": "丙戌",
+        "stem": "丙",
+        "stem_pinyin": "Bǐng",
+        "branch": "戌",
+        "branch_pinyin": "Xū",
+        "animal": "Dog",
+        "stem_element": "Fire",
+        "polarity": "Yang",
+        "nayin_chinese": "屋上土",
+        "nayin_english": "Earth on the Rooftop",
+        "nayin_element": "Earth"
+      },
+      {
+        "position": 24,
+        "index0": 23,
+        "ganzhi": "丁亥",
+        "stem": "丁",
+        "stem_pinyin": "Dīng",
+        "branch": "亥",
+        "branch_pinyin": "Hài",
+        "animal": "Pig",
+        "stem_element": "Fire",
+        "polarity": "Yin",
+        "nayin_chinese": "屋上土",
+        "nayin_english": "Earth on the Rooftop",
+        "nayin_element": "Earth"
+      },
+      {
+        "position": 25,
+        "index0": 24,
+        "ganzhi": "戊子",
+        "stem": "戊",
+        "stem_pinyin": "Wù",
+        "branch": "子",
+        "branch_pinyin": "Zǐ",
+        "animal": "Rat",
+        "stem_element": "Earth",
+        "polarity": "Yang",
+        "nayin_chinese": "霹雳火",
+        "nayin_english": "Thunderbolt Fire",
+        "nayin_element": "Fire"
+      },
+      {
+        "position": 26,
+        "index0": 25,
+        "ganzhi": "己丑",
+        "stem": "己",
+        "stem_pinyin": "Jǐ",
+        "branch": "丑",
+        "branch_pinyin": "Chǒu",
+        "animal": "Ox",
+        "stem_element": "Earth",
+        "polarity": "Yin",
+        "nayin_chinese": "霹雳火",
+        "nayin_english": "Thunderbolt Fire",
+        "nayin_element": "Fire"
+      },
+      {
+        "position": 27,
+        "index0": 26,
+        "ganzhi": "庚寅",
+        "stem": "庚",
+        "stem_pinyin": "Gēng",
+        "branch": "寅",
+        "branch_pinyin": "Yín",
+        "animal": "Tiger",
+        "stem_element": "Metal",
+        "polarity": "Yang",
+        "nayin_chinese": "松柏木",
+        "nayin_english": "Pine and Cypress Wood",
+        "nayin_element": "Wood"
+      },
+      {
+        "position": 28,
+        "index0": 27,
+        "ganzhi": "辛卯",
+        "stem": "辛",
+        "stem_pinyin": "Xīn",
+        "branch": "卯",
+        "branch_pinyin": "Mǎo",
+        "animal": "Rabbit",
+        "stem_element": "Metal",
+        "polarity": "Yin",
+        "nayin_chinese": "松柏木",
+        "nayin_english": "Pine and Cypress Wood",
+        "nayin_element": "Wood"
+      },
+      {
+        "position": 29,
+        "index0": 28,
+        "ganzhi": "壬辰",
+        "stem": "壬",
+        "stem_pinyin": "Rén",
+        "branch": "辰",
+        "branch_pinyin": "Chén",
+        "animal": "Dragon",
+        "stem_element": "Water",
+        "polarity": "Yang",
+        "nayin_chinese": "长流水",
+        "nayin_english": "Ever-flowing Water",
+        "nayin_element": "Water"
+      },
+      {
+        "position": 30,
+        "index0": 29,
+        "ganzhi": "癸巳",
+        "stem": "癸",
+        "stem_pinyin": "Guǐ",
+        "branch": "巳",
+        "branch_pinyin": "Sì",
+        "animal": "Snake",
+        "stem_element": "Water",
+        "polarity": "Yin",
+        "nayin_chinese": "长流水",
+        "nayin_english": "Ever-flowing Water",
+        "nayin_element": "Water"
+      },
+      {
+        "position": 31,
+        "index0": 30,
+        "ganzhi": "甲午",
+        "stem": "甲",
+        "stem_pinyin": "Jiǎ",
+        "branch": "午",
+        "branch_pinyin": "Wǔ",
+        "animal": "Horse",
+        "stem_element": "Wood",
+        "polarity": "Yang",
+        "nayin_chinese": "沙中金",
+        "nayin_english": "Gold in the Sand",
+        "nayin_element": "Metal"
+      },
+      {
+        "position": 32,
+        "index0": 31,
+        "ganzhi": "乙未",
+        "stem": "乙",
+        "stem_pinyin": "Yǐ",
+        "branch": "未",
+        "branch_pinyin": "Wèi",
+        "animal": "Goat",
+        "stem_element": "Wood",
+        "polarity": "Yin",
+        "nayin_chinese": "沙中金",
+        "nayin_english": "Gold in the Sand",
+        "nayin_element": "Metal"
+      },
+      {
+        "position": 33,
+        "index0": 32,
+        "ganzhi": "丙申",
+        "stem": "丙",
+        "stem_pinyin": "Bǐng",
+        "branch": "申",
+        "branch_pinyin": "Shēn",
+        "animal": "Monkey",
+        "stem_element": "Fire",
+        "polarity": "Yang",
+        "nayin_chinese": "山下火",
+        "nayin_english": "Fire beneath the Mountain",
+        "nayin_element": "Fire"
+      },
+      {
+        "position": 34,
+        "index0": 33,
+        "ganzhi": "丁酉",
+        "stem": "丁",
+        "stem_pinyin": "Dīng",
+        "branch": "酉",
+        "branch_pinyin": "Yǒu",
+        "animal": "Rooster",
+        "stem_element": "Fire",
+        "polarity": "Yin",
+        "nayin_chinese": "山下火",
+        "nayin_english": "Fire beneath the Mountain",
+        "nayin_element": "Fire"
+      },
+      {
+        "position": 35,
+        "index0": 34,
+        "ganzhi": "戊戌",
+        "stem": "戊",
+        "stem_pinyin": "Wù",
+        "branch": "戌",
+        "branch_pinyin": "Xū",
+        "animal": "Dog",
+        "stem_element": "Earth",
+        "polarity": "Yang",
+        "nayin_chinese": "平地木",
+        "nayin_english": "Wood of the Plains",
+        "nayin_element": "Wood"
+      },
+      {
+        "position": 36,
+        "index0": 35,
+        "ganzhi": "己亥",
+        "stem": "己",
+        "stem_pinyin": "Jǐ",
+        "branch": "亥",
+        "branch_pinyin": "Hài",
+        "animal": "Pig",
+        "stem_element": "Earth",
+        "polarity": "Yin",
+        "nayin_chinese": "平地木",
+        "nayin_english": "Wood of the Plains",
+        "nayin_element": "Wood"
+      },
+      {
+        "position": 37,
+        "index0": 36,
+        "ganzhi": "庚子",
+        "stem": "庚",
+        "stem_pinyin": "Gēng",
+        "branch": "子",
+        "branch_pinyin": "Zǐ",
+        "animal": "Rat",
+        "stem_element": "Metal",
+        "polarity": "Yang",
+        "nayin_chinese": "壁上土",
+        "nayin_english": "Earth on the Wall",
+        "nayin_element": "Earth"
+      },
+      {
+        "position": 38,
+        "index0": 37,
+        "ganzhi": "辛丑",
+        "stem": "辛",
+        "stem_pinyin": "Xīn",
+        "branch": "丑",
+        "branch_pinyin": "Chǒu",
+        "animal": "Ox",
+        "stem_element": "Metal",
+        "polarity": "Yin",
+        "nayin_chinese": "壁上土",
+        "nayin_english": "Earth on the Wall",
+        "nayin_element": "Earth"
+      },
+      {
+        "position": 39,
+        "index0": 38,
+        "ganzhi": "壬寅",
+        "stem": "壬",
+        "stem_pinyin": "Rén",
+        "branch": "寅",
+        "branch_pinyin": "Yín",
+        "animal": "Tiger",
+        "stem_element": "Water",
+        "polarity": "Yang",
+        "nayin_chinese": "金箔金",
+        "nayin_english": "Gold Foil Gold",
+        "nayin_element": "Metal"
+      },
+      {
+        "position": 40,
+        "index0": 39,
+        "ganzhi": "癸卯",
+        "stem": "癸",
+        "stem_pinyin": "Guǐ",
+        "branch": "卯",
+        "branch_pinyin": "Mǎo",
+        "animal": "Rabbit",
+        "stem_element": "Water",
+        "polarity": "Yin",
+        "nayin_chinese": "金箔金",
+        "nayin_english": "Gold Foil Gold",
+        "nayin_element": "Metal"
+      },
+      {
+        "position": 41,
+        "index0": 40,
+        "ganzhi": "甲辰",
+        "stem": "甲",
+        "stem_pinyin": "Jiǎ",
+        "branch": "辰",
+        "branch_pinyin": "Chén",
+        "animal": "Dragon",
+        "stem_element": "Wood",
+        "polarity": "Yang",
+        "nayin_chinese": "覆灯火",
+        "nayin_english": "Fire of the Covered Lamp",
+        "nayin_element": "Fire"
+      },
+      {
+        "position": 42,
+        "index0": 41,
+        "ganzhi": "乙巳",
+        "stem": "乙",
+        "stem_pinyin": "Yǐ",
+        "branch": "巳",
+        "branch_pinyin": "Sì",
+        "animal": "Snake",
+        "stem_element": "Wood",
+        "polarity": "Yin",
+        "nayin_chinese": "覆灯火",
+        "nayin_english": "Fire of the Covered Lamp",
+        "nayin_element": "Fire"
+      },
+      {
+        "position": 43,
+        "index0": 42,
+        "ganzhi": "丙午",
+        "stem": "丙",
+        "stem_pinyin": "Bǐng",
+        "branch": "午",
+        "branch_pinyin": "Wǔ",
+        "animal": "Horse",
+        "stem_element": "Fire",
+        "polarity": "Yang",
+        "nayin_chinese": "天河水",
+        "nayin_english": "Water of the Milky Way",
+        "nayin_element": "Water"
+      },
+      {
+        "position": 44,
+        "index0": 43,
+        "ganzhi": "丁未",
+        "stem": "丁",
+        "stem_pinyin": "Dīng",
+        "branch": "未",
+        "branch_pinyin": "Wèi",
+        "animal": "Goat",
+        "stem_element": "Fire",
+        "polarity": "Yin",
+        "nayin_chinese": "天河水",
+        "nayin_english": "Water of the Milky Way",
+        "nayin_element": "Water"
+      },
+      {
+        "position": 45,
+        "index0": 44,
+        "ganzhi": "戊申",
+        "stem": "戊",
+        "stem_pinyin": "Wù",
+        "branch": "申",
+        "branch_pinyin": "Shēn",
+        "animal": "Monkey",
+        "stem_element": "Earth",
+        "polarity": "Yang",
+        "nayin_chinese": "大驿土",
+        "nayin_english": "Earth of the Great Post Road",
+        "nayin_element": "Earth"
+      },
+      {
+        "position": 46,
+        "index0": 45,
+        "ganzhi": "己酉",
+        "stem": "己",
+        "stem_pinyin": "Jǐ",
+        "branch": "酉",
+        "branch_pinyin": "Yǒu",
+        "animal": "Rooster",
+        "stem_element": "Earth",
+        "polarity": "Yin",
+        "nayin_chinese": "大驿土",
+        "nayin_english": "Earth of the Great Post Road",
+        "nayin_element": "Earth"
+      },
+      {
+        "position": 47,
+        "index0": 46,
+        "ganzhi": "庚戌",
+        "stem": "庚",
+        "stem_pinyin": "Gēng",
+        "branch": "戌",
+        "branch_pinyin": "Xū",
+        "animal": "Dog",
+        "stem_element": "Metal",
+        "polarity": "Yang",
+        "nayin_chinese": "钗钏金",
+        "nayin_english": "Hairpin Gold",
+        "nayin_element": "Metal"
+      },
+      {
+        "position": 48,
+        "index0": 47,
+        "ganzhi": "辛亥",
+        "stem": "辛",
+        "stem_pinyin": "Xīn",
+        "branch": "亥",
+        "branch_pinyin": "Hài",
+        "animal": "Pig",
+        "stem_element": "Metal",
+        "polarity": "Yin",
+        "nayin_chinese": "钗钏金",
+        "nayin_english": "Hairpin Gold",
+        "nayin_element": "Metal"
+      },
+      {
+        "position": 49,
+        "index0": 48,
+        "ganzhi": "壬子",
+        "stem": "壬",
+        "stem_pinyin": "Rén",
+        "branch": "子",
+        "branch_pinyin": "Zǐ",
+        "animal": "Rat",
+        "stem_element": "Water",
+        "polarity": "Yang",
+        "nayin_chinese": "桑柘木",
+        "nayin_english": "Mulberry Wood",
+        "nayin_element": "Wood"
+      },
+      {
+        "position": 50,
+        "index0": 49,
+        "ganzhi": "癸丑",
+        "stem": "癸",
+        "stem_pinyin": "Guǐ",
+        "branch": "丑",
+        "branch_pinyin": "Chǒu",
+        "animal": "Ox",
+        "stem_element": "Water",
+        "polarity": "Yin",
+        "nayin_chinese": "桑柘木",
+        "nayin_english": "Mulberry Wood",
+        "nayin_element": "Wood"
+      },
+      {
+        "position": 51,
+        "index0": 50,
+        "ganzhi": "甲寅",
+        "stem": "甲",
+        "stem_pinyin": "Jiǎ",
+        "branch": "寅",
+        "branch_pinyin": "Yín",
+        "animal": "Tiger",
+        "stem_element": "Wood",
+        "polarity": "Yang",
+        "nayin_chinese": "大溪水",
+        "nayin_english": "Water of the Great Stream",
+        "nayin_element": "Water"
+      },
+      {
+        "position": 52,
+        "index0": 51,
+        "ganzhi": "乙卯",
+        "stem": "乙",
+        "stem_pinyin": "Yǐ",
+        "branch": "卯",
+        "branch_pinyin": "Mǎo",
+        "animal": "Rabbit",
+        "stem_element": "Wood",
+        "polarity": "Yin",
+        "nayin_chinese": "大溪水",
+        "nayin_english": "Water of the Great Stream",
+        "nayin_element": "Water"
+      },
+      {
+        "position": 53,
+        "index0": 52,
+        "ganzhi": "丙辰",
+        "stem": "丙",
+        "stem_pinyin": "Bǐng",
+        "branch": "辰",
+        "branch_pinyin": "Chén",
+        "animal": "Dragon",
+        "stem_element": "Fire",
+        "polarity": "Yang",
+        "nayin_chinese": "沙中土",
+        "nayin_english": "Earth in the Sand",
+        "nayin_element": "Earth"
+      },
+      {
+        "position": 54,
+        "index0": 53,
+        "ganzhi": "丁巳",
+        "stem": "丁",
+        "stem_pinyin": "Dīng",
+        "branch": "巳",
+        "branch_pinyin": "Sì",
+        "animal": "Snake",
+        "stem_element": "Fire",
+        "polarity": "Yin",
+        "nayin_chinese": "沙中土",
+        "nayin_english": "Earth in the Sand",
+        "nayin_element": "Earth"
+      },
+      {
+        "position": 55,
+        "index0": 54,
+        "ganzhi": "戊午",
+        "stem": "戊",
+        "stem_pinyin": "Wù",
+        "branch": "午",
+        "branch_pinyin": "Wǔ",
+        "animal": "Horse",
+        "stem_element": "Earth",
+        "polarity": "Yang",
+        "nayin_chinese": "天上火",
+        "nayin_english": "Fire in the Sky",
+        "nayin_element": "Fire"
+      },
+      {
+        "position": 56,
+        "index0": 55,
+        "ganzhi": "己未",
+        "stem": "己",
+        "stem_pinyin": "Jǐ",
+        "branch": "未",
+        "branch_pinyin": "Wèi",
+        "animal": "Goat",
+        "stem_element": "Earth",
+        "polarity": "Yin",
+        "nayin_chinese": "天上火",
+        "nayin_english": "Fire in the Sky",
+        "nayin_element": "Fire"
+      },
+      {
+        "position": 57,
+        "index0": 56,
+        "ganzhi": "庚申",
+        "stem": "庚",
+        "stem_pinyin": "Gēng",
+        "branch": "申",
+        "branch_pinyin": "Shēn",
+        "animal": "Monkey",
+        "stem_element": "Metal",
+        "polarity": "Yang",
+        "nayin_chinese": "石榴木",
+        "nayin_english": "Pomegranate Wood",
+        "nayin_element": "Wood"
+      },
+      {
+        "position": 58,
+        "index0": 57,
+        "ganzhi": "辛酉",
+        "stem": "辛",
+        "stem_pinyin": "Xīn",
+        "branch": "酉",
+        "branch_pinyin": "Yǒu",
+        "animal": "Rooster",
+        "stem_element": "Metal",
+        "polarity": "Yin",
+        "nayin_chinese": "石榴木",
+        "nayin_english": "Pomegranate Wood",
+        "nayin_element": "Wood"
+      },
+      {
+        "position": 59,
+        "index0": 58,
+        "ganzhi": "壬戌",
+        "stem": "壬",
+        "stem_pinyin": "Rén",
+        "branch": "戌",
+        "branch_pinyin": "Xū",
+        "animal": "Dog",
+        "stem_element": "Water",
+        "polarity": "Yang",
+        "nayin_chinese": "大海水",
+        "nayin_english": "Water of the Great Sea",
+        "nayin_element": "Water"
+      },
+      {
+        "position": 60,
+        "index0": 59,
+        "ganzhi": "癸亥",
+        "stem": "癸",
+        "stem_pinyin": "Guǐ",
+        "branch": "亥",
+        "branch_pinyin": "Hài",
+        "animal": "Pig",
+        "stem_element": "Water",
+        "polarity": "Yin",
+        "nayin_chinese": "大海水",
+        "nayin_english": "Water of the Great Sea",
+        "nayin_element": "Water"
+      }
+    ]
+  },
+  "nayin": {
+    "_schema": "The 30 NaYin (纳音) melodic five-element phases in cycle order, each spanning 2 consecutive sexagenary positions. English names extracted verbatim from the app's NAYIN map. element is the NaYin's own five-element (independent of the stem element). cycle_positions and ganzhi_pair give the two 60-cycle slots each NaYin covers.",
+    "entries": [
+      {
+        "ordinal": 1,
+        "chinese": "海中金",
+        "english": "Gold in the Sea",
+        "element": "Metal",
+        "cycle_positions": [
+          1,
+          2
+        ],
+        "ganzhi_pair": [
+          "甲子",
+          "乙丑"
+        ]
+      },
+      {
+        "ordinal": 2,
+        "chinese": "炉中火",
+        "english": "Fire in the Furnace",
+        "element": "Fire",
+        "cycle_positions": [
+          3,
+          4
+        ],
+        "ganzhi_pair": [
+          "丙寅",
+          "丁卯"
+        ]
+      },
+      {
+        "ordinal": 3,
+        "chinese": "大林木",
+        "english": "Wood of the Great Forest",
+        "element": "Wood",
+        "cycle_positions": [
+          5,
+          6
+        ],
+        "ganzhi_pair": [
+          "戊辰",
+          "己巳"
+        ]
+      },
+      {
+        "ordinal": 4,
+        "chinese": "路旁土",
+        "english": "Earth by the Roadside",
+        "element": "Earth",
+        "cycle_positions": [
+          7,
+          8
+        ],
+        "ganzhi_pair": [
+          "庚午",
+          "辛未"
+        ]
+      },
+      {
+        "ordinal": 5,
+        "chinese": "剑锋金",
+        "english": "Gold of the Sword Edge",
+        "element": "Metal",
+        "cycle_positions": [
+          9,
+          10
+        ],
+        "ganzhi_pair": [
+          "壬申",
+          "癸酉"
+        ]
+      },
+      {
+        "ordinal": 6,
+        "chinese": "山头火",
+        "english": "Fire on the Mountaintop",
+        "element": "Fire",
+        "cycle_positions": [
+          11,
+          12
+        ],
+        "ganzhi_pair": [
+          "甲戌",
+          "乙亥"
+        ]
+      },
+      {
+        "ordinal": 7,
+        "chinese": "涧下水",
+        "english": "Water beneath the Stream",
+        "element": "Water",
+        "cycle_positions": [
+          13,
+          14
+        ],
+        "ganzhi_pair": [
+          "丙子",
+          "丁丑"
+        ]
+      },
+      {
+        "ordinal": 8,
+        "chinese": "城头土",
+        "english": "Earth on the City Wall",
+        "element": "Earth",
+        "cycle_positions": [
+          15,
+          16
+        ],
+        "ganzhi_pair": [
+          "戊寅",
+          "己卯"
+        ]
+      },
+      {
+        "ordinal": 9,
+        "chinese": "白蜡金",
+        "english": "White Wax Gold",
+        "element": "Metal",
+        "cycle_positions": [
+          17,
+          18
+        ],
+        "ganzhi_pair": [
+          "庚辰",
+          "辛巳"
+        ]
+      },
+      {
+        "ordinal": 10,
+        "chinese": "杨柳木",
+        "english": "Willow Wood",
+        "element": "Wood",
+        "cycle_positions": [
+          19,
+          20
+        ],
+        "ganzhi_pair": [
+          "壬午",
+          "癸未"
+        ]
+      },
+      {
+        "ordinal": 11,
+        "chinese": "泉中水",
+        "english": "Water in the Spring",
+        "element": "Water",
+        "cycle_positions": [
+          21,
+          22
+        ],
+        "ganzhi_pair": [
+          "甲申",
+          "乙酉"
+        ]
+      },
+      {
+        "ordinal": 12,
+        "chinese": "屋上土",
+        "english": "Earth on the Rooftop",
+        "element": "Earth",
+        "cycle_positions": [
+          23,
+          24
+        ],
+        "ganzhi_pair": [
+          "丙戌",
+          "丁亥"
+        ]
+      },
+      {
+        "ordinal": 13,
+        "chinese": "霹雳火",
+        "english": "Thunderbolt Fire",
+        "element": "Fire",
+        "cycle_positions": [
+          25,
+          26
+        ],
+        "ganzhi_pair": [
+          "戊子",
+          "己丑"
+        ]
+      },
+      {
+        "ordinal": 14,
+        "chinese": "松柏木",
+        "english": "Pine and Cypress Wood",
+        "element": "Wood",
+        "cycle_positions": [
+          27,
+          28
+        ],
+        "ganzhi_pair": [
+          "庚寅",
+          "辛卯"
+        ]
+      },
+      {
+        "ordinal": 15,
+        "chinese": "长流水",
+        "english": "Ever-flowing Water",
+        "element": "Water",
+        "cycle_positions": [
+          29,
+          30
+        ],
+        "ganzhi_pair": [
+          "壬辰",
+          "癸巳"
+        ]
+      },
+      {
+        "ordinal": 16,
+        "chinese": "沙中金",
+        "english": "Gold in the Sand",
+        "element": "Metal",
+        "cycle_positions": [
+          31,
+          32
+        ],
+        "ganzhi_pair": [
+          "甲午",
+          "乙未"
+        ]
+      },
+      {
+        "ordinal": 17,
+        "chinese": "山下火",
+        "english": "Fire beneath the Mountain",
+        "element": "Fire",
+        "cycle_positions": [
+          33,
+          34
+        ],
+        "ganzhi_pair": [
+          "丙申",
+          "丁酉"
+        ]
+      },
+      {
+        "ordinal": 18,
+        "chinese": "平地木",
+        "english": "Wood of the Plains",
+        "element": "Wood",
+        "cycle_positions": [
+          35,
+          36
+        ],
+        "ganzhi_pair": [
+          "戊戌",
+          "己亥"
+        ]
+      },
+      {
+        "ordinal": 19,
+        "chinese": "壁上土",
+        "english": "Earth on the Wall",
+        "element": "Earth",
+        "cycle_positions": [
+          37,
+          38
+        ],
+        "ganzhi_pair": [
+          "庚子",
+          "辛丑"
+        ]
+      },
+      {
+        "ordinal": 20,
+        "chinese": "金箔金",
+        "english": "Gold Foil Gold",
+        "element": "Metal",
+        "cycle_positions": [
+          39,
+          40
+        ],
+        "ganzhi_pair": [
+          "壬寅",
+          "癸卯"
+        ]
+      },
+      {
+        "ordinal": 21,
+        "chinese": "覆灯火",
+        "english": "Fire of the Covered Lamp",
+        "element": "Fire",
+        "cycle_positions": [
+          41,
+          42
+        ],
+        "ganzhi_pair": [
+          "甲辰",
+          "乙巳"
+        ]
+      },
+      {
+        "ordinal": 22,
+        "chinese": "天河水",
+        "english": "Water of the Milky Way",
+        "element": "Water",
+        "cycle_positions": [
+          43,
+          44
+        ],
+        "ganzhi_pair": [
+          "丙午",
+          "丁未"
+        ]
+      },
+      {
+        "ordinal": 23,
+        "chinese": "大驿土",
+        "english": "Earth of the Great Post Road",
+        "element": "Earth",
+        "cycle_positions": [
+          45,
+          46
+        ],
+        "ganzhi_pair": [
+          "戊申",
+          "己酉"
+        ]
+      },
+      {
+        "ordinal": 24,
+        "chinese": "钗钏金",
+        "english": "Hairpin Gold",
+        "element": "Metal",
+        "cycle_positions": [
+          47,
+          48
+        ],
+        "ganzhi_pair": [
+          "庚戌",
+          "辛亥"
+        ]
+      },
+      {
+        "ordinal": 25,
+        "chinese": "桑柘木",
+        "english": "Mulberry Wood",
+        "element": "Wood",
+        "cycle_positions": [
+          49,
+          50
+        ],
+        "ganzhi_pair": [
+          "壬子",
+          "癸丑"
+        ]
+      },
+      {
+        "ordinal": 26,
+        "chinese": "大溪水",
+        "english": "Water of the Great Stream",
+        "element": "Water",
+        "cycle_positions": [
+          51,
+          52
+        ],
+        "ganzhi_pair": [
+          "甲寅",
+          "乙卯"
+        ]
+      },
+      {
+        "ordinal": 27,
+        "chinese": "沙中土",
+        "english": "Earth in the Sand",
+        "element": "Earth",
+        "cycle_positions": [
+          53,
+          54
+        ],
+        "ganzhi_pair": [
+          "丙辰",
+          "丁巳"
+        ]
+      },
+      {
+        "ordinal": 28,
+        "chinese": "天上火",
+        "english": "Fire in the Sky",
+        "element": "Fire",
+        "cycle_positions": [
+          55,
+          56
+        ],
+        "ganzhi_pair": [
+          "戊午",
+          "己未"
+        ]
+      },
+      {
+        "ordinal": 29,
+        "chinese": "石榴木",
+        "english": "Pomegranate Wood",
+        "element": "Wood",
+        "cycle_positions": [
+          57,
+          58
+        ],
+        "ganzhi_pair": [
+          "庚申",
+          "辛酉"
+        ]
+      },
+      {
+        "ordinal": 30,
+        "chinese": "大海水",
+        "english": "Water of the Great Sea",
+        "element": "Water",
+        "cycle_positions": [
+          59,
+          60
+        ],
+        "ganzhi_pair": [
+          "壬戌",
+          "癸亥"
+        ]
+      }
+    ]
+  },
+  "year_boundary_rules": {
+    "_schema": "How a Gregorian/lunar year maps to its zodiac animal, year stem, and sexagenary position — and the CRITICAL distinction between the two competing year boundaries. Read metadata.design_decisions.year_boundary_rule for the prominent summary.",
+    "gregorian_to_cycle_formula": {
+      "zero_indexed_array": "(year - 4) mod 60 gives the 0-indexed position into sixty_cycle.entries (1984 -> index 0 -> 甲子).",
+      "one_indexed_human": "(year - 3) mod 60 gives the human 1-60 position, mapping a result of 0 to 60.",
+      "stem_rule": "stem index = (year - 4) mod 10 into [甲乙丙丁戊己庚辛壬癸] (1984 -> 甲).",
+      "branch_animal_rule": "branch index = (year - 4) mod 12 into [子丑寅卯辰巳午未申酉戌亥] (1984 -> 子 -> Rat).",
+      "anchor": "1984 = 甲子 = Wood Rat = cycle position 1. The cycle repeats every 60 years."
+    },
+    "popular_zodiac_year": {
+      "boundary": "Chinese Lunar New Year (variable, late January to mid February)",
+      "applies_to": "the popular zodiac ANIMAL year and, in lunar-javascript, the year stem reported by getYearGan()/getYearShengXiao()."
+    },
+    "formal_bazi_year_pillar": {
+      "boundary": "Li Chun (立春), the first solar term, ~Feb 4 (drifts Feb 3-5 by year)",
+      "applies_to": "the formal BaZi YEAR PILLAR (年柱) stem-branch. A person born between Lunar New Year and Li Chun keeps the PREVIOUS year pillar in formal BaZi.",
+      "note": "BaZi MONTHS also switch on solar terms (jie 节), not lunar calendar months."
+    },
+    "which_the_app_uses": "The app (pages/api/chinese-zodiac.api.js) calls lunar-javascript getYearShengXiao()/getYearGan()/getYearNaYin(), which use the LUNAR NEW YEAR boundary for the displayed year animal/stem/NaYin. The four pillars themselves come from getEightChar(), whose year pillar uses solar terms (Li Chun). So the app's top-line 'animal' and 'element' follow the popular convention while its fourPillars.year follows the BaZi convention. This can disagree for births in the Lunar-New-Year-to-Li-Chun window. Documented here so the discrepancy is intentional, not a bug."
+  },
+  "compatibility": {
+    "_schema": "Canonical deterministic compatibility structures based on the Earthly Branches (not the loose per-animal strings in `animals`). Prefer these for rigorous logic. Each group lists branches + animals; transformation/clash elements included where standard.",
+    "san_he": {
+      "name": "San He",
+      "chinese": "三合",
+      "label": "Trines / affinity groups",
+      "description": "Four three-animal affinity triangles; each combines into one element.",
+      "groups": [
+        {
+          "branches": [
+            "申",
+            "子",
+            "辰"
+          ],
+          "animals": [
+            "Monkey",
+            "Rat",
+            "Dragon"
+          ],
+          "produces_element": "Water",
+          "produces_chinese": "水"
+        },
+        {
+          "branches": [
+            "巳",
+            "酉",
+            "丑"
+          ],
+          "animals": [
+            "Snake",
+            "Rooster",
+            "Ox"
+          ],
+          "produces_element": "Metal",
+          "produces_chinese": "金"
+        },
+        {
+          "branches": [
+            "寅",
+            "午",
+            "戌"
+          ],
+          "animals": [
+            "Tiger",
+            "Horse",
+            "Dog"
+          ],
+          "produces_element": "Fire",
+          "produces_chinese": "火"
+        },
+        {
+          "branches": [
+            "亥",
+            "卯",
+            "未"
+          ],
+          "animals": [
+            "Pig",
+            "Rabbit",
+            "Goat"
+          ],
+          "produces_element": "Wood",
+          "produces_chinese": "木"
+        }
+      ]
+    },
+    "liu_he": {
+      "name": "Liu He",
+      "chinese": "六合",
+      "label": "Six harmonies",
+      "description": "Six harmony pairs; each transforms into an element.",
+      "pairs": [
+        {
+          "branches": [
+            "子",
+            "丑"
+          ],
+          "animals": [
+            "Rat",
+            "Ox"
+          ],
+          "transforms_to": "Earth",
+          "transforms_chinese": "土"
+        },
+        {
+          "branches": [
+            "寅",
+            "亥"
+          ],
+          "animals": [
+            "Tiger",
+            "Pig"
+          ],
+          "transforms_to": "Wood",
+          "transforms_chinese": "木"
+        },
+        {
+          "branches": [
+            "卯",
+            "戌"
+          ],
+          "animals": [
+            "Rabbit",
+            "Dog"
+          ],
+          "transforms_to": "Fire",
+          "transforms_chinese": "火"
+        },
+        {
+          "branches": [
+            "辰",
+            "酉"
+          ],
+          "animals": [
+            "Dragon",
+            "Rooster"
+          ],
+          "transforms_to": "Metal",
+          "transforms_chinese": "金"
+        },
+        {
+          "branches": [
+            "巳",
+            "申"
+          ],
+          "animals": [
+            "Snake",
+            "Monkey"
+          ],
+          "transforms_to": "Water",
+          "transforms_chinese": "水"
+        },
+        {
+          "branches": [
+            "午",
+            "未"
+          ],
+          "animals": [
+            "Horse",
+            "Goat"
+          ],
+          "transforms_to": "Earth",
+          "transforms_chinese": "土",
+          "note": "Standard reading is Earth; a minority of schools say Fire or no transformation."
+        }
+      ]
+    },
+    "liu_chong": {
+      "name": "Liu Chong",
+      "chinese": "六冲",
+      "label": "Six clashes / conflicts",
+      "description": "Six clashing pairs; these are the 180-degree opposites in the branch wheel.",
+      "pairs": [
+        {
+          "branches": [
+            "子",
+            "午"
+          ],
+          "animals": [
+            "Rat",
+            "Horse"
+          ]
+        },
+        {
+          "branches": [
+            "丑",
+            "未"
+          ],
+          "animals": [
+            "Ox",
+            "Goat"
+          ]
+        },
+        {
+          "branches": [
+            "寅",
+            "申"
+          ],
+          "animals": [
+            "Tiger",
+            "Monkey"
+          ]
+        },
+        {
+          "branches": [
+            "卯",
+            "酉"
+          ],
+          "animals": [
+            "Rabbit",
+            "Rooster"
+          ]
+        },
+        {
+          "branches": [
+            "辰",
+            "戌"
+          ],
+          "animals": [
+            "Dragon",
+            "Dog"
+          ]
+        },
+        {
+          "branches": [
+            "巳",
+            "亥"
+          ],
+          "animals": [
+            "Snake",
+            "Pig"
+          ]
+        }
+      ]
+    },
+    "liu_hai": {
+      "name": "Liu Hai",
+      "chinese": "六害",
+      "label": "Six harms",
+      "description": "Six harm pairs (subtler friction than a clash).",
+      "pairs": [
+        {
+          "branches": [
+            "子",
+            "未"
+          ],
+          "animals": [
+            "Rat",
+            "Goat"
+          ]
+        },
+        {
+          "branches": [
+            "丑",
+            "午"
+          ],
+          "animals": [
+            "Ox",
+            "Horse"
+          ]
+        },
+        {
+          "branches": [
+            "寅",
+            "巳"
+          ],
+          "animals": [
+            "Tiger",
+            "Snake"
+          ]
+        },
+        {
+          "branches": [
+            "卯",
+            "辰"
+          ],
+          "animals": [
+            "Rabbit",
+            "Dragon"
+          ]
+        },
+        {
+          "branches": [
+            "申",
+            "亥"
+          ],
+          "animals": [
+            "Monkey",
+            "Pig"
+          ]
+        },
+        {
+          "branches": [
+            "酉",
+            "戌"
+          ],
+          "animals": [
+            "Rooster",
+            "Dog"
+          ]
+        }
+      ]
+    },
+    "xing": {
+      "name": "Xing",
+      "chinese": "刑",
+      "label": "Punishments",
+      "description": "Four punishment categories: two three-way groups, one mutual pair, and four self-punishments.",
+      "groups": [
+        {
+          "type": "ungrateful",
+          "chinese": "恩将仇报之刑",
+          "branches": [
+            "丑",
+            "戌",
+            "未"
+          ],
+          "animals": [
+            "Ox",
+            "Dog",
+            "Goat"
+          ],
+          "note": "Three-way: Chou->Xu->Wei->Chou"
+        },
+        {
+          "type": "bullying",
+          "chinese": "恃势之刑",
+          "branches": [
+            "寅",
+            "巳",
+            "申"
+          ],
+          "animals": [
+            "Tiger",
+            "Snake",
+            "Monkey"
+          ],
+          "note": "Three-way: Yin->Si->Shen->Yin"
+        },
+        {
+          "type": "uncivilized",
+          "chinese": "无礼之刑",
+          "branches": [
+            "子",
+            "卯"
+          ],
+          "animals": [
+            "Rat",
+            "Rabbit"
+          ],
+          "note": "Mutual two-way"
+        },
+        {
+          "type": "self_punishment",
+          "chinese": "自刑",
+          "branches": [
+            "辰",
+            "午",
+            "酉",
+            "亥"
+          ],
+          "animals": [
+            "Dragon",
+            "Horse",
+            "Rooster",
+            "Pig"
+          ],
+          "note": "Each branch punishes its own duplicate"
+        }
+      ]
+    },
+    "san_hui": {
+      "name": "San Hui",
+      "chinese": "三会",
+      "label": "Three seasonal / directional meetings",
+      "description": "Four trios of three consecutive branches; each forms a season, direction, and element.",
+      "groups": [
+        {
+          "branches": [
+            "寅",
+            "卯",
+            "辰"
+          ],
+          "animals": [
+            "Tiger",
+            "Rabbit",
+            "Dragon"
+          ],
+          "direction": "East",
+          "season": "Spring",
+          "element": "Wood",
+          "element_chinese": "木"
+        },
+        {
+          "branches": [
+            "巳",
+            "午",
+            "未"
+          ],
+          "animals": [
+            "Snake",
+            "Horse",
+            "Goat"
+          ],
+          "direction": "South",
+          "season": "Summer",
+          "element": "Fire",
+          "element_chinese": "火"
+        },
+        {
+          "branches": [
+            "申",
+            "酉",
+            "戌"
+          ],
+          "animals": [
+            "Monkey",
+            "Rooster",
+            "Dog"
+          ],
+          "direction": "West",
+          "season": "Autumn",
+          "element": "Metal",
+          "element_chinese": "金"
+        },
+        {
+          "branches": [
+            "亥",
+            "子",
+            "丑"
+          ],
+          "animals": [
+            "Pig",
+            "Rat",
+            "Ox"
+          ],
+          "direction": "North",
+          "season": "Winter",
+          "element": "Water",
+          "element_chinese": "水"
+        }
+      ]
+    }
+  },
+  "four_pillars": {
+    "_schema": "Structured mapping so a full BaZi reading is not just the year animal. The app computes all four pillars via lunar-javascript getEightChar(); each pillar is a stem+branch (and thus an animal via the branch).",
+    "pillars": {
+      "year": {
+        "chinese": "年柱",
+        "derived_from": "year of birth (boundary: see year_boundary_rules)",
+        "public_animal": "the year branch is the popular 'true' zodiac animal — what people mean by 'I am a Dragon'",
+        "represents": "ancestry, early environment, social face"
+      },
+      "month": {
+        "chinese": "月柱",
+        "derived_from": "birth month (switches on solar terms / jie)",
+        "inner_animal": "the month branch is the INNER animal — inner self, parents, formative drives",
+        "represents": "inner character, career foundation, family of origin"
+      },
+      "day": {
+        "chinese": "日柱",
+        "derived_from": "birth day",
+        "day_master": "the DAY STEM is the Day Master (日主) — the core 'self' element in BaZi, the reference point the whole chart is read against; the day branch is the 'true' or self animal",
+        "represents": "the self and the spouse/partner (day branch)"
+      },
+      "time": {
+        "chinese": "时柱",
+        "derived_from": "birth hour (mapped to the shichen two-hour branch)",
+        "secret_animal": "the hour branch is the SECRET animal — private self, hidden nature, children/later life",
+        "represents": "inner aspirations, children, the private self"
+      }
+    },
+    "inner_secret_true": {
+      "_note": "Common popular framing layered on the four pillars.",
+      "true_animal": "year branch animal (the well-known zodiac sign)",
+      "inner_animal": "month branch animal",
+      "secret_animal": "hour branch animal",
+      "day_master": "day STEM (element + polarity) — the chart's core self"
+    }
+  },
+  "shichen": {
+    "_schema": "The 12 shichen (時辰) two-hour periods of the traditional day, each ruled by one branch. Maps a birth hour to its hour-pillar branch (and thus secret animal). Zi spans midnight (23:00-01:00).",
+    "子": {
+      "branch": "子",
+      "animal": "Rat",
+      "hours": "23:00-01:00"
+    },
+    "丑": {
+      "branch": "丑",
+      "animal": "Ox",
+      "hours": "01:00-03:00"
+    },
+    "寅": {
+      "branch": "寅",
+      "animal": "Tiger",
+      "hours": "03:00-05:00"
+    },
+    "卯": {
+      "branch": "卯",
+      "animal": "Rabbit",
+      "hours": "05:00-07:00"
+    },
+    "辰": {
+      "branch": "辰",
+      "animal": "Dragon",
+      "hours": "07:00-09:00"
+    },
+    "巳": {
+      "branch": "巳",
+      "animal": "Snake",
+      "hours": "09:00-11:00"
+    },
+    "午": {
+      "branch": "午",
+      "animal": "Horse",
+      "hours": "11:00-13:00"
+    },
+    "未": {
+      "branch": "未",
+      "animal": "Goat",
+      "hours": "13:00-15:00"
+    },
+    "申": {
+      "branch": "申",
+      "animal": "Monkey",
+      "hours": "15:00-17:00"
+    },
+    "酉": {
+      "branch": "酉",
+      "animal": "Rooster",
+      "hours": "17:00-19:00"
+    },
+    "戌": {
+      "branch": "戌",
+      "animal": "Dog",
+      "hours": "19:00-21:00"
+    },
+    "亥": {
+      "branch": "亥",
+      "animal": "Pig",
+      "hours": "21:00-23:00"
+    }
+  }
+}

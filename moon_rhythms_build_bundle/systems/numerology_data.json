@@ -1,0 +1,1129 @@
+{
+  "metadata": {
+    "name": "Moon Rhythms Deterministic Numerology Reference",
+    "version": "v1",
+    "generated": "2026-06-23",
+    "system": "Pythagorean (default)",
+    "description": "Single source of truth for all deterministic numerology data used by Moon Rhythms. This file is for STRUCTURED LOOKUP and exact computation reproducibility. It encodes the letter values, reduction rules, and formulas the app's numerology engine (lib/numerology.js) already ships, then EXTENDS them with researched, cross-checked numerology structures (Chaldean alternate, karmic debt/lessons, hidden passion, bridges, personal month/day, essence/transit, full birthday and pinnacle/challenge meaning tables). Interpretive long-form prose belongs in a separate RAG corpus, NOT here. Descriptor strings are concise, modern, grounded, and warm: no mystical/woo language, no fate-talk, no emojis, no em dashes.",
+    "design_decisions": {
+      "system_default": "Pythagorean. Letter values A=1..I=9, J=1..R=9, S=1..Z=8. This matches the app's lib/numerology.js LETTER_VALUES map exactly and is what every core number is computed from.",
+      "chaldean_included_as_alternate": "The classical Chaldean (Cheiro) table is included under systems.chaldean as a reference-only alternate. It is NOT what the app computes with. Chaldean values run 1-8; 9 is never assigned to a letter (treated as sacred). If the app ever offers a Chaldean toggle, this table is the source.",
+      "y_rule": "The phonetically correct rule (Y is a vowel when it carries the only vowel sound of a syllable, a consonant otherwise) requires syllable analysis and is documented for reference. The app's CURRENT engine uses a SIMPLER deterministic convention: vowels = {a,e,i,o,u} only, and Y is ALWAYS treated as a consonant (it is not in the VOWELS set in lib/numerology.js). This file records both: vowel_consonant_rules.app_engine_convention is the reproducible one; vowel_consonant_rules.standard_phonetic_rule and the y_as_vowel guidance document the more accurate convention for any future upgrade. W is always a consonant in both the app and the standard modern-software default.",
+      "master_numbers": "Master numbers are [11, 22, 33]. They are preserved (not reduced) when an intermediate or final sum lands on 11, 22, or 33, for the core numbers and name-derived cycles. The app's reduceToSingle() implements exactly this (stops reducing when n is in [11,22,33]). 44 is NOT treated as a master number by the canonical Western (Decoz) school; it is a 'Power number'. We expose include_44 as a documented optional flag set false.",
+      "challenges_reduce_masters": "Challenge numbers are the one place master status is NOT preserved: they always reduce to a single digit 0-8 (0 is valid and common). The app's challenges() uses reduceStrict() for this, matching Decoz.",
+      "karmic_debt_detection": "A karmic debt (13, 14, 16, 19) is detected on the PRE-REDUCTION total of a core number, before it collapses to a single digit. The app does not currently surface karmic debt; this file documents the standard detection rule and themes so the assembler/AI can compute and reference it. Reductions: 13->4, 14->5, 16->7, 19->1.",
+      "pinnacle_timing_convention": "First Pinnacle runs from birth to age (36 - reduced Life Path); each of the second and third Pinnacles lasts 9 years; the fourth runs to end of life. This is the canonical Decoz convention and matches the app's pinnacles() (firstEnd = 36 - lifePath, then +9 windows). Alternative softened ranges ('27-35', '30-35') from other sources are noted in pinnacles.timing.alternative_conventions.",
+      "life_cycles_timing_deviation": "IMPORTANT: the app's lifeCycles() reuses the pinnacle 'firstEnd = 36 - lifePath' boundary for the three Period Cycles (Formative birth..36-LP, Productive next 27 years, Harvest to end). The canonical Decoz Period-Cycle rule is DIFFERENT: cycle 1 ends at the first Personal Year 1 on or after age 27, cycle 2 lasts exactly 27 years, cycle 3 to death. We encode the app's actual behavior under life_cycles.app_engine_timing (reproducible) AND the Decoz canonical rule under life_cycles.canonical_decoz_timing (documented). Pinnacles and Period Cycles do NOT share a transition age in the canonical system; the app conflates them. Flagged here, app code not changed.",
+      "personal_year_master_handling": "The app reduces the Personal Year fully to a single digit (reduceToSingle on the final sum, with month/day/year components reduced via reduceStrict first). Some schools keep 11/22 if the Personal Year total is a master number. We follow the app (single digit 1-9 for Personal Year output) and note the alternative.",
+      "extended_vs_app": "Extracted-from-app (exact, reproducible): Pythagorean letter values, vowel set, reduction rules, Life Path / Expression / Soul Urge / Personality / Birthday / Maturity / Personal Year formulas, 4 Pinnacles (+ 36-LP timing), 4 Challenges, 3 Life Cycles, and the meaning tables the app shipped for Life Path 1-33, Expression, Soul Urge, Personality, Personal Year. Added-from-research (cross-checked >=2 reputable sources, see numerology_RESEARCH.md): Chaldean table, vowel/consonant + Y rule documentation, karmic debt, karmic lessons, hidden passion/intensity, bridge numbers, personal month/day, essence/transit method, full Birthday 1-31 meanings, Pinnacle/Challenge meaning tables, Maturity meanings, core single-digit + master meanings, and an interpretive Life Path compatibility matrix (flagged non-deterministic).",
+      "voice": "All descriptor strings are short, grounded, and warm. No 'cosmic', 'destined', 'written in the stars', no emojis, no em dashes. Where a classical source used loaded or fatalistic language it was neutralized. Karmic / past-life framing from classical sources is reframed as present-tense growth themes (e.g. 'a lesson to develop X' rather than 'debt from a past life')."
+    },
+    "sources_summary": "See numerology_RESEARCH.md for full source list with URLs and access dates (all 2026-06-23). Primary references: worldnumerology.com (Hans Decoz), numerology.com, tokenrock.com, affinitynumerology.com, numerology.center, feliciabender.com, plus Chaldean table cross-checks."
+  },
+  "systems": {
+    "_schema": "The two letter-to-number alphabets. Pythagorean is the app default and the basis of every computed number. Chaldean is reference-only.",
+    "pythagorean": {
+      "id": "pythagorean",
+      "name": "Pythagorean",
+      "is_app_default": true,
+      "value_range": "1-9",
+      "note": "Sequential 1-9 cycle through the alphabet. This map is identical to lib/numerology.js LETTER_VALUES.",
+      "letter_values": {
+        "a": 1,
+        "b": 2,
+        "c": 3,
+        "d": 4,
+        "e": 5,
+        "f": 6,
+        "g": 7,
+        "h": 8,
+        "i": 9,
+        "j": 1,
+        "k": 2,
+        "l": 3,
+        "m": 4,
+        "n": 5,
+        "o": 6,
+        "p": 7,
+        "q": 8,
+        "r": 9,
+        "s": 1,
+        "t": 2,
+        "u": 3,
+        "v": 4,
+        "w": 5,
+        "x": 6,
+        "y": 7,
+        "z": 8
+      },
+      "value_to_letters": {
+        "1": [
+          "a",
+          "j",
+          "s"
+        ],
+        "2": [
+          "b",
+          "k",
+          "t"
+        ],
+        "3": [
+          "c",
+          "l",
+          "u"
+        ],
+        "4": [
+          "d",
+          "m",
+          "v"
+        ],
+        "5": [
+          "e",
+          "n",
+          "w"
+        ],
+        "6": [
+          "f",
+          "o",
+          "x"
+        ],
+        "7": [
+          "g",
+          "p",
+          "y"
+        ],
+        "8": [
+          "h",
+          "q",
+          "z"
+        ],
+        "9": [
+          "i",
+          "r"
+        ]
+      }
+    },
+    "chaldean": {
+      "id": "chaldean",
+      "name": "Chaldean (Cheiro standard)",
+      "is_app_default": false,
+      "reference_only": true,
+      "value_range": "1-8",
+      "note": "Classical Chaldean (per Cheiro / Book of Numbers). The number 9 is NEVER assigned to a letter (held as sacred), though a name total can still sum to 9. The most-disputed letters between Chaldean lineages are X (5 vs 6) and Z (7 vs 8); the standard/Cheiro values used here are X=5, Z=7. This table is for an optional alternate system; the app does not compute with it.",
+      "letter_values": {
+        "a": 1,
+        "i": 1,
+        "j": 1,
+        "q": 1,
+        "y": 1,
+        "b": 2,
+        "k": 2,
+        "r": 2,
+        "c": 3,
+        "g": 3,
+        "l": 3,
+        "s": 3,
+        "d": 4,
+        "m": 4,
+        "t": 4,
+        "e": 5,
+        "h": 5,
+        "n": 5,
+        "x": 5,
+        "u": 6,
+        "v": 6,
+        "w": 6,
+        "o": 7,
+        "z": 7,
+        "f": 8,
+        "p": 8
+      },
+      "value_to_letters": {
+        "1": [
+          "a",
+          "i",
+          "j",
+          "q",
+          "y"
+        ],
+        "2": [
+          "b",
+          "k",
+          "r"
+        ],
+        "3": [
+          "c",
+          "g",
+          "l",
+          "s"
+        ],
+        "4": [
+          "d",
+          "m",
+          "t"
+        ],
+        "5": [
+          "e",
+          "h",
+          "n",
+          "x"
+        ],
+        "6": [
+          "u",
+          "v",
+          "w"
+        ],
+        "7": [
+          "o",
+          "z"
+        ],
+        "8": [
+          "f",
+          "p"
+        ]
+      },
+      "nine_rule": "No letter maps to 9 in classical Chaldean. 9 is considered sacred and excluded from letter assignment.",
+      "known_variants": "Some 'improved' Chaldean systems (e.g. astronumero) deliberately assign 9 and shift S/H/T/E values; these are non-classical and not used here."
+    }
+  },
+  "vowel_consonant_rules": {
+    "_schema": "Rules for splitting a name into vowels (drives Soul Urge / Heart's Desire) and consonants (drives Personality). As of 2026-06-23 the app implements the syllable-scope phonetic Y rule.",
+    "implemented_rule": {
+      "name": "Phonetic Y, syllable scope",
+      "base_vowels": [
+        "a",
+        "e",
+        "i",
+        "o",
+        "u"
+      ],
+      "y_is_vowel": "conditional",
+      "w_is_vowel": false,
+      "summary": "Y counts as a VOWEL except when it acts as a consonant: (1) immediately preceded by a base vowel (Maya, Murray, Raymond), or (2) word-initial and immediately followed by a base vowel (Yolanda, the soft-J glide). Otherwise Y is a vowel (Lynn, Yvonne, Carolyn, Bryant, Kathryn). W is always a consonant.",
+      "scope": "syllable",
+      "scope_note": "The rule is scoped to the SYLLABLE, not the whole word. This is the universally cited convention: Y is a vowel when it carries the only vowel sound in its own syllable, even if the word has other vowels elsewhere (Carolyn, Kathryn, Brittany, Sydney). Word-scope is a common misimplementation and is NOT used.",
+      "deterministic_algorithm": "For each Y at position i in a name-word: consonant if name[i-1] is a base vowel; consonant if i==0 and name[i+1] is a base vowel; otherwise vowel. This inspects only the Y's immediate neighbors, which is exactly what makes it syllable-scoped without full syllabification."
+    },
+    "citation": {
+      "rule": "Phonetic Y rule, scoped to the syllable",
+      "sources": [
+        "Hans Decoz, World Numerology - 'Y is a vowel when it is the only vowel sound in the syllable.'",
+        "Matthew Oliver Goodwin, 'Numerology: The Complete Guide' (1981) - 'Y is a vowel when there is no other vowel in a syllable.'"
+      ],
+      "consensus": "High for syllable-scope (the two leading authorities agree). The broader question of whether to count Y at all is school-dependent (Juno Jordan never counts Y); Decoz/Goodwin phonetic Y is the modern majority. W-as-vowel is a fringe minority (Goodwin only); the app keeps W as a consonant.",
+      "research_doc": "numerology_Y_RULE_RESEARCH.md"
+    },
+    "history": {
+      "before_2026_06_23": "The app previously treated Y and W as always consonants (the Juno Jordan minority convention), so vowel-Y names (Lynn, Carolyn, Yvonne, Bryant) produced different Soul Urge / Personality numbers than Decoz and most popular calculators.",
+      "changed_2026_06_23": "Switched lib/numerology.js to the syllable-scope phonetic Y rule above to match the cited authorities."
+    }
+  },
+  "reduction_rules": {
+    "_schema": "How multi-digit numbers collapse to a final value. Two modes, matching the app's two functions.",
+    "reduce_to_single_preserving_masters": {
+      "id": "reduceToSingle",
+      "rule": "Repeatedly sum the digits until the result is a single digit (1-9) OR a master number (11, 22, 33). Stop as soon as the running value is 11, 22, or 33.",
+      "matches_app_function": "reduceToSingle(n)",
+      "used_for": [
+        "life_path",
+        "expression",
+        "soul_urge",
+        "personality",
+        "maturity",
+        "personal_year_final",
+        "pinnacles",
+        "life_cycle_components"
+      ]
+    },
+    "reduce_strict_to_single": {
+      "id": "reduceStrict",
+      "rule": "Repeatedly sum the digits until the result is a single digit (1-9). Master numbers are NOT preserved here.",
+      "matches_app_function": "reduceStrict(n)",
+      "used_for": [
+        "pinnacle_and_challenge_month_day_year_components",
+        "challenge_results",
+        "personal_year_components"
+      ]
+    },
+    "master_numbers": [
+      11,
+      22,
+      33
+    ],
+    "include_44_optional_flag": false,
+    "note_44": "44 is a 'Power number' in the canonical Western school, not a master number. Left out of master handling by default. Set include_44 true only to support schools that treat 44 as a master."
+  },
+  "core_numbers": {
+    "_schema": "The primary numbers computed from name and/or birthdate. Each entry documents the exact formula the app uses (reproducible) plus which reduction mode applies. Meaning tables live in meaning_tables below, keyed by context.",
+    "life_path": {
+      "id": "life_path",
+      "name": "Life Path",
+      "inputs": [
+        "birthdate"
+      ],
+      "formula": "Reduce the birth month, birth day, and the digit-sum of the birth year each to a single digit (preserving masters), sum those three, then reduce the total (preserving masters).",
+      "app_implementation": "m = reduceToSingle(month); d = reduceToSingle(day); y = reduceToSingle(digitSum(year)); result = reduceToSingle(m + d + y).",
+      "reduction_mode": "reduceToSingle",
+      "can_carry_karmic_debt": true,
+      "meaning_context": "life_path"
+    },
+    "expression": {
+      "id": "expression",
+      "name": "Expression",
+      "alternate_names": [
+        "Destiny"
+      ],
+      "inputs": [
+        "full_birth_name"
+      ],
+      "formula": "For each name part, sum the Pythagorean values of all its letters and reduce that part (preserving masters); sum the reduced parts and reduce the total (preserving masters).",
+      "app_implementation": "For each whitespace-split name: nameSum = sum(letterValue(ch)); add reduceToSingle(nameSum). Then result = reduceToSingle(totalOfReducedParts).",
+      "reduction_mode": "reduceToSingle",
+      "can_carry_karmic_debt": true,
+      "meaning_context": "expression"
+    },
+    "soul_urge": {
+      "id": "soul_urge",
+      "name": "Soul Urge",
+      "alternate_names": [
+        "Heart's Desire"
+      ],
+      "inputs": [
+        "full_birth_name"
+      ],
+      "formula": "Same as Expression but using VOWELS only (per the app's vowel set a,e,i,o,u; Y excluded).",
+      "app_implementation": "For each name: vowelSum = sum of letterValue(ch) where ch is in {a,e,i,o,u}; add reduceToSingle(vowelSum). result = reduceToSingle(total).",
+      "reduction_mode": "reduceToSingle",
+      "can_carry_karmic_debt": true,
+      "meaning_context": "soul_urge"
+    },
+    "personality": {
+      "id": "personality",
+      "name": "Personality",
+      "inputs": [
+        "full_birth_name"
+      ],
+      "formula": "Same as Expression but using CONSONANTS only (every letter with a Pythagorean value that is NOT in the app vowel set; Y and W count as consonants).",
+      "app_implementation": "For each name: conSum = sum of letterValue(ch) where ch is NOT in {a,e,i,o,u} and has a value; add reduceToSingle(conSum). result = reduceToSingle(total).",
+      "reduction_mode": "reduceToSingle",
+      "can_carry_karmic_debt": true,
+      "meaning_context": "personality"
+    },
+    "birthday": {
+      "id": "birthday",
+      "name": "Birthday Number",
+      "alternate_names": [
+        "Day of Birth"
+      ],
+      "inputs": [
+        "birthdate"
+      ],
+      "formula": "The day of the month of birth, as-is, NOT reduced. Range 1-31.",
+      "app_implementation": "Number(birthdate.split('-')[2]).",
+      "reduction_mode": "none",
+      "can_carry_karmic_debt": true,
+      "meaning_context": "birthday",
+      "note": "The app keeps the raw 1-31 day and looks up a per-day meaning (see meaning_tables.birthday). Some practitioners also reduce it to a single digit; the app does not."
+    },
+    "maturity": {
+      "id": "maturity",
+      "name": "Maturity Number",
+      "alternate_names": [
+        "Realization",
+        "Power Number"
+      ],
+      "inputs": [
+        "life_path",
+        "expression"
+      ],
+      "formula": "Reduce (Life Path + Expression), preserving masters.",
+      "app_implementation": "reduceToSingle(lifePath + expression).",
+      "reduction_mode": "reduceToSingle",
+      "meaning_context": "maturity",
+      "note": "Represents the dominant theme that emerges in later life, roughly age 35 onward."
+    }
+  },
+  "personal_cycles": {
+    "_schema": "Time-based cycles. Personal Year is what the app ships; Personal Month and Personal Day are the standard extensions and are added here.",
+    "personal_year": {
+      "id": "personal_year",
+      "name": "Personal Year",
+      "inputs": [
+        "birth_month",
+        "birth_day",
+        "current_calendar_year"
+      ],
+      "formula": "Reduce (reduced birth month + reduced birth day + reduced current year) to a single digit.",
+      "app_implementation": "sum = reduceStrict(month) + reduceStrict(day) + reduceStrict(digitSum(currentYear)); result = reduceToSingle(sum). The app reduces the final result with master preservation but in practice Personal Year is presented 1-9.",
+      "reduction_mode": "reduceToSingle (app), components via reduceStrict",
+      "output_range": "1-9",
+      "meaning_context": "personal_year",
+      "master_handling_note": "Some schools keep 11/22 if the Personal Year total is a master number. The app reduces to 1-9. Documented; app behavior preserved."
+    },
+    "personal_month": {
+      "id": "personal_month",
+      "name": "Personal Month",
+      "added_by_research": true,
+      "inputs": [
+        "personal_year",
+        "current_calendar_month"
+      ],
+      "formula": "Reduce (Personal Year + current calendar month number) to a single digit.",
+      "example": "Personal Year 1 + June (6) = 7.",
+      "output_range": "1-9",
+      "meaning_context": "personal_year",
+      "note": "Not computed by the app yet. Theme reuses the Personal Year meaning table (same 1-9 archetypes at a monthly scale)."
+    },
+    "personal_day": {
+      "id": "personal_day",
+      "name": "Personal Day",
+      "added_by_research": true,
+      "inputs": [
+        "personal_month",
+        "current_calendar_day"
+      ],
+      "formula": "Reduce (Personal Month + current calendar day number) to a single digit.",
+      "example": "Personal Month 7 + day 23 = 30 -> 3.",
+      "output_range": "1-9",
+      "meaning_context": "personal_year",
+      "note": "Not computed by the app yet. Theme reuses the Personal Year meaning table at a daily scale."
+    }
+  },
+  "pinnacles": {
+    "_schema": "Four Pinnacle cycles, life phases each carrying a number. Formulas and timing match the app exactly. Meanings in meaning_tables.pinnacle.",
+    "formulas": {
+      "first": "reduceToSingle(reducedMonth + reducedDay)",
+      "second": "reduceToSingle(reducedDay + reducedYear)",
+      "third": "reduceToSingle(first + second)",
+      "fourth": "reduceToSingle(reducedMonth + reducedYear)"
+    },
+    "component_reduction": "month, day, and year(digit-sum) reduced via reduceStrict before combining (matches app pinnacles()).",
+    "master_numbers_preserved": true,
+    "timing": {
+      "convention": "36_minus_life_path",
+      "first": "Birth to age (36 - reducedLifePath).",
+      "second": "9 years (ends at 45 - lifePath).",
+      "third": "9 years (ends at 54 - lifePath).",
+      "fourth": "From (54 - lifePath) to end of life.",
+      "app_implementation": "firstEnd = 36 - lifePath; windows: Birth..firstEnd, firstEnd+1..firstEnd+9, firstEnd+10..firstEnd+18, firstEnd+19+. Matches Decoz; firstEnd ranges 27 (LP9) to 35 (LP1).",
+      "alternative_conventions": "affinitynumerology states the first pinnacle 'lasts 27 to 35 years' as a range; tokenrock says 'between ages 30 and 35'. These are prose roundings of the same 36-LP output, not different math. No mainstream source applies a separate hard cap."
+    },
+    "meaning_context": "pinnacle"
+  },
+  "challenges": {
+    "_schema": "Four Challenge numbers, growth tensions. Formulas match the app. Challenges always reduce to a single digit 0-8; master numbers are NOT preserved. 0 is valid and common.",
+    "formulas": {
+      "first": "abs(reducedMonth - reducedDay)",
+      "second": "abs(reducedDay - reducedYear)",
+      "third_main": "abs(first - second)",
+      "fourth": "abs(reducedMonth - reducedYear)"
+    },
+    "labels": {
+      "first": "First Challenge",
+      "second": "Second Challenge",
+      "third": "Third (Main) Challenge",
+      "fourth": "Fourth Challenge"
+    },
+    "component_reduction": "month, day, year(digit-sum) reduced via reduceStrict; results reduced via reduceStrict (matches app challenges()).",
+    "master_numbers_preserved": false,
+    "output_range": "0-8",
+    "timing_note": "Challenges are fluid and overlapping in the canonical system: First felt birth to ~30-35, Second ~35 to ~55/60, Third (Main) active birth to death, Fourth most felt in later life. The app does not assign ages to challenges; it labels them only.",
+    "meaning_context": "challenge"
+  },
+  "life_cycles": {
+    "_schema": "Three Period (Life) Cycles. Formulas match the app. TIMING is where the app deviates from the canonical Decoz rule; both are recorded.",
+    "formulas": {
+      "first_formative": "reduceToSingle(birthMonth)",
+      "second_productive": "reduceToSingle(birthDay)",
+      "third_harvest": "reduceToSingle(digitSum(birthYear))"
+    },
+    "labels": {
+      "first": "Formative",
+      "second": "Productive",
+      "third": "Harvest"
+    },
+    "master_numbers_preserved": true,
+    "app_engine_timing": {
+      "first": "Birth to age (36 - lifePath).",
+      "second": "Next 27 years (firstEnd+1 to firstEnd+27).",
+      "third": "From (firstEnd+28) to end of life.",
+      "note": "Reproducible: this is what lib/numerology.js lifeCycles() does. It reuses the pinnacle boundary 36-lifePath."
+    },
+    "canonical_decoz_timing": {
+      "first": "Birth to the first Personal Year 1 cycle on or after age 27.",
+      "second": "Exactly 27 years.",
+      "third": "To end of life.",
+      "note": "Documented for reference. Decoz does NOT tie Period-Cycle 1 to 36-lifePath; he ties it to the 9-year Personal-Year wheel. The app's reuse of 36-lifePath is a simplification/conflation. App code intentionally left unchanged."
+    },
+    "themes": {
+      "first": "Formative years: shaped by family and environment, finding your nature.",
+      "second": "Productive years: individual talents emerge, working toward self-mastery.",
+      "third": "Harvest years: fullest self-expression and the fruition of who you became."
+    },
+    "meaning_context": "life_path",
+    "meaning_note": "Period Cycle number meanings reuse the general single-digit / Life Path archetypes (1-9, 11, 22) at the scale of a life phase."
+  },
+  "karmic_debt": {
+    "_schema": "Karmic Debt numbers. Added by research; not computed by the app yet. A debt is present when a core number's PRE-REDUCTION total equals 13, 14, 16, or 19 before it collapses to a single digit. Framing reworded from classical past-life language into present-tense growth themes.",
+    "detection_rule": "Inspect the two-digit total of a core number (Life Path, Expression, Soul Urge, Personality, Birthday, and cycle positions) before final reduction. If that total is 13, 14, 16, or 19, the corresponding karmic debt is active. The final single digit alone does not reveal it.",
+    "carried_by": [
+      "life_path",
+      "expression",
+      "soul_urge",
+      "personality",
+      "birthday",
+      "pinnacles",
+      "essence",
+      "personal_year"
+    ],
+    "numbers": {
+      "13": {
+        "reduces_to": 4,
+        "theme": "Work and focus",
+        "descriptor": "Lasting results come from steady, organized effort. The growth here is choosing discipline over shortcuts and finishing what you start."
+      },
+      "14": {
+        "reduces_to": 5,
+        "theme": "Freedom and moderation",
+        "descriptor": "Freedom is the gift and the trap. The growth here is staying adaptable without tipping into excess, impulsiveness, or escape."
+      },
+      "16": {
+        "reduces_to": 7,
+        "theme": "Ego and renewal",
+        "descriptor": "Old versions of the self get stripped away so a truer one can form. The growth here is humility, honesty in love, and rebuilding on solid ground."
+      },
+      "19": {
+        "reduces_to": 1,
+        "theme": "Independence and interdependence",
+        "descriptor": "Strength is real, but going it alone has limits. The growth here is using power with integrity and learning to receive help, not just give it."
+      }
+    }
+  },
+  "karmic_lessons": {
+    "_schema": "Numbers 1-9 that do NOT appear at all among the Pythagorean letter values of the full birth name. Each missing number is an undeveloped quality to grow into. Added by research; not computed by the app yet.",
+    "computation": "Convert every letter of the full birth name to its Pythagorean value. Any of 1-9 that never appears is a Karmic Lesson. Most people have one to three.",
+    "distinct_from_karmic_debt": "A lesson is an unfamiliar/undeveloped quality (a number missing from the name). A debt is a misused quality (a 13/14/16/19 pre-reduction total). Different mechanisms.",
+    "meanings": {
+      "1": "Build initiative, self-confidence, and the willingness to decide and lead.",
+      "2": "Develop tact, patience, and sensitivity to others; learn real cooperation.",
+      "3": "Ease up on self-criticism and let yourself express and create out loud.",
+      "4": "Build a methodical, disciplined approach and a steady work ethic.",
+      "5": "Welcome change and new experience; loosen rigidity and broaden your range.",
+      "6": "Lean into commitment and responsibility for the people you care about.",
+      "7": "Go deeper: develop self-knowledge, focus, and genuine understanding.",
+      "8": "Get comfortable managing money, resources, and the material side of life.",
+      "9": "Widen your view: develop compassion, generosity, and service to others."
+    }
+  },
+  "hidden_passion": {
+    "_schema": "Also called the Intensity number. The Pythagorean value (1-9) that appears MOST often among the letters of the name, representing a concentrated, repeated strength. Added by research; not computed by the app yet.",
+    "computation": "Tally how many times each value 1-9 appears in the name's letters. The value with the highest count is the Hidden Passion. A value appearing two or more times is an Intensity number; the highest is the Hidden Passion.",
+    "tie_break": "If two or more values tie for highest count, check these chart numbers in order until one matches: Expression, then Heart's Desire, then Personality, then Life Path, then Birthday. First match wins.",
+    "meanings": {
+      "1": "A drive to lead, compete, and get things done.",
+      "2": "A drive to understand people and relationships.",
+      "3": "A drive to create, express, and connect socially.",
+      "4": "A drive for solid, efficient, well-made work.",
+      "5": "A drive for freedom and new experiences.",
+      "6": "A drive to care for and support others.",
+      "7": "A drive to learn and understand life deeply.",
+      "8": "A drive for achievement, status, and results.",
+      "9": "A drive to help others and serve a larger good."
+    }
+  },
+  "bridge_numbers": {
+    "_schema": "Bridge numbers measure the gap between two related core numbers and suggest how to close it. Added by research; not computed by the app yet. Value = absolute difference (master numbers reduced to single digits first). Range 0-8.",
+    "types": {
+      "life_path_expression": {
+        "name": "Life Path to Expression Bridge",
+        "computation": "abs(reduced Life Path - reduced Expression)."
+      },
+      "soul_urge_personality": {
+        "name": "Soul Urge to Personality Bridge",
+        "computation": "abs(reduced Soul Urge - reduced Personality)."
+      }
+    },
+    "meanings": {
+      "0": "The two energies already line up. Decisions come easily and progress feels smooth.",
+      "1": "Trust your own judgment more and lean less on others' approval.",
+      "2": "You are warmer than people realize; show it through tact and openness.",
+      "3": "Lighten up, socialize, and let your creativity out so things feel less heavy.",
+      "4": "Stay open to new ideas and follow tasks all the way through.",
+      "5": "Experiment and listen to your instincts; loosen rigid, predictable habits.",
+      "6": "Express your ideas and make real time for the people you love.",
+      "7": "Give yourself quiet and reflection to process and pursue what interests you.",
+      "8": "Aim at a clear goal; the effort pays off in real, practical achievement."
+    }
+  },
+  "essence_transit": {
+    "_schema": "Name-based annual cycles. Added by research as a documented method; not computed by the app, and moderately sourced (see RESEARCH for uncertainty flags). Useful if the assembler ever supports year-by-year forecasting.",
+    "transit_letters": {
+      "tracks": {
+        "physical": "first name",
+        "mental": "middle name",
+        "spiritual": "last name"
+      },
+      "rule": "Within each track, each letter is active for a number of years equal to its Pythagorean value, then the next letter takes over. When a name's letters are exhausted, the track repeats from its first letter.",
+      "example": "In 'Mike', M (value 4) is active 4 years, then the next letter for its value, and so on; the full name's letter values sum to its cycle length before repeating."
+    },
+    "essence": {
+      "rule": "For a given year (birthday to birthday), the Essence equals the sum of the three currently active transit letters (physical + mental + spiritual), then reduced to a single digit (or kept as a master / karmic-debt two-digit total before reducing).",
+      "duration": "An Essence persists until one of the three active transit letters changes, so it can repeat across multiple years.",
+      "karmic_debt": "A pre-reduction Essence sum of 13, 14, 16, or 19 carries the matching karmic debt for that year."
+    },
+    "confidence_note": "Letter-duration-equals-its-value and the three-track summation are well sourced. Edge cases (names of unequal length, master retention in Essence) are moderately confident and not firsthand-verified end to end."
+  },
+  "meaning_tables": {
+    "_schema": "Lookup tables of short descriptors keyed by context then by number. Where the app already shipped a meaning it is preserved or lightly refined; gaps are filled from research. Master numbers 11/22/33 included for every core context. All strings are concise, grounded, warm; no woo, no emojis, no em dashes.",
+    "core": {
+      "_note": "General essence of each number, context-independent. Use as a fallback or for Maturity/Period-Cycle/Personal-Month reuse.",
+      "1": {
+        "title": "The Leader",
+        "keywords": [
+          "independent",
+          "ambitious",
+          "pioneering",
+          "decisive"
+        ],
+        "essence": "Self-starting and bold, comfortable going first."
+      },
+      "2": {
+        "title": "The Peacemaker",
+        "keywords": [
+          "diplomatic",
+          "sensitive",
+          "cooperative",
+          "patient"
+        ],
+        "essence": "Attuned to others, gifted at harmony and partnership."
+      },
+      "3": {
+        "title": "The Communicator",
+        "keywords": [
+          "expressive",
+          "creative",
+          "optimistic",
+          "social"
+        ],
+        "essence": "Artistic and upbeat, a natural at connecting and inspiring."
+      },
+      "4": {
+        "title": "The Builder",
+        "keywords": [
+          "stable",
+          "practical",
+          "disciplined",
+          "reliable"
+        ],
+        "essence": "Grounded and hardworking, builds things that last."
+      },
+      "5": {
+        "title": "The Freedom Seeker",
+        "keywords": [
+          "adaptable",
+          "curious",
+          "adventurous",
+          "versatile"
+        ],
+        "essence": "Dynamic and quick, thrives on variety and change."
+      },
+      "6": {
+        "title": "The Nurturer",
+        "keywords": [
+          "caring",
+          "responsible",
+          "protective",
+          "devoted"
+        ],
+        "essence": "Warm and dependable, centered on home and people."
+      },
+      "7": {
+        "title": "The Seeker",
+        "keywords": [
+          "analytical",
+          "introspective",
+          "intuitive",
+          "deep"
+        ],
+        "essence": "Reflective and truth-seeking, drawn to understanding."
+      },
+      "8": {
+        "title": "The Powerhouse",
+        "keywords": [
+          "ambitious",
+          "capable",
+          "authoritative",
+          "resilient"
+        ],
+        "essence": "Goal-driven and effective, built for achievement."
+      },
+      "9": {
+        "title": "The Humanitarian",
+        "keywords": [
+          "compassionate",
+          "idealistic",
+          "generous",
+          "wise"
+        ],
+        "essence": "Big-hearted and big-picture, oriented toward service."
+      },
+      "11": {
+        "title": "The Intuitive (Master)",
+        "keywords": [
+          "visionary",
+          "insightful",
+          "inspiring",
+          "sensitive"
+        ],
+        "essence": "The 2 amplified: heightened intuition and the ability to uplift."
+      },
+      "22": {
+        "title": "The Master Builder",
+        "keywords": [
+          "visionary",
+          "practical",
+          "disciplined",
+          "ambitious"
+        ],
+        "essence": "The 4 amplified: turns large visions into real structures."
+      },
+      "33": {
+        "title": "The Master Teacher",
+        "keywords": [
+          "devoted",
+          "compassionate",
+          "nurturing",
+          "uplifting"
+        ],
+        "essence": "The 6 amplified: teaching and healing through selfless care."
+      }
+    },
+    "life_path": {
+      "_note": "Life purpose framing. Preserved from the app's LIFE_PATH_MEANINGS (title + description) verbatim.",
+      "1": {
+        "title": "The Leader",
+        "description": "Independent, ambitious, and pioneering. You are here to develop individuality and self-confidence. You lead by example and blaze new trails."
+      },
+      "2": {
+        "title": "The Diplomat",
+        "description": "Cooperative, sensitive, and harmonizing. You are here to learn partnership and balance. Your strength lies in mediation and bringing people together."
+      },
+      "3": {
+        "title": "The Communicator",
+        "description": "Creative, expressive, and joyful. You are here to inspire through words, art, and social connection. Your optimism uplifts those around you."
+      },
+      "4": {
+        "title": "The Builder",
+        "description": "Practical, disciplined, and dependable. You are here to create lasting foundations. You find fulfillment through hard work and systematic effort."
+      },
+      "5": {
+        "title": "The Freedom Seeker",
+        "description": "Adventurous, versatile, and dynamic. You are here to experience life fully through change and variety. You thrive on exploration and sensory experience."
+      },
+      "6": {
+        "title": "The Nurturer",
+        "description": "Responsible, loving, and protective. You are here to serve family and community. Your home is your sanctuary and your heart holds deep compassion."
+      },
+      "7": {
+        "title": "The Seeker",
+        "description": "Analytical, introspective, and spiritual. You are here to pursue knowledge and inner truth. Solitude fuels your deep understanding of life's mysteries."
+      },
+      "8": {
+        "title": "The Powerhouse",
+        "description": "Ambitious, authoritative, and materially focused. You are here to master the material world: wealth, status, and achievement. Balance power with integrity."
+      },
+      "9": {
+        "title": "The Humanitarian",
+        "description": "Compassionate, idealistic, and selfless. You are here to serve the greater good and let go of the personal. Your path is one of wisdom through experience."
+      },
+      "11": {
+        "title": "The Intuitive (Master)",
+        "description": "Highly intuitive, inspirational, and spiritually aware. You carry the vibration of 2 amplified, a channel between the conscious and unconscious."
+      },
+      "22": {
+        "title": "The Master Builder",
+        "description": "Visionary, practical idealist, and powerful manifestor. You carry the vibration of 4 amplified, capable of turning the grandest dreams into reality."
+      },
+      "33": {
+        "title": "The Master Teacher",
+        "description": "Selfless, nurturing at the highest level, and spiritually devoted. You carry the vibration of 6 amplified, a healer and teacher of unconditional love."
+      }
+    },
+    "expression": {
+      "_note": "Talents and abilities framing. Preserved from the app's EXPRESSION_MEANINGS.",
+      "1": "Natural leader with original ideas. Your destiny is to pioneer and innovate.",
+      "2": "Born peacemaker. Your destiny is to cooperate, mediate, and harmonize.",
+      "3": "Gifted communicator and artist. Your destiny is to create and inspire joy.",
+      "4": "Systematic builder. Your destiny is to create order, structure, and lasting value.",
+      "5": "Agent of change. Your destiny is to promote freedom, progress, and versatility.",
+      "6": "Devoted caretaker. Your destiny is to nurture, beautify, and take responsibility.",
+      "7": "Deep thinker and analyst. Your destiny is to seek truth and share wisdom.",
+      "8": "Executive achiever. Your destiny is to manage, accumulate, and wield power wisely.",
+      "9": "Universal philanthropist. Your destiny is to give, transform, and release.",
+      "11": "Inspired messenger. Your destiny is to illuminate and uplift through intuition.",
+      "22": "Architect of the impossible. Your destiny is to build systems that serve many.",
+      "33": "Spiritual teacher. Your destiny is to heal through selfless love and devotion."
+    },
+    "soul_urge": {
+      "_note": "Inner motivation framing. Preserved from the app's SOUL_URGE_MEANINGS.",
+      "1": "Deep desire to be independent and lead.",
+      "2": "Inner longing for love, partnership, and peace.",
+      "3": "Heart craves creative self-expression and joy.",
+      "4": "Soul wants stability, security, and order.",
+      "5": "Inner restlessness: you crave freedom and adventure.",
+      "6": "Deep need to nurture, protect, and create harmony.",
+      "7": "Soul seeks solitude, knowledge, and depth.",
+      "8": "Inner drive for achievement, recognition, and influence.",
+      "9": "Heart yearns to serve others and make a difference.",
+      "11": "Longing for insight and inspired connection.",
+      "22": "Deep urge to build something lasting for the world.",
+      "33": "Soul driven by unconditional love and healing service."
+    },
+    "personality": {
+      "_note": "How others perceive you framing. Preserved from the app's PERSONALITY_MEANINGS.",
+      "1": "Others see you as confident, strong-willed, and self-reliant.",
+      "2": "Others see you as gentle, approachable, and diplomatic.",
+      "3": "Others see you as charming, witty, and socially magnetic.",
+      "4": "Others see you as reliable, grounded, and hardworking.",
+      "5": "Others see you as dynamic, exciting, and unpredictable.",
+      "6": "Others see you as warm, responsible, and trustworthy.",
+      "7": "Others see you as reserved, intellectual, and thoughtful.",
+      "8": "Others see you as powerful, successful, and authoritative.",
+      "9": "Others see you as compassionate, worldly, and generous.",
+      "11": "Others see you as insightful, inspiring, and magnetic.",
+      "22": "Others see you as grounded and capable of extraordinary things.",
+      "33": "Others see you as wise, nurturing, and quietly devoted."
+    },
+    "maturity": {
+      "_note": "Later-life framing, roughly age 35 onward. Added from research (Maturity context).",
+      "1": "Later life rewards independence and stepping into leadership.",
+      "2": "Later life brings deeper partnership, peace, and cooperation.",
+      "3": "Later life opens up creativity and freer self-expression.",
+      "4": "Later life solidifies the stability and achievements you built.",
+      "5": "Later life brings welcome freedom and a taste for change.",
+      "6": "Later life centers on family, service, and responsibility.",
+      "7": "Later life deepens into wisdom, study, and reflection.",
+      "8": "Later life brings recognition and material reward.",
+      "9": "Later life turns toward giving back and a broader purpose.",
+      "11": "Later life heightens intuition and quiet influence.",
+      "22": "Later life is when your biggest visions actually get built.",
+      "33": "Later life deepens your role as a teacher and guide."
+    },
+    "personal_year": {
+      "_note": "Yearly theme framing. Preserved from the app's PERSONAL_YEAR_MEANINGS; also reused for Personal Month and Personal Day.",
+      "1": "New beginnings: plant seeds for the next nine-year cycle.",
+      "2": "Patience and partnerships: let things develop.",
+      "3": "Creativity and social expansion: express yourself.",
+      "4": "Hard work and foundation building: buckle down.",
+      "5": "Change and freedom: expect the unexpected.",
+      "6": "Home, family, and responsibility: nurture what matters.",
+      "7": "Reflection and inner growth: go inward.",
+      "8": "Harvest and achievement: reap what you have sown.",
+      "9": "Completion and release: let go of what no longer serves you.",
+      "11": "Inspiration and heightened intuition (if a master year).",
+      "22": "Large-scale building and tangible impact (if a master year)."
+    },
+    "pinnacle": {
+      "_note": "Life-phase theme for each Pinnacle. Added from research (Decoz/Bender keywords).",
+      "1": "Independence and leadership: new beginnings and bold action.",
+      "2": "Harmony and partnership: patience, diplomacy, relationships.",
+      "3": "Creativity and expression: communication, joy, imagination.",
+      "4": "Hard work and order: building a solid, lasting foundation.",
+      "5": "Freedom and change: variety, travel, staying adaptable.",
+      "6": "Responsibility and family: love, duty, and care.",
+      "7": "Inner development: introspection, study, and expertise.",
+      "8": "Empowerment and success: material mastery and authority.",
+      "9": "Compassion: serving a cause larger than yourself.",
+      "11": "Heightened intuition and inspiration to draw on.",
+      "22": "Master building: large-scale, practical achievement.",
+      "33": "Master teaching and nurturing at a high level."
+    },
+    "challenge": {
+      "_note": "Growth tension for each Challenge number. Range 0-8 (0 is valid). Added from research (Decoz). Reframed as present-tense growth, no fatalism.",
+      "0": "No single recurring obstacle: stay true to your ideals and be of service.",
+      "1": "Build independence and willpower; stand on your own without dominating others.",
+      "2": "Manage sensitivity; ease jealousy and fear, and use tact with detail.",
+      "3": "Find your voice; quiet self-criticism and focus your creative energy.",
+      "4": "Build discipline and organization; finish what you start.",
+      "5": "Channel restlessness; commit and enjoy freedom without overindulgence.",
+      "6": "Soften rigid standards; lead with gratitude and balanced service.",
+      "7": "Reconnect with faith, play, and people; avoid isolating yourself in logic.",
+      "8": "Balance ambition with values; use money and power without losing yourself."
+    },
+    "birthday": {
+      "_note": "Day-of-month talent, 1 through 31. Added from research (numerology.com + Decoz, agree on all 31). The app currently shows only a generic ordinal sentence; this fills the full table.",
+      "1": {
+        "title": "The Leader",
+        "description": "A self-starting innovator with strong drive and independence, comfortable going first."
+      },
+      "2": {
+        "title": "The Peacemaker",
+        "description": "Warm, intuitive, and cooperative, with a gift for finding fair solutions and creating harmony."
+      },
+      "3": {
+        "title": "The Creative",
+        "description": "A natural communicator with real artistic flair and an expressive, charismatic presence."
+      },
+      "4": {
+        "title": "The Rock",
+        "description": "Grounded, disciplined, and dependable, you bring stability and follow-through to everything."
+      },
+      "5": {
+        "title": "The Freedom Lover",
+        "description": "Highly adaptable and quick on your feet, you thrive on variety and seize fleeting opportunities."
+      },
+      "6": {
+        "title": "The Nurturer",
+        "description": "A natural caregiver with a talent for supporting, healing, and protecting the people you love."
+      },
+      "7": {
+        "title": "The Seeker",
+        "description": "A sharp, reflective mind drawn to deeper truths, research, and quiet understanding."
+      },
+      "8": {
+        "title": "The Achiever",
+        "description": "Goal-oriented and capable, with a strong instinct for business, judgment, and results."
+      },
+      "9": {
+        "title": "The Humanitarian",
+        "description": "Compassionate and service-minded, you shine when speaking up for and helping others."
+      },
+      "10": {
+        "title": "The Director",
+        "description": "A sharp leader who can dream up ideas, organize the details, and direct others to execute."
+      },
+      "11": {
+        "title": "The Intuitive",
+        "description": "Keenly perceptive, you read unspoken feelings and make a natural counselor or guide."
+      },
+      "12": {
+        "title": "The Self-Expressive",
+        "description": "Rich imagination and creativity surface in everything you take seriously."
+      },
+      "13": {
+        "title": "The Builder",
+        "description": "A conscientious, practical worker who turns creative ideas into something real and lasting."
+      },
+      "14": {
+        "title": "The Adventurer",
+        "description": "Open-minded and social, you embrace the new but think before you leap."
+      },
+      "15": {
+        "title": "The Caregiver",
+        "description": "Your love for others runs wide and deep, paired with a curious, social streak."
+      },
+      "16": {
+        "title": "The Analyst",
+        "description": "An inquisitive, focused mind that reads beneath the surface and uncovers what matters."
+      },
+      "17": {
+        "title": "The Self-Reliant",
+        "description": "Independent and ambitious, you do remarkable work when you run things your own way."
+      },
+      "18": {
+        "title": "The Worldly Giver",
+        "description": "Broad-minded and open-hearted, you want to leave the world better and feel best being of service."
+      },
+      "19": {
+        "title": "The Individualist",
+        "description": "Fiercely independent and capable, you learn to balance self-reliance with interdependence."
+      },
+      "20": {
+        "title": "The Harmonizer",
+        "description": "Deeply sensitive to others' feelings, you build cooperative, attuned relationships."
+      },
+      "21": {
+        "title": "The Creative Spark",
+        "description": "A highly charged imagination and social charm make you an inspiring, expressive presence."
+      },
+      "22": {
+        "title": "The Master Builder",
+        "description": "Vision plus the inner strength to build institutions and realize big ideas."
+      },
+      "23": {
+        "title": "The Versatile",
+        "description": "Highly adaptable with an easy way with people, you handle change better than most."
+      },
+      "24": {
+        "title": "The Devoted",
+        "description": "Loyal and warm-hearted, you nurture, protect, and provide, skilled at stable relationships."
+      },
+      "25": {
+        "title": "The Investigator",
+        "description": "A deep researcher and analyst who never takes things at face value and grows through reflection."
+      },
+      "26": {
+        "title": "The Achiever-Helper",
+        "description": "Driven to succeed in ways that benefit others, with intuitive insight into what people need."
+      },
+      "27": {
+        "title": "The Tolerant Mind",
+        "description": "Open, compassionate, and well-informed, you apply broad knowledge toward the greater good."
+      },
+      "28": {
+        "title": "The Team Leader",
+        "description": "Ambitious and self-assured, you lead by bringing people together toward shared achievement."
+      },
+      "29": {
+        "title": "The Connector",
+        "description": "An intuitive synthesizer who sees how everything and everyone is connected."
+      },
+      "30": {
+        "title": "The Performer",
+        "description": "An artist at heart with a gift for creative communication and an uplifting effect on others."
+      },
+      "31": {
+        "title": "The Foundation",
+        "description": "A blend of practicality and imagination, you turn creative ideas into organized, real results."
+      }
+    }
+  },
+  "compatibility": {
+    "_schema": "Life Path compatibility. INTERPRETIVE, NOT DETERMINISTIC: a 'challenging' rating does not mean incompatible, and the published matrix is asymmetric (a number's list does not always mirror the other's). Master Life Paths are reduced (11->2, 22->4, 33->6) for this lookup. Use as a soft first-pass heuristic only, then layer in the full chart. Source: numerology.com.",
+    "is_deterministic": false,
+    "master_reduction_for_lookup": {
+      "11": 2,
+      "22": 4,
+      "33": 6
+    },
+    "life_path_matrix": {
+      "1": {
+        "most_compatible": [
+          3,
+          5,
+          6
+        ],
+        "challenging": [
+          1,
+          8,
+          9
+        ]
+      },
+      "2": {
+        "most_compatible": [
+          4,
+          6,
+          8
+        ],
+        "challenging": [
+          3,
+          5
+        ]
+      },
+      "3": {
+        "most_compatible": [
+          1,
+          5,
+          9
+        ],
+        "challenging": [
+          2,
+          3,
+          6,
+          8
+        ]
+      },
+      "4": {
+        "most_compatible": [
+          2,
+          7,
+          8
+        ],
+        "challenging": [
+          3,
+          5,
+          9
+        ]
+      },
+      "5": {
+        "most_compatible": [
+          1,
+          3,
+          7
+        ],
+        "challenging": [
+          2,
+          4,
+          9
+        ]
+      },
+      "6": {
+        "most_compatible": [
+          1,
+          2,
+          8,
+          9
+        ],
+        "challenging": [
+          3,
+          7
+        ]
+      },
+      "7": {
+        "most_compatible": [
+          4,
+          5,
+          7
+        ],
+        "challenging": [
+          6,
+          8,
+          9
+        ]
+      },
+      "8": {
+        "most_compatible": [
+          4,
+          6
+        ],
+        "challenging": [
+          1,
+          3,
+          5,
+          7,
+          9
+        ]
+      },
+      "9": {
+        "most_compatible": [
+          3,
+          6,
+          9
+        ],
+        "challenging": [
+          1,
+          4,
+          5,
+          7,
+          8
+        ]
+      }
+    },
+    "commonly_cited_harmonious_pairs": [
+      [
+        1,
+        5
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        4,
+        8
+      ],
+      [
+        3,
+        9
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        1,
+        3
+      ]
+    ]
+  }
+}
