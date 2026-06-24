@@ -16,6 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.moonrhythms.app",
+      "usesAppleSignIn": true,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Moon Rhythms uses your location to calculate accurate moon positions for your exact coordinates.",
         "ITSAppUsesNonExemptEncryption": false
@@ -37,7 +38,14 @@
       "expo-router",
       "expo-font",
       "expo-sqlite",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-apple-authentication",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.196284379401-dpg4luib2jc5iqb2pc8tre04si1kobcg"
+        }
+      ]
     ],
     "extra": {
       "router": {},

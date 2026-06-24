@@ -14,6 +14,7 @@ import { Screen } from "../../components/ui/Screen";
 import { Input } from "../../components/ui/Input";
 import { GhostPillButton } from "../../components/ui/GhostPillButton";
 import { TextLink } from "../../components/ui/TextLink";
+import { SocialAuthButtons } from "../../components/auth/SocialAuthButtons";
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -136,6 +137,12 @@ export default function SignUpScreen() {
                     disabled={loading}
                   />
                 </View>
+
+                <SocialAuthButtons
+                  mode="sign-up"
+                  disabled={loading}
+                  onError={setPasswordError}
+                />
 
                 <View className="mt-4">
                   <TextLink
