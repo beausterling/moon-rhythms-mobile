@@ -209,7 +209,7 @@ function ShootingStar({
 
 // ---------- NightSky ----------
 
-const STAR_COUNT = 150;
+const STAR_COUNT = 60;
 
 export function NightSky() {
   const stars = useMemo(() => generateStars(STAR_COUNT), []);
