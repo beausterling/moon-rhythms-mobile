@@ -1,62 +1,40 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback } from "react";
 import { View, Text } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
-import { Image } from "expo-image";
-import {
-  MOON_FRAME_BASE_URL,
-  MOON_FRAME_START,
-  MOON_FRAME_END,
-} from "../../lib/constants";
+import { useVideoPlayer, VideoView } from "expo-video";
 import { NightSky } from "../../components/NightSky";
 import { GhostPillButton } from "../../components/ui/GhostPillButton";
 import { TextLink } from "../../components/ui/TextLink";
 
-const FRAME_INTERVAL = 1000 / 24; // 24fps = ~42ms per frame
-const FRAME_COUNT = MOON_FRAME_END - MOON_FRAME_START + 1; // 712 frames
-
-// Precompute every frame URL once (module scope, not per render).
-const FRAME_URIS = Array.from(
-  { length: FRAME_COUNT },
-  (_, i) =>
-    `${MOON_FRAME_BASE_URL}/moon.${String(MOON_FRAME_START + i).padStart(4, "0")}.webp`,
-);
+// Looping moon-phase animation, bundled locally (no network). One synodic month
+// (712 frames @ 24fps, ~30s) encoded as H.264 — hardware-decoded with constant
+// memory, so it runs reliably for as long as the welcome screen stays open.
+const MOON_LOOP = require("../../assets/moon-loop.mp4");
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const frameIndex = useRef(0);
-  const [currentFrame, setCurrentFrame] = useState(0);
 
-  // Prefetch every frame to DISK ONLY. The encoded webps total ~2MB, but each
-  // decoded 730x730 frame is ~2.1MB in memory — holding all 712 (the old
-  // cachePolicy="memory-disk" behavior) ballooned to ~1.5GB and iOS jetsam-killed
-  // the app after ~15s. Disk cache keeps memory flat: only the visible frame is
-  // ever decoded in RAM.
-  useEffect(() => {
-    Image.clearMemoryCache();
-    Image.prefetch(FRAME_URIS, "disk");
-  }, []);
+  const player = useVideoPlayer(MOON_LOOP, (p) => {
+    p.loop = true;
+    p.muted = true;
+    p.play();
+  });
 
-  // Advance frames only while the welcome screen is focused. On blur (navigating
-  // to Sign in/up) or unmount the interval is cleared, so the loop never decodes
-  // frames off-screen.
+  // Pause while the screen isn't focused (behind Sign in/up), resume on return.
   useFocusEffect(
     useCallback(() => {
-      const interval = setInterval(() => {
-        frameIndex.current = (frameIndex.current + 1) % FRAME_COUNT;
-        setCurrentFrame(frameIndex.current);
-      }, FRAME_INTERVAL);
-      return () => clearInterval(interval);
-    }, []),
+      player.play();
+      return () => player.pause();
+    }, [player]),
   );
-
-  const moonImageUri = FRAME_URIS[currentFrame];
 
   return (
     <View className="flex-1 bg-black items-center justify-center">
       <NightSky />
 
       <View className="items-center px-8 w-full">
-        {/* Moon loop — 240px diameter circle */}
+        {/* Moon loop — 240px diameter circle, video slightly oversized + offset
+            to match the previous framed look (cover crop). */}
         <View
           className="overflow-hidden"
           style={{
@@ -66,9 +44,10 @@ export default function WelcomeScreen() {
             backgroundColor: "transparent",
           }}
         >
-          <Image
-            source={{ uri: moonImageUri }}
+          <VideoView
+            player={player}
             style={{
+              position: "absolute",
               width: 280,
               height: 280,
               left: -20,
@@ -76,11 +55,8 @@ export default function WelcomeScreen() {
               backgroundColor: "transparent",
             }}
             contentFit="cover"
-            cachePolicy="disk"
-            recyclingKey="moon-loop"
-            transition={0}
-            priority="high"
-            placeholder={{ uri: FRAME_URIS[0] }}
+            nativeControls={false}
+            allowsPictureInPicture={false}
           />
         </View>
 
